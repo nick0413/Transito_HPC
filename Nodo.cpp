@@ -2,14 +2,14 @@
 
 // Constructor
 Nodo::Nodo(bool interaccionConCamion, float capacidadMaximaBasura,float cantidadDeBasura, int tipo){
-	establecerInterracionConCamion(interaccionConCamion);
+	establecerInteraccionConCamion(interaccionConCamion);
 	establecerCapacidadMaximaBasura(capacidadMaximaBasura);
 	establecerCantidadDeBasura(cantidadDeBasura);
 	establecerTipo(tipo);	
 }
 
 bool Nodo::obtenerInteraccionConCamion(){
-	return interaccionConCamion;
+	return this->interaccionConCamion;
 }
 void Nodo::establecerInteraccionConCamion(bool interaccionConCamion){
 	this->interaccionConCamion=interaccionConCamion;
@@ -17,7 +17,7 @@ void Nodo::establecerInteraccionConCamion(bool interaccionConCamion){
 }
 
 float Nodo::obtenerCapacidadMaximaBasura(){
-	return capacidadMaximaBasura;
+	return this-> capacidadMaximaBasura;
 }
 void Nodo::establecerCapacidadMaximaBasura(float capacidadMaximaBasura){
 	this->capacidadMaximaBasura=capacidadMaximaBasura;
@@ -25,7 +25,7 @@ void Nodo::establecerCapacidadMaximaBasura(float capacidadMaximaBasura){
 }
 
 float Nodo::obtenerCantidadDeBasura(){
-	return cantidadDeBasura;
+	return this-> cantidadDeBasura;
 }
 void Nodo:: establecerCantidadDeBasura(float cantidadDeBasura){
 	this->cantidadDeBasura=cantidadDeBasura;
@@ -33,7 +33,7 @@ void Nodo:: establecerCantidadDeBasura(float cantidadDeBasura){
 }
 
 int Nodo::obtenerTipo(){
-	return tipo;
+	return this-> tipo;
 }
 void Nodo::establecerTipo(int tipo){
 	this->tipo=tipo;

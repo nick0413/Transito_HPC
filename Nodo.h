@@ -1,7 +1,7 @@
 class Nodo
 {
 	public:
-		Nodo(bool,float,int,float); // Constructor
+		Nodo(bool,float,float,int); // Constructor
 		
 		bool obtenerInteraccionConCamion();
 		void establecerInteraccionConCamion(bool);
