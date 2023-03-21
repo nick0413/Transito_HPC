@@ -24,7 +24,7 @@ int main(){
     }
     
 
-    /* //Prueba clase Nodo
+    //Prueba clase Nodo
     Nodo nodo1(true,100,30,2);
 
     cout<<nodo1.obtenerInteraccionConCamion()<<endl;
@@ -32,5 +32,5 @@ int main(){
     cout<<nodo1.obtenerCantidadDeBasura()<<endl;
     cout<<nodo1.obtenerTipo()<<endl;
     return 0;
-    */
+    
 }
