@@ -18,9 +18,6 @@ M load_csv_arma (const std::string & path) {
 }
 
 
-//void Dijkstra()
-
-
 void print_block(const MatrixXd& x)
 {
 	int m=sqrt(x.size());
@@ -35,14 +32,7 @@ void print_block(const MatrixXd& x)
 }
 int main(){
 
-	MatrixXd m;
-	m.resize(2,2); 
-	m<< 2,3,
-		4,5;
-	MatrixXd A = load_csv_arma<MatrixXd>("Mapa.csv");
 
-	cout<<A<<endl;
-	//print_block(m);
-	cout<<typeid(m).name()<<"\n";
+	MatrixXd A = load_csv_arma<MatrixXd>("Mapa.csv");
     return 0;
 }

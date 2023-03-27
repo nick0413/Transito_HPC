@@ -26,7 +26,7 @@ def gen_graph():
 					M[i,j]=0
 		G=nx.from_numpy_array(M)
 
-		G.remove_edges_from(list(nx.selfloop_edges(G)))
+		#G.remove_edges_from(list(nx.selfloop_edges(G)))
 
 		if not (G.is_multigraph()):
 			if verbose:print('multigraph',G.is_multigraph())\
