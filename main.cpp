@@ -9,15 +9,12 @@
 using namespace std;
 using namespace Eigen;
 
-
 template <typename M>
 M load_csv_arma (const std::string & path) {
     arma::mat X;
     X.load(path, arma::csv_ascii);
     return Eigen::Map<const M>(X.memptr(), X.n_rows, X.n_cols);
 }
-
-
 void print_block(const MatrixXd& x)
 {
 	int m=sqrt(x.size());
@@ -30,9 +27,16 @@ void print_block(const MatrixXd& x)
 
 		}
 }
+
+void Dijkstra(const MatrixXd& Madyacencia)
+	{	
+		int m=sqrt(Madyacencia.size());
+		MatrixXd Mexplorado= MatrixXd::Ones(m,m);
+		cout<<Mexplorado<<endl;
+	}
+
 int main(){
-
-
 	MatrixXd A = load_csv_arma<MatrixXd>("Mapa.csv");
+	Dijkstra(A);
     return 0;
 }

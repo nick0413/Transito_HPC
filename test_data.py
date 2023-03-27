@@ -8,7 +8,7 @@ try:
 	pr=sys.argv[1]
 except:
 	pr=None
-if (pr=='verbose'):
+if (pr=='v'):
 	verbose=True
 else:
 	verbose=False
@@ -16,26 +16,31 @@ else:
 
 def gen_graph():
 	while True:
-		print('----------')
+		if verbose:print('----------')
 		Msize=rd.randint(5,20)
 		M=np.random.randint(0,10,(Msize,Msize))
 		#print(M)
 		for i in range(Msize):
 			for j in range(Msize):
-				if(rd.randint(0,100)>10):
+				if(rd.randint(0,100)>50):
 					M[i,j]=0
 		G=nx.from_numpy_array(M)
 
-		#G.remove_edges_from(list(nx.selfloop_edges(G)))
+		G.remove_edges_from(list(nx.selfloop_edges(G)))
 
-		if not (G.is_multigraph()):
-			if verbose:print('multigraph',G.is_multigraph())\
-			
-			if nx.is_connected(G):
-				if nx.number_of_isolates(G)==0:
-					if verbose:print('no isolates')
-					break
-	return G
+		if not nx.is_directed_acyclic_graph(G):
+			if verbose:print("not DAG")
+			if not (G.is_multigraph()):
+				if verbose:print('multigraph',G.is_multigraph())\
+				
+				if nx.is_connected(G):
+					if nx.number_of_isolates(G)==0:
+						if verbose:print('no isolates')
+						break
+	M=nx.to_numpy_array(G)
+	M=np.triu(M)
+
+	return nx.from_numpy_array(M)
 
 G1=gen_graph()	
 
@@ -48,10 +53,10 @@ np.savetxt('Mapa.csv',M1,delimiter=',')
 if verbose:
 	edge_colors = M1[np.triu_indices_from(M1)]
 	edges=np.ones((edge_colors.shape[0],4))
-	print(edge_colors)
+	#print(edge_colors)
 	pos = nx.spring_layout(G1)
-	print(pos)
+	#print(pos)
 	#nx.draw(G1, pos=pos, with_labels=True, edge_color=edges)
 	print(M1)
-	nx.draw(G1,with_labels = True)
+	nx.draw(G1,with_labels = True,arrows=True,arrowstyle='-|>')
 	plt.show()
