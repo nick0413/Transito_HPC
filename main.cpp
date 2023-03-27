@@ -1,36 +1,42 @@
 #include <iostream>
 #include <vector>
-
 #include "Nodo.h"
 #include "Camion.h"
+#include <eigen/Eigen/Dense>
+#include <fstream>
+#include <armadillo/include/armadillo>
+
 using namespace std;
+using namespace Eigen;
+
+template <typename M>
+M load_csv_arma (const std::string & path) {
+    arma::mat X;
+    X.load(path, arma::csv_ascii);
+    return Eigen::Map<const M>(X.memptr(), X.n_rows, X.n_cols);
+}
+void print_block(const MatrixXd& x)
+{
+	int m=sqrt(x.size());
+  	for(int ii=0;ii<m;ii++)
+		{for(int jj=0;jj<m;jj++)
+			{
+				cout<<x.coeff(ii,jj)<<" ";
+			}
+			cout<<"\n";
+
+		}
+}
+
+void Dijkstra(const MatrixXd& Madyacencia)
+	{	
+		int m=sqrt(Madyacencia.size());
+		MatrixXd Mexplorado= MatrixXd::Ones(m,m);
+		cout<<Mexplorado<<endl;
+	}
 
 int main(){
-
-    Camion camion_verde(1,(vector<float>) {2.3,2.3},3.6,3.5);
-    cout<<"Tipo de basura"<<endl;
-    cout<<camion_verde.obtenerTipoBasura()<<endl;
-    cout<<"Posición camión"<<endl;
-    for(auto& aux : camion_verde.obtenerPosicionCamion()){
-        cout<<aux<<" ";
-    }
-    cout<<"\nCapacidad Máxima"<<endl;
-    cout<<camion_verde.obtenerCapacidadMaxima()<<endl;
-    cout<<"Cantidad de basura"<<endl;
-    cout<<camion_verde.obtenerCantidadBasura()<<endl;
-    
-    if (camion_verde.sobrepasoCapacidadMaxima) {
-        cout<<"Sobrepaso la capacidad máxima de basura"<<endl;
-    }
-    
-
-    //Prueba clase Nodo
-    Nodo nodo1(true,100,30,2);
-
-    cout<<nodo1.obtenerInteraccionConCamion()<<endl;
-    cout<<nodo1.obtenerCapacidadMaximaBasura()<<endl;
-    cout<<nodo1.obtenerCantidadDeBasura()<<endl;
-    cout<<nodo1.obtenerTipo()<<endl;
+	MatrixXd A = load_csv_arma<MatrixXd>("Mapa.csv");
+	Dijkstra(A);
     return 0;
-    
 }
