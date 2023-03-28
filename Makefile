@@ -1,4 +1,4 @@
-Crea una lista de todos los archivos cpp.
+#Crea una lista de todos los archivos cpp.
 ARCHIVOS_CPP = $(wildcard ./*.cpp) 
 # Nombre del archivo con el main. (No poner espacios al final)
 MAIN = main

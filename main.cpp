@@ -1,12 +1,12 @@
 #include <iostream>
-#include <vector>
 #include "Nodo.h"
 #include "Camion.h"
-#include <eigen/Eigen/Dense>
 #include <fstream>
 #include <armadillo>
 
 using namespace std;
+
+
 bool verbose=false;
 arma::vec append_vec(arma::vec & vector, double value)
 	{
@@ -39,7 +39,7 @@ arma::uvec Dijkstra(arma::mat Madyacencia, int start, int end)
 		arma::uvec visited_nodes;
 		arma::uvec idx;
 		visited_nodes=append_vec(visited_nodes,current_node);
-		cout<<i<<"\n";
+		//cout<<i<<"\n";
 		while (true)
 			{
 				i++;
@@ -48,26 +48,31 @@ arma::uvec Dijkstra(arma::mat Madyacencia, int start, int end)
 				
 				while (Notfound)
 					{	
-						cout<<conexion<<"\n";
+						
+						//cout<<conexion<<"\n";
 						idx = find(conexion==0);
 						conexion.elem(idx).fill(999);
 						new_node=conexion.index_min();
 
 						if ( !arma::any(visited_nodes == new_node))
-							{
+							{	
+								if(verbose){cout<<"Nodo sumado al camino: "<<new_node<<"\n";}
 								Notfound=false;
 								visited_nodes=append_vec(visited_nodes,new_node);
 								current_node=new_node;
 							}
-						else if (j==3)
-							{break;}
 						else	
 							{conexion(new_node)=999;};
 						
 
 					}
-				if(current_node==end){break;};
-				if(verbose){if(i==3){break;};};
+				if(current_node==end){
+					//visited_nodes=append_vec(visited_nodes,current_node);
+					cout<<"------------------------------" <<current_node<<endl;
+					break; 
+					
+				};
+				//if(verbose){if(i==3){break;};};
 			}
 
 		return visited_nodes;
@@ -75,21 +80,28 @@ arma::uvec Dijkstra(arma::mat Madyacencia, int start, int end)
 
 int main(int argc, char **argv){
 	
-	try
-		{if(stoi(argv[1])==1){verbose=true;};}
-	catch (...)
-		{verbose=false;}
+	try{if(stoi(argv[1])==1){verbose=true;};}
+	catch (...){verbose=false;}
 
-	arma::mat A = load_csv_arma("Mapa.csv");
+	arma::mat Mapa = load_csv_arma("Mapa.csv");
 
-	arma::mat B = {
-					{0,3,0,2,0},
-					{3,0,3,4,0},
-					{0,3,0,1,2},
-					{2,4,1,0,0},
-					{0,0,2,0,0},
-	              };
-	arma::uvec path = Dijkstra(B,0,4);
-	cout<<path<<endl;
+	int start=4;
+	int end=7;
+	arma:: uvec Ruta1=Dijkstra(Mapa,start,end);
+	cout<<Mapa<<endl;
+	cout<<Ruta1<<endl;
+	double t=0;
+	double tmax=10;
+	double dt=0.5;
+	Camion cam1;
+	cam1.Inicio(start,end,Ruta1,30,0.3);
+	cout<<"Nodo incial: "<<cam1.Nodo()<<"\n";
+	for(;t<tmax;t+=dt)
+		{
+			cam1.Avanzar(Mapa,dt,verbose);
+			cam1.Print_pos();
+		}
+	
+
     return 0;
 }
