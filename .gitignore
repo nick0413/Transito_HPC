@@ -9,3 +9,5 @@ GUI/prueba
 Mapa.csv
 main.out
 a.exe
+GUI_SFML/main.o
+GUI_SFML/main.out
