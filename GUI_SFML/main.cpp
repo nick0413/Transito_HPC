@@ -8,14 +8,15 @@ using namespace std;
 
 bool isMovMyView(sf::Texture& texture,sf::View& view)
 {
+    // Se encarga de enmarcar un movimiento
     // cout<<"view.getCenter().x "<<view.getCenter().x<<endl;
     // cout<<"view.getCenter().y "<<view.getCenter().y<<endl<<endl;
     bool result=true;
-    if (view.getCenter().x<=0 || view.getCenter().x>=texture.getSize().x)
+    if (view.getCenter().x<=0+view.getSize().x/2 || view.getCenter().x>=texture.getSize().x - view.getSize().x/2)
     {
         result &= false;
     }
-    if(view.getCenter().y<=0 || view.getCenter().y>=texture.getSize().y)
+    if(view.getCenter().y<=0 +view.getSize().y/2 || view.getCenter().y>=texture.getSize().y - view.getSize().y/2)
     {
         result &= false;
     }
@@ -41,9 +42,9 @@ int main(){
     // float scaleY ;     //Calculate scale.
     // //View ([left,top],[width,height])
 
-    sf::Vector2f viewPricipalPosition(2118.f, 3048.f);
+    sf::Vector2f viewPricipalCenter(2118.f, 3048.f);
     sf::Vector2f viewPricipalSize(800.f, 600.f);
-    sf::View viewPrincipal(viewPricipalPosition, viewPricipalSize);
+    sf::View viewPrincipal(viewPricipalCenter, viewPricipalSize);
 
     // cout<<"Center View x: "<<viewPrincipal.getCenter().x<<endl;
     // cout<<"Center View y: "<<viewPrincipal.getCenter().y<<endl;
@@ -81,7 +82,8 @@ int main(){
         sf::Event event;
         //Se mantiene en el loop si algún evento pasa
         while (window.pollEvent(event))
-        {
+        {   
+            bool wasUpdateByKeyboardArrows=true;
             switch (event.type)
             {
             case sf::Event::Closed:
@@ -89,6 +91,8 @@ int main(){
                 break;
             
             case sf::Event::KeyPressed:
+
+
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
                 {
                     cout<<"Move left"<<endl;
@@ -98,6 +102,7 @@ int main(){
 
                     if(!isMovMyView(textFondo,viewPrincipal)){
                         viewPrincipal.setCenter(posActual);
+                        wasUpdateByKeyboardArrows=false;
                     }
 
                 }
@@ -111,11 +116,13 @@ int main(){
 
                     if(!isMovMyView(textFondo,viewPrincipal)){
                         viewPrincipal.setCenter(posActual);
+                        wasUpdateByKeyboardArrows=false;
                     }
                 }
                 else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
                 {
                     cout<<"Move Up"<<endl;
+                    
                     
 
                     sf::Vector2f posActual=viewPrincipal.getCenter();
@@ -124,7 +131,10 @@ int main(){
 
                     if(!isMovMyView(textFondo,viewPrincipal)){
                         viewPrincipal.setCenter(posActual);
+                        wasUpdateByKeyboardArrows=false;
                     }
+
+                    
 
                 }
                 else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
@@ -137,7 +147,13 @@ int main(){
 
                     if(!isMovMyView(textFondo,viewPrincipal)){
                         viewPrincipal.setCenter(posActual);
+                        wasUpdateByKeyboardArrows=false;
                     }
+                }
+                // Al quedarse en un ciclo sin poder actualizar vuelve a un lugar de referencia
+                if(!wasUpdateByKeyboardArrows && !isMovMyView(textFondo,viewPrincipal))
+                {
+                        viewPrincipal.setCenter(viewPricipalCenter);
                 }
                 
                 break;
