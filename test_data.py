@@ -14,10 +14,11 @@ else:
 	verbose=False
 
 
+
 def gen_graph():
 	while True:
 		if verbose:print('----------')
-		Msize=rd.randint(5,20)
+		Msize=rd.randint(5,15)
 		M=np.random.randint(0,10,(Msize,Msize))
 		#print(M)
 		for i in range(Msize):
