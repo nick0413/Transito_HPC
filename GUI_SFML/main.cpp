@@ -76,7 +76,16 @@ int main(){
     // Tomado de: https://stackoverflow.com/questions/36448101/2-3-1-set-scale-of-background-texture-to-renderwindow-size
     //sprFondo.scale(0.5, 0.5);
 
+    // Creación de contenedores
 
+    // Contenedor 1
+    // https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1CircleShape.php
+    sf::CircleShape contenedor_1;
+    contenedor_1.setRadius(30);
+    contenedor_1.setFillColor(sf::Color::Red);
+    contenedor_1.setPosition(1968, 1432); 
+
+    
     while(window.isOpen()){
        
         sf::Event event;
@@ -144,7 +153,7 @@ int main(){
                     sf::Vector2f posActual=viewPrincipal.getCenter();
                     viewPrincipal.move(0,moveViewPrincipalY);
                     
-
+		    
                     if(!isMovMyView(textFondo,viewPrincipal)){
                         viewPrincipal.setCenter(posActual);
                         wasUpdateByKeyboardArrows=false;
@@ -174,6 +183,7 @@ int main(){
                    {
                         // Más grande
                         viewPrincipal.zoom(zoomViewPrincipal);
+			
                    }
                    else{
                         // Más pequeño
@@ -190,11 +200,18 @@ int main(){
                 break;
             }
         }
+
+		
         // Es una forma de actualizar
         window.clear();
         window.setView(viewPrincipal);
+
+	// En esta parte se colocan los objetos
         window.draw(sprFondo);
-        window.display();
+	window.draw(contenedor_1);
+
+	
+	window.display();
 
     }
 
