@@ -1,8 +1,13 @@
+// Librerias estándar y extenas
 #include <string>
 #include <iostream>
-
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+
+// Clases propias
+
+#include "Tools.h"
+
 using namespace std;
 
 
@@ -54,11 +59,16 @@ int main(){
     float moveViewPrincipalY=50.f;
     float zoomViewPrincipal=(float) 0.5;
     
-
+    // Vector de contenedores
+    string fileDataContenedores="datos_contenedores.txt";
+    vector<Contenedor> vectorContenedores;
+    Tools tools;
+    
     // Se crea la textura
     if(!textFondo.loadFromFile(figFondo))
     {
         cout<< "por favor cargue verifique la ruta: "<<figFondo<<endl;
+	return 1;
     }
     // Tomado de: https://stackoverflow.com/questions/36448101/2-3-1-set-scale-of-background-texture-to-renderwindow-size
 
@@ -80,10 +90,13 @@ int main(){
 
     // Contenedor 1
     // https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1CircleShape.php
-    sf::CircleShape contenedor_1;
-    contenedor_1.setRadius(30);
-    contenedor_1.setFillColor(sf::Color::Red);
-    contenedor_1.setPosition(1968, 1432); 
+
+    
+    if(!tools.vectorContenedores(fileDataContenedores,vectorContenedores))
+      {
+	cout<<"Por favor verifique que el archivo "<<fileDataContenedores<<" exista"<<endl;
+	return 1;
+      }
 
     
     while(window.isOpen()){
@@ -96,7 +109,7 @@ int main(){
             switch (event.type)
             {
             case sf::Event::Closed:
-                window.close();
+	      window.close();
                 break;
             
             case sf::Event::KeyPressed:
@@ -208,8 +221,12 @@ int main(){
 
 	// En esta parte se colocan los objetos
         window.draw(sprFondo);
-	window.draw(contenedor_1);
 
+	// Dibujan los contenedores
+
+	for(auto contenedor : vectorContenedores){
+	  window.draw(contenedor);
+	};
 	
 	window.display();
 
