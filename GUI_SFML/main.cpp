@@ -87,10 +87,7 @@ int main(){
     //sprFondo.scale(0.5, 0.5);
 
     // Creación de contenedores
-
-    // Contenedor 1
     // https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1CircleShape.php
-
     
     if(!tools.vectorContenedores(fileDataContenedores,vectorContenedores))
       {

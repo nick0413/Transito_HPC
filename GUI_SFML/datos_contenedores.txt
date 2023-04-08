@@ -1,3 +1,3 @@
-name , position_x , position_y , radius , color
-primero , 1968 , 1492 , 30 , red     
-segundo , 1900 , 1350 , 30 , red
+position_x , position_y , radius , color , información,		id (numero del nodo) , capacidad máxima [kg] , capacidad actual		
+1968 , 1492 , 30 , red , Nodo 1 , 1 , 450 , 0     
+1900 , 1350 , 30 , red , Nodo 2 , 2 , 450 , 0

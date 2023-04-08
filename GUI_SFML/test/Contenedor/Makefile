@@ -13,7 +13,6 @@ compile_run :
 
 .PHONY : sanitize
 sanitize:
-
 	g++ -c $(FILES_CPP)
 	g++ $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system $(FLAGS_SANITIZE)
 	./$(MAIN_OUT)
@@ -27,4 +26,4 @@ debugging :
 .PHONY : clean
 clean : 
 	rm -f *.out
-	rm -f *.o
+	rem -f *.o

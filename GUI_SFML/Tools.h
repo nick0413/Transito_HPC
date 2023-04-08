@@ -20,7 +20,7 @@ class Tools{
 
 bool Tools::vectorContenedores(string &fileInfContenedores , vector<Contenedor> & vectorContenedores){
 
-
+  int contadorInfoContenedores;
   vector<vector<string>> myDatosContenedores;
 
   
@@ -29,26 +29,40 @@ bool Tools::vectorContenedores(string &fileInfContenedores , vector<Contenedor> 
     return false;
   }
 
-  for(int i=1;i<myDatosContenedores.size();i++){      
-    // Se le coloca el nombre
-    Contenedor auxContenedor(myDatosContenedores[i][0]);
+  for(int i=1;i<myDatosContenedores.size();i++){
+    contadorInfoContenedores=0;
+    Contenedor auxContenedor;
+
     // Se configura la posición
-    float posX=stof(myDatosContenedores[i][1]);
-    float posY=stof(myDatosContenedores[i][2]);
+    float posX=stof(myDatosContenedores[i][contadorInfoContenedores++]);
+    float posY=stof(myDatosContenedores[i][contadorInfoContenedores++]);
     auxContenedor.setPosition(posX,posY);
+
     // Configuración del radio
-    float radius=stof(myDatosContenedores[i][3]);
+    float radius=stof(myDatosContenedores[i][contadorInfoContenedores++]);
     auxContenedor.setRadius(radius);
-    // Configuración del colorx
-    
-      
-    if (strcmp(myDatosContenedores[i][4].c_str(),"red")==0){
+
+    // Configuración del color  
+    if (strcmp(myDatosContenedores[i][contadorInfoContenedores++].c_str(),"red")==0){
       auxContenedor.setFillColor(sf::Color::Red);
     }
     else{
       auxContenedor.setFillColor(sf::Color::Green);
     }
 
+    // Se le coloca la información
+    auxContenedor.setInformation(myDatosContenedores[i][contadorInfoContenedores++]);
+
+    // Identificación
+    auxContenedor.setId(atoi(myDatosContenedores[i][contadorInfoContenedores++].c_str()));
+
+    // Capacidad Máxima
+    auxContenedor.setMaximumCapacity(stof(myDatosContenedores[i][contadorInfoContenedores++]));
+
+    // Capacidad actual
+    auxContenedor.setCurrentCapacity(stof(myDatosContenedores[i][contadorInfoContenedores++]));
+    
+    // Se coloca en el vector
     vectorContenedores.push_back(auxContenedor);      
   
   
