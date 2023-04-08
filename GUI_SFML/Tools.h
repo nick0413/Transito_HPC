@@ -33,18 +33,37 @@ bool Tools::vectorContenedores(string &fileInfContenedores , vector<Contenedor> 
     contadorInfoContenedores=0;
     Contenedor auxContenedor;
 
-    // Se configura la posición
-    float posX=stof(myDatosContenedores[i][contadorInfoContenedores++]);
-    float posY=stof(myDatosContenedores[i][contadorInfoContenedores++]);
-    auxContenedor.setPosition(posX,posY);
-
     // Configuración del radio
     float radius=stof(myDatosContenedores[i][contadorInfoContenedores++]);
     auxContenedor.setRadius(radius);
 
-    // Configuración del color  
-    if (strcmp(myDatosContenedores[i][contadorInfoContenedores++].c_str(),"red")==0){
+    
+    // Se configura la posición
+    float posX=stof(myDatosContenedores[i][contadorInfoContenedores++])-radius; // Se resta el radio para que quede centrado
+    float posY=stof(myDatosContenedores[i][contadorInfoContenedores++])-radius; 
+    auxContenedor.setPosition(posX,posY);
+
+
+    // Configuración del color
+    string colorStr=myDatosContenedores[i][contadorInfoContenedores++];
+    boost::algorithm::to_lower(colorStr);
+
+    sf::Color color(0,0,0); 
+    
+    if (strcmp(colorStr.c_str(),"red")==0){
       auxContenedor.setFillColor(sf::Color::Red);
+    }
+    else if (strcmp(colorStr.c_str(),"yellow")==0){
+      auxContenedor.setFillColor(sf::Color::Yellow);
+    }
+    else if (strcmp(colorStr.c_str(),"orange")==0){
+      color.r=255;
+      color.g=165;
+      color.b=0;
+      auxContenedor.setFillColor(color);
+    }
+    else if (strcmp(colorStr.c_str(),"blue")==0){
+      auxContenedor.setFillColor(sf::Color::Blue);
     }
     else{
       auxContenedor.setFillColor(sf::Color::Green);
@@ -81,8 +100,12 @@ bool Tools::datosContenedores(string &fname,vector<vector<string>> &content){
   if(file.is_open()){
 
     while(getline(file,line)){
-
+      // https://www.geeksforgeeks.org/how-to-use-getline-in-c-when-there-are-black-lines-in-input/
+      if(line.length()==0)
+	continue;
+      
       row.clear();
+      
       stringstream str(line); 	// Para extraer cada campo
 
       while(getline(str,word,',')){

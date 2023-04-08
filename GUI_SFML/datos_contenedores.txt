@@ -1,3 +1,28 @@
-position_x , position_y , radius , color , información,		id (numero del nodo) , capacidad máxima [kg] , capacidad actual		
-1968 , 1492 , 30 , red , Nodo 1 , 1 , 450 , 0     
-1900 , 1350 , 30 , red , Nodo 2 , 2 , 450 , 0
+radius , position_x , position_y , color , información,	id (numero del nodo) , capacidad máxima [kg] , capacidad actual		
+30 , 742.1 , 1770 , red , Nodo 1 , 1 , 450 , 0
+30 , 728.1 , 1758 , yellow , Nodo 2, 2 , 450 , 0
+30 , 1459 , 2733 , red , Nodo 3, 3 , 450 , 0
+30 , 1454 , 2741 , yellow , Nodo 4, 4 , 450 , 0
+30 , 2156 , 2523 , yellow , Nodo 5, 5 , 450 , 0
+30 , 2154 , 2526 , red , Nodo 6, 6 , 450 , 0
+30 , 2237 , 3234 , orange , Nodo 7, 7 , 450 , 0
+30 , 2242 , 3235 , yellow , Nodo 8, 8 , 450 , 0
+30 , 2375 , 3431 , orange , Nodo 9, 9 , 450 , 0
+30 , 2454 , 3570 , yellow , Nodo 10, 10 , 450 , 0
+30 , 2466 , 3574 , yellow , Nodo 11, 11 , 450 , 0
+30 , 2449 , 3576 , red , Nodo 12, 12 , 450 , 0
+30 , 2458 , 3579 , red , Nodo 13, 13 , 450 , 0
+30 , 2950 , 3283 , yellow , Nodo 14, 14 , 450 , 0
+30 , 2945 , 3302 , red , Nodo 15, 15 , 450 , 0
+30 , 3531 , 2520 , red , Nodo 16, 16 , 450 , 0
+30 , 3526 , 2526 , red , Nodo 17, 17 , 450 , 0
+30 , 3309 , 2353 , yellow , Nodo 18, 18 , 450 , 0
+30 , 3301 , 2357 , red , Nodo 19, 19 , 450 , 0
+30 , 3298 , 2361 , yellow , Nodo 20, 20 , 450 , 0
+30 , 3125 , 1571 , red , Nodo 21 , 21 , 450 , 0
+
+30 , 3114 , 1570 , yellow , Nodo 22, 22 , 450 , 0
+
+30 , 3321 , 1327 , orange , Nodo 23, 23 , 450 , 0
+
+30 , 2686 , 361 , blue , Nodo 24, 24 , 450 , 0
