@@ -70,7 +70,7 @@ int main(){
   string fileCamion="./figs/trashmaster.png";
   sf::Vector2f defaultPositionCamion(1188,1722);
   vector<sf::Vector2f> movimientoCamion;
-  sf::Time tiempoMovimientoCamion =sf::seconds(10.f);
+  sf::Time tiempoMovimientoCamion =sf::seconds(3.f);
   
   
   // Nodos de la carreteras
