@@ -169,3 +169,5 @@ src/lib/libsfml-window.a
 src/lib/libvorbis.a
 src/lib/libvorbisenc.a
 src/lib/libvorbisfile.a
+Sim.exe
+

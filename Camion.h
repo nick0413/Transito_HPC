@@ -12,6 +12,7 @@ class Camion{
 		void Print_pos(void);
     private:
 
+
 		int Tipo;
 		arma::uvec Ruta;
 		double Capacidad;
@@ -57,3 +58,5 @@ void Camion::Print_pos(void)
 	{
 		cout<<Pos_nodo<<" "<<Pos_arista<<"\n";
 	}
+
+

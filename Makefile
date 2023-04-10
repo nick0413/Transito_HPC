@@ -1,3 +1,4 @@
+
 all:compile link
 
 compile: Madyacencia.txt
