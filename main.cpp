@@ -35,7 +35,7 @@ arma::mat load_csv_arma (const std::string & path) {
 }
 
 arma::uvec Dijkstra(arma::mat Madyacencia, int start, int end)
-	{
+	{   
 		int i=0,j=0;
 		int new_node;
 		bool Notfound=true;
@@ -47,6 +47,7 @@ arma::uvec Dijkstra(arma::mat Madyacencia, int start, int end)
 		arma::uvec visited_nodes;
 		arma::uvec idx;
 		visited_nodes=append_vec(visited_nodes,current_node);
+        
 		//cout<<i<<"\n";
 		while (true)
 			{
@@ -82,6 +83,8 @@ arma::uvec Dijkstra(arma::mat Madyacencia, int start, int end)
 				};
 				//if(verbose){if(i==3){break;};};
 			}
+
+		
 
 		return visited_nodes;
 	}
@@ -120,10 +123,16 @@ int main(int argc, char **argv){
 	int start=4;
 	int end=7;
     arma::mat Mapa = load_csv_arma("Mapa.csv");
-    cout<<"corre hasta aqui2mak"<<endl;
+    //Mapa.load("Madyacencia1.txt", arma::raw_ascii);
+    cout<< Mapa.n_cols<< "\t"<< Mapa.n_rows<<endl;
+    arma::mat PosicionNodos;
+    PosicionNodos.load("nodos-finales.csv", arma::raw_ascii);
 
     arma:: uvec Ruta1=Dijkstra(Mapa,start,end);
-    cout<<"corre hasta aqui1"<<endl;
+    //arma::uvec x_sort_indices = arma::sort_index(Ruta1);
+    //PosicionNodos=PosicionNodos.rows(x_sort_indices ); //Organiza los nodos en el orden de Ruta 1 
+
+    cout<< PosicionNodos(0,1)<< endl;
 
 
     string figFondo= "./figs/Contenedores-Residuos.jpg";
@@ -190,16 +199,21 @@ int main(int argc, char **argv){
 	// return 1;
     //   }
     cout<<"corre hasta aqui"<<endl;
+
+
     //---------------Camion------------
+
+
     window.setFramerateLimit(1); //si esta en 1 se mueve en tiempo real, es cuantos pasos van a pasar por cada segundo real
  
     sf::RectangleShape rect;
     
-    sf::Vector2f rectanglePosition(0, 4100);
+    sf::Vector2f rectanglePosition(2128, 3180);
  
     rect.setPosition(rectanglePosition);
-    rect.setSize(sf::Vector2f(50, 50));
+    rect.setSize(sf::Vector2f(100, 100));
     rect.setOutlineColor(sf::Color::Red);
+    rect.setOutlineThickness(5);
     double xVelocity = 11.6666;
 
     while(window.isOpen()){
@@ -319,7 +333,7 @@ int main(int argc, char **argv){
             }
         }
     //Physics
-    rectanglePosition.x += xVelocity;
+    //rectanglePosition.x += xVelocity;
     //rectanglePosition.y += yVelocity;
     rect.setPosition(rectanglePosition);
 		
