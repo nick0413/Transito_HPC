@@ -33,7 +33,25 @@ arma::mat load_csv_arma (const std::string & path) {
     X.load(path, arma::csv_ascii);
     return X;
 }
+arma::vec getPosition(arma::mat PosNodos,arma::uvec Ruta, int counter){
+    int nodo = Ruta(counter);
+    double posx= PosNodos(nodo, 1);
+    double posy= PosNodos(nodo, 2);
+    arma::vec position = {posx, posy};
+    return position;
 
+}
+void update(arma::mat PosNodos, arma::mat Madyacencia, arma::uvec Ruta, double & xVelocity, double & yVelocity, double V, double dt, arma::vec & nodo_old, arma::vec & nodo_new, arma::vec & r, 
+double & distancia, double & pasos, int i, int j ){
+    nodo_old = getPosition(PosNodos, Ruta, i);
+    nodo_new = getPosition(PosNodos, Ruta, j);
+    r = nodo_new-nodo_old;
+    distancia = arma::norm(r);
+    pasos = distancia/V;
+    xVelocity = dt*r(0)/pasos;
+    yVelocity = dt*r(1)/pasos;
+    cout<<distancia<<"\t"<<xVelocity<<"\t"<<yVelocity<<"\t"<<nodo_old(0)<<"\t"<<nodo_old(1)<<"\t"<<Ruta(i)<<endl;
+}
 arma::uvec Dijkstra(arma::mat Madyacencia, int start, int end)
 	{   
 		int i=0,j=0;
@@ -122,7 +140,7 @@ int main(int argc, char **argv){
 
 	int start=4;
 	int end=7;
-    arma::mat Mapa = load_csv_arma("Madyacencia.txt");
+    arma::mat Mapa = load_csv_arma("Mapa.csv");
     //Mapa.load("Madyacencia1.txt", arma::raw_ascii);
     cout<< Mapa.n_cols<< "\t"<< Mapa.n_rows<<endl;
     arma::mat PosicionNodos;
@@ -132,8 +150,7 @@ int main(int argc, char **argv){
     //arma::uvec x_sort_indices = arma::sort_index(Ruta1);
     //PosicionNodos=PosicionNodos.rows(x_sort_indices ); //Organiza los nodos en el orden de Ruta 1 
 
-    cout<< PosicionNodos(0,1)<< endl;
-
+    cout<< Ruta1 <<endl;
 
     string figFondo= "./figs/Contenedores-Residuos.jpg";
     // Se inicializa una ventana de 800x600 con el título TransitoHPC 
@@ -204,17 +221,28 @@ int main(int argc, char **argv){
     //---------------Camion------------
 
 
-    window.setFramerateLimit(1); //si esta en 1 se mueve en tiempo real, es cuantos pasos van a pasar por cada segundo real
+    window.setFramerateLimit(30); //si esta en 1 se mueve en tiempo real, es cuantos pasos van a pasar por cada segundo real
  
     sf::RectangleShape rect;
-    
-    sf::Vector2f rectanglePosition(2128, 3180);
- 
+    int i = 0;
+    int j = 1;
+    double V=11.66;
+    double dt = 1;
+    arma::vec pos_nodo_old;
+    arma::vec pos_nodo_new;
+    arma::vec r;
+    double distancia;
+    double pasos;
+    double xVelocity;
+    double yVelocity;
+    update(PosicionNodos, Mapa, Ruta1, xVelocity, yVelocity, V, dt, pos_nodo_old, pos_nodo_new, r, distancia, pasos, i, j);
+    sf::Vector2f rectanglePosition(pos_nodo_old(0), pos_nodo_old(1));
+    double distrecorrida = 0;
     rect.setPosition(rectanglePosition);
     rect.setSize(sf::Vector2f(100, 100));
     rect.setOutlineColor(sf::Color::Red);
     rect.setOutlineThickness(5);
-    double xVelocity = 11.6666;
+    cout<<xVelocity<<"\t"<<yVelocity<<endl;
 
     while(window.isOpen()){
        
@@ -333,9 +361,20 @@ int main(int argc, char **argv){
             }
         }
     //Physics
-    //rectanglePosition.x += xVelocity;
-    //rectanglePosition.y += yVelocity;
+
+    rectanglePosition.x += xVelocity;
+    rectanglePosition.y += yVelocity;
+    distrecorrida += sqrt(xVelocity*xVelocity+yVelocity*yVelocity);
     rect.setPosition(rectanglePosition);
+    if(distrecorrida>distancia){
+        i+=1;
+        j+=1;
+        cout<<i<<"\t"<<j<<endl;
+        if(Ruta1(j)==end){break;}
+        update(PosicionNodos, Mapa, Ruta1, xVelocity, yVelocity, V, dt, pos_nodo_old, pos_nodo_new, r, distancia, pasos, i, j);
+        distrecorrida=0;
+        
+    }
 		
         // Es una forma de actualizar
     window.clear();
