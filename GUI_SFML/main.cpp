@@ -1,8 +1,13 @@
+// Librerias estándar y extenas
 #include <string>
 #include <iostream>
-
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+
+// Clases propias
+
+#include "Tools.h"
+
 using namespace std;
 
 
@@ -54,11 +59,16 @@ int main(){
     float moveViewPrincipalY=50.f;
     float zoomViewPrincipal=(float) 0.5;
     
-
+    // Vector de contenedores
+    string fileDataContenedores="datos_contenedores.txt";
+    vector<Contenedor> vectorContenedores;
+    Tools tools;
+    
     // Se crea la textura
     if(!textFondo.loadFromFile(figFondo))
     {
         cout<< "por favor cargue verifique la ruta: "<<figFondo<<endl;
+	return 1;
     }
     // Tomado de: https://stackoverflow.com/questions/36448101/2-3-1-set-scale-of-background-texture-to-renderwindow-size
 
@@ -76,7 +86,16 @@ int main(){
     // Tomado de: https://stackoverflow.com/questions/36448101/2-3-1-set-scale-of-background-texture-to-renderwindow-size
     //sprFondo.scale(0.5, 0.5);
 
+    // Creación de contenedores
+    // https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1CircleShape.php
+    
+    if(!tools.vectorContenedores(fileDataContenedores,vectorContenedores))
+      {
+	cout<<"Por favor verifique que el archivo "<<fileDataContenedores<<" exista"<<endl;
+	return 1;
+      }
 
+    
     while(window.isOpen()){
        
         sf::Event event;
@@ -87,7 +106,7 @@ int main(){
             switch (event.type)
             {
             case sf::Event::Closed:
-                window.close();
+	      window.close();
                 break;
             
             case sf::Event::KeyPressed:
@@ -144,7 +163,7 @@ int main(){
                     sf::Vector2f posActual=viewPrincipal.getCenter();
                     viewPrincipal.move(0,moveViewPrincipalY);
                     
-
+		    
                     if(!isMovMyView(textFondo,viewPrincipal)){
                         viewPrincipal.setCenter(posActual);
                         wasUpdateByKeyboardArrows=false;
@@ -174,6 +193,7 @@ int main(){
                    {
                         // Más grande
                         viewPrincipal.zoom(zoomViewPrincipal);
+			
                    }
                    else{
                         // Más pequeño
@@ -190,11 +210,22 @@ int main(){
                 break;
             }
         }
+
+		
         // Es una forma de actualizar
         window.clear();
         window.setView(viewPrincipal);
+
+	// En esta parte se colocan los objetos
         window.draw(sprFondo);
-        window.display();
+
+	// Dibujan los contenedores
+
+	for(auto contenedor : vectorContenedores){
+	  window.draw(contenedor);
+	};
+	
+	window.display();
 
     }
 

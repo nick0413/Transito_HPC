@@ -8,6 +8,13 @@ $(MAIN_OUT) : $(FILES_CPP)
 	g++ $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system
 	./$(MAIN_OUT) 
 
+.PHONY : compile_and_run
+compile_and_run:
+	g++ -c $(FILES_CPP)
+	g++ $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system
+	./$(MAIN_OUT) 
+
+
 .PHONY : debugging
 debugging : 
 	g++ -g -c $(FILES_CPP)
