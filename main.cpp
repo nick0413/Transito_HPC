@@ -147,8 +147,8 @@ int main(int argc, char **argv){
 
 	int start=4;
 	int end=7;
-    arma::mat Mapa = load_csv_arma("Mapa.csv");
-    //Mapa.load("Madyacencia1.txt", arma::raw_ascii);
+    arma::mat Mapa;// = load_csv_arma("Mapa.csv");
+    Mapa.load("Madyacencia1.csv", arma::raw_ascii);
     cout<< Mapa.n_cols<< "\t"<< Mapa.n_rows<<endl;
     arma::mat PosicionNodos;
     PosicionNodos.load("nodos-finales.csv", arma::raw_ascii);
@@ -159,7 +159,7 @@ int main(int argc, char **argv){
 
     cout<< Ruta1 <<endl;
 
-    string figFondo= "./figs/Contenedores-Residuos.jpg";
+    string figFondo= "./figs/Contenedores-Residuos-nods.png";
     // Se inicializa una ventana de 800x600 con el título TransitoHPC 
     // El tercer argumento es el estilo que por defecto muestra
     // un título, redimensionamiento y para cerrar.
