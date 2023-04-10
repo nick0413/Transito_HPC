@@ -1,5 +1,11 @@
-#include <SFML/Graphics.hpp>
+#include <math.h> 
 #include <string>
+// Precisión
+#include <iomanip>
+#include <sstream>
+
+#include <SFML/Graphics.hpp>
+
 
 using namespace std;
 
@@ -22,13 +28,16 @@ class Contenedor : public sf::CircleShape{
 
   bool setCurrentCapacity(float);
   float getCurrentCapacity();
+
+  bool setTextPercentageCurrentlyCapacity(sf::Text);
+  sf::Text getTextPercentageCurrentlyCapacity();
   
  private:
   string information;
   int id;
   float maximumCapacity;
   float currentCapacity;
-  
+  sf::Text textPercentageCurrentlyCapacity;
 };
 
 // https://stackoverflow.com/questions/34396115/multiple-constructors-in-c
@@ -39,7 +48,7 @@ Contenedor::Contenedor(string information,int id, float maximumCapacity, float c
   setId(id);
   setMaximumCapacity(maximumCapacity);
   setCurrentCapacity(currentCapacity);
-  
+
 }
 
 Contenedor::Contenedor(string information,int id, float maximumCapacity):Contenedor(information,id, maximumCapacity, 0.0){
@@ -84,6 +93,19 @@ float Contenedor::getMaximumCapacity(){
 bool Contenedor::setCurrentCapacity(float currentCapacity){
   if(currentCapacity<=maximumCapacity){
     this->currentCapacity=currentCapacity;
+
+    auto auxPercentage=currentCapacity*100/maximumCapacity;
+
+    // Redondeo a dos cifras decimales
+    auxPercentage=round(auxPercentage*100)/100;
+    // https://stackoverflow.com/questions/29200635/convert-float-to-string-with-precision-number-of-decimal-digits-specified
+
+    stringstream stream;
+    stream << fixed << setprecision(2) << auxPercentage <<" %";
+    this->textPercentageCurrentlyCapacity.setString(stream.str());
+    
+    setTextPercentageCurrentlyCapacity(this->textPercentageCurrentlyCapacity);
+    
     return true;
   }
   else{
@@ -93,6 +115,14 @@ bool Contenedor::setCurrentCapacity(float currentCapacity){
 }
 float Contenedor::getCurrentCapacity(){
   return this->currentCapacity;
+}
+
+bool Contenedor::setTextPercentageCurrentlyCapacity(sf::Text text){
+  this->textPercentageCurrentlyCapacity=text;
+  return true;
+}
+sf::Text Contenedor::getTextPercentageCurrentlyCapacity(){
+  return this->textPercentageCurrentlyCapacity;
 }
 
 

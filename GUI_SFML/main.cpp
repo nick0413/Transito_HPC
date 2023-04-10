@@ -57,19 +57,21 @@ int main(){
   float moveViewPrincipalY=50.f;
   float zoomViewPrincipal=(float) 0.5;
   
-    
-  // Vector de contenedores
-  string fileDataContenedores="datos_contenedores.txt";
+  // ******* Contenedores *******
+  
+  string fileDataContenedores="./files/datos_contenedores.txt";
   vector<Contenedor> vectorContenedores;
-    
+  string fileFontInformation="./fonts/DeliusSwashCaps-Regular.ttf";
+  sf::Font fontInformation;  
 
-  // Camión
+  // ****** Camión ****** 
   sf::Texture textCamion;
   sf::Sprite sprCamion;
   string fileCamion="./figs/trashmaster.png";
   sf::Vector2f defaultPositionCamion(1188,1722);
   vector<sf::Vector2f> movimientoCamion;
   sf::Time tiempoMovimientoCamion =sf::seconds(10.f);
+  
   
   // Nodos de la carreteras
   vector<NodosCarretera> vectorNodosCarretera;
@@ -101,6 +103,8 @@ int main(){
   // Tomado de: https://stackoverflow.com/questions/36448101/2-3-1-set-scale-of-background-texture-to-renderwindow-size
   //sprFondo.scale(0.5, 0.5);
 
+   // ******* Configuración Contenedores *******
+  
   // Creación de contenedores
   // https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1CircleShape.php
     
@@ -109,7 +113,7 @@ int main(){
       cout<<"Por favor verifique que el archivo "<<fileDataContenedores<<" exista"<<endl;
       return 1;
     }
-  
+ 
   // Creación nodos de la carretera
 
   if(!tools.vectorNodosCarretera(fileNodosCarretera,vectorNodosCarretera)){
@@ -117,6 +121,29 @@ int main(){
     return 1;
   }
 
+  // fuente
+  if(!fontInformation.loadFromFile(fileFontInformation)){
+       cout<<"Por favor verifique que el archivo "<<fileFontInformation<<" exista"<<endl;
+    return 1;
+  }
+
+ 
+  // Configuración de tamaño, color y estilo del texto
+
+  sf::Text auxText;
+  for (int i=0;i< vectorContenedores.size();i++){
+    auxText=vectorContenedores[i].getTextPercentageCurrentlyCapacity();
+    
+    auxText.setFont(fontInformation);
+    auxText.setCharacterSize(40);
+    auxText.setFillColor(vectorContenedores[i].getFillColor());
+    auxText.setStyle(sf::Text::Bold);
+    // auxText.setPosition(vectorContenedores[i].getPosition()*1.01f);
+    vectorContenedores[i].setTextPercentageCurrentlyCapacity(auxText);
+  }
+  
+  // ********** Configuración Camión ************
+  
   // Se crea la textura del camion
   if(!textCamion.loadFromFile(fileCamion))
     {
@@ -130,6 +157,7 @@ int main(){
   sprCamion.setPosition(defaultPositionCamion);
   posicionActualDelCamion=defaultPositionCamion;
 
+  
   // Se cargar los recorridos que debe hacer el camión
   for (auto nodCar : vectorNodosCarretera){
     movimientoCamion.push_back(nodCar.getPosition());
@@ -273,11 +301,15 @@ int main(){
 	// Se coloca el fondo de pantalla
         window.draw(sprFondo);
 
-	// Dibujan los contenedores
+	// Dibujan los contenedores y la información
 
 	for(auto contenedor : vectorContenedores){
+
 	  window.draw(contenedor);
+	  window.draw(contenedor.getTextPercentageCurrentlyCapacity());
+
 	};
+	
 
 	// Se actualiza la posición del camión y se dibuja.
 	{

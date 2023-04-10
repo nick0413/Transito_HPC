@@ -36,9 +36,13 @@ bool Tools::vectorContenedores(string &fileInfContenedores , vector<Contenedor> 
     return false;
   }
 
+  
+  Contenedor auxContenedor;
+  sf::Text auxText;
+  
   for(int i=1;i<myDatosContenedores.size();i++){
     contadorInfoContenedores=0;
-    Contenedor auxContenedor;
+    
 
     // Configuración del radio
     float radius=stof(myDatosContenedores[i][contadorInfoContenedores++]);
@@ -87,6 +91,13 @@ bool Tools::vectorContenedores(string &fileInfContenedores , vector<Contenedor> 
 
     // Capacidad actual
     auxContenedor.setCurrentCapacity(stof(myDatosContenedores[i][contadorInfoContenedores++]));
+
+    // Posición texto
+    auxText=auxContenedor.getTextPercentageCurrentlyCapacity();
+    posX=stof(myDatosContenedores[i][contadorInfoContenedores++]);    
+    posY=stof(myDatosContenedores[i][contadorInfoContenedores++]); 
+    auxText.setPosition(posX,posY);
+    auxContenedor.setTextPercentageCurrentlyCapacity(auxText);
     
     // Se coloca en el vector
     vectorContenedores.push_back(auxContenedor);      
