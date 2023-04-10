@@ -42,7 +42,7 @@ arma::vec getPosition(arma::mat PosNodos,arma::uvec Ruta, int counter){
 
 }
 void update(arma::mat PosNodos, arma::mat Madyacencia, arma::uvec Ruta, double & xVelocity, double & yVelocity, double V, double dt, arma::vec & nodo_old, arma::vec & nodo_new, arma::vec & r, 
-double & distancia, double & pasos, int i, int j ){
+double & distancia, double & pasos, int i, int j, sf::Sprite &rect){
     nodo_old = getPosition(PosNodos, Ruta, i);
     nodo_new = getPosition(PosNodos, Ruta, j);
     r = nodo_new-nodo_old;
@@ -50,6 +50,13 @@ double & distancia, double & pasos, int i, int j ){
     pasos = distancia/V;
     xVelocity = dt*r(0)/pasos;
     yVelocity = dt*r(1)/pasos;
+    rect.setScale(0.040f, 0.04f);
+    if(xVelocity<0){
+        rect.setScale(-0.040f, 0.04f);
+    }
+    else{
+        rect.setScale(0.040f, 0.04f);
+    }
     cout<<distancia<<"\t"<<xVelocity<<"\t"<<yVelocity<<"\t"<<nodo_old(0)<<"\t"<<nodo_old(1)<<"\t"<<Ruta(i)<<endl;
 }
 arma::uvec Dijkstra(arma::mat Madyacencia, int start, int end)
@@ -219,11 +226,20 @@ int main(int argc, char **argv){
 
 
     //---------------Camion------------
+     sf::Texture spriteCamion;
+    if (!spriteCamion.loadFromFile("./figs/Camion_sprite.png"))
+    {
+        // error loading texture
+        return 1;
+    }
+
+    // create a sprite and set its texture
+    sf::Sprite rect(spriteCamion);
 
 
     window.setFramerateLimit(30); //si esta en 1 se mueve en tiempo real, es cuantos pasos van a pasar por cada segundo real
  
-    sf::RectangleShape rect;
+    
     int i = 0;
     int j = 1;
     double V=11.66;
@@ -235,13 +251,13 @@ int main(int argc, char **argv){
     double pasos;
     double xVelocity;
     double yVelocity;
-    update(PosicionNodos, Mapa, Ruta1, xVelocity, yVelocity, V, dt, pos_nodo_old, pos_nodo_new, r, distancia, pasos, i, j);
+    update(PosicionNodos, Mapa, Ruta1, xVelocity, yVelocity, V, dt, pos_nodo_old, pos_nodo_new, r, distancia, pasos, i, j,rect);
     sf::Vector2f rectanglePosition(pos_nodo_old(0), pos_nodo_old(1));
     double distrecorrida = 0;
     rect.setPosition(rectanglePosition);
-    rect.setSize(sf::Vector2f(100, 100));
-    rect.setOutlineColor(sf::Color::Red);
-    rect.setOutlineThickness(5);
+    
+    //rect.setOutlineColor(sf::Color::Red);
+    //rect.setOutlineThickness(5);
     cout<<xVelocity<<"\t"<<yVelocity<<endl;
 
     while(window.isOpen()){
@@ -362,8 +378,8 @@ int main(int argc, char **argv){
         }
     //Physics
 
-    rectanglePosition.x += xVelocity;
-    rectanglePosition.y += yVelocity;
+    rectanglePosition.x += dt*xVelocity;
+    rectanglePosition.y += dt*yVelocity;
     distrecorrida += sqrt(xVelocity*xVelocity+yVelocity*yVelocity);
     rect.setPosition(rectanglePosition);
     if(distrecorrida>distancia){
@@ -371,7 +387,7 @@ int main(int argc, char **argv){
         j+=1;
         cout<<i<<"\t"<<j<<endl;
         if(Ruta1(j)==end){break;}
-        update(PosicionNodos, Mapa, Ruta1, xVelocity, yVelocity, V, dt, pos_nodo_old, pos_nodo_new, r, distancia, pasos, i, j);
+        update(PosicionNodos, Mapa, Ruta1, xVelocity, yVelocity, V, dt, pos_nodo_old, pos_nodo_new, r, distancia, pasos, i, j, rect);
         distrecorrida=0;
         
     }
