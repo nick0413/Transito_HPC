@@ -2,7 +2,7 @@
 
 ## Integrantes
 
-* Diana Del Mar Muños Valencia
+* Diana Del Mar Muñoz Valencia
 * Nicolás Cordoba Garzón
 * Esteban Ladino Fajardo
 
