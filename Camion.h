@@ -57,10 +57,3 @@ void Camion::Print_pos(void)
 	{
 		cout<<Pos_nodo<<" "<<Pos_arista<<"\n";
 	}
-
-
-
-
-
-
-

@@ -2,10 +2,9 @@
 
 ## Integrantes
 
-* Diana Del Mar Muñoz Valencia
+* Diana Del Mar Muños Valencia
 * Nicolás Cordoba Garzón
 * Esteban Ladino Fajardo
-
 
 ## [GUI](./GUI)
 
