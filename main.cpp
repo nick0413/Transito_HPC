@@ -152,7 +152,7 @@ int main(int argc, char **argv){
 
 	int start=4;
 	int end=7;
-    arma::mat Mapa= load_csv_arma("Madyacencia.csv");
+    arma::mat Mapa= load_csv_arma("Mapa.csv");
     //Mapa.load("Madyacencia.txt", arma::raw_ascii);
     cout<< Mapa.n_cols<< "\t"<< Mapa.n_rows<<endl;
     arma::mat PosicionNodos;
