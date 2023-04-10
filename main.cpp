@@ -1,6 +1,7 @@
 // Librerias estándar y extenas
 #include <string>
 #include <iostream>
+
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 // #include "Nodo.h"
@@ -14,6 +15,7 @@
 
 using namespace std;
 bool verbose=false;
+
 
 
 arma::vec append_vec(arma::vec & vector, double value)
@@ -32,6 +34,7 @@ arma::mat load_csv_arma (const std::string & path) {
     arma::mat X;
     X.load(path, arma::csv_ascii);
     return X;
+
 }
 arma::vec getPosition(arma::mat PosNodos,arma::uvec Ruta, int counter){
     int nodo = Ruta(counter);
@@ -61,6 +64,7 @@ double & distancia, double & pasos, int i, int j, sf::Sprite &rect){
 }
 arma::uvec Dijkstra(arma::mat Madyacencia, int start, int end)
 	{   
+
 		int i=0,j=0;
 		int new_node;
 		bool Notfound=true;
@@ -72,7 +76,7 @@ arma::uvec Dijkstra(arma::mat Madyacencia, int start, int end)
 		arma::uvec visited_nodes;
 		arma::uvec idx;
 		visited_nodes=append_vec(visited_nodes,current_node);
-        
+
 		//cout<<i<<"\n";
 		while (true)
 			{
@@ -87,6 +91,7 @@ arma::uvec Dijkstra(arma::mat Madyacencia, int start, int end)
 						idx = find(conexion==0);
 						conexion.elem(idx).fill(999);
 						new_node=conexion.index_min();
+
 
 						if ( !arma::any(visited_nodes == new_node))
 							{	
@@ -409,6 +414,7 @@ int main(int argc, char **argv){
 	window.display();
 
     }
+
 
     return 0;
 }
