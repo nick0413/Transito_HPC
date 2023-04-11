@@ -14,7 +14,9 @@ class Camion{
 		int  Next_in_route(void);
 		double Arista(arma::mat Madyacencia);
 		void Print_pos(void);
+		bool Is_alive(void){return Alive;};
 		arma::vec getPosition(arma::mat PosNodos, int nodo);
+
 
 		void draw(sf::RenderWindow & window,arma::mat Mapa,arma::mat PosNodos);
 
@@ -22,6 +24,7 @@ class Camion{
 
 
 		int Tipo;
+		bool Alive;
 		arma::ivec Ruta;
 		sf::Sprite sprite;
 		sf::Texture texture;
@@ -41,6 +44,7 @@ void Camion::Inicio(int nodo_deposito,int tipoBasura , arma::ivec ruta, double c
 		Pos_nodo=nodo_deposito;
 		Pos_arista=0;
 		Vel=velocidad;
+		Alive=true;
 
 		if (!texture.loadFromFile("./figs/Camion_sprite.png"))
 			{cout<<" error loading texture\n";}
@@ -51,16 +55,23 @@ void Camion::Inicio(int nodo_deposito,int tipoBasura , arma::ivec ruta, double c
     
 	}
 void Camion::Avanzar(arma::mat Madyacencia, double dt, bool verbose)
-	{
+	{	
+		
 		Pos_arista+=dt*Vel;
 		arma::uvec idx=arma::find(Ruta == Pos_nodo);
+		if(idx(0)+1>Ruta.size()){Alive=false; return;}
 		double cuadra=Madyacencia(Pos_nodo,Ruta(idx(0)+1));
 		if(verbose) {cout<<"cuadra actual: "<<cuadra<<"\nNodo actual:" <<Pos_nodo<<"\n"; cout<<Ruta<<"\n"; }
 		if(Pos_arista>=cuadra)
-			{
-				Pos_nodo=Ruta(idx(0)+1);
-				Pos_arista=0;
+			{	
+
+					Pos_nodo=Ruta(idx(0)+1);
+					Pos_arista=0;
+					// cout<<Pos_nodo<<"\n";
+					// cout<<Ruta.size()<<"\n";
+					// cout<<Ruta.t()<<"\n";
 			}
+
 	}
 
 int Camion::Nodo(void)
@@ -80,8 +91,10 @@ int Camion::Nodo_in_route(void)
 		return Ruta(idx(0));
 	}
 int Camion::Next_in_route(void)
-	{
+	{	
+		
 		arma::uvec idx=arma::find(Ruta == Pos_nodo);
+		if (idx(0)+1>=Ruta.size()){Alive=false;return-100;}
 		return Ruta(idx(0)+1);
 	}
 
@@ -90,27 +103,35 @@ void Camion::Print_pos(void)
 		cout<<Pos_nodo<<" "<<Pos_arista<<"\n";
 	}
 arma::vec Camion::getPosition(arma::mat PosNodos, int nodo)
-	{
+	{	
+
 		double posx= PosNodos(nodo, 1);
 		double posy= PosNodos(nodo, 2);
 		arma::vec position = {posx, posy};
+		
 		return position;
+
+		
 	}
 
 
 void Camion::draw(sf::RenderWindow & window,arma::mat Mapa,arma::mat PosNodos)
 	{	
-		
+			
 			int nodo_pos=Nodo_in_route();
 			int next_pos=Next_in_route();
+			if(next_pos==-100){cout<<"fin de la ruta\n";return;}
+
 			arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
 			arma::vec nodo_siguiente=getPosition(PosNodos,next_pos);
+
+
 			arma::vec r=nodo_siguiente-nodo_actual;
 
 			arma::vec r2=arma::normalise(r,1);
-			cout<<"||||||||||||||||||||||\n";
-			cout<<r(0)<<"\t"<<r(1)<<"\n";
-			cout<<r2(0)<<"\t"<<r2(1)<<"\n";
+			// cout<<"||||||||||||||||||||||\n";
+			// cout<<r(0)<<"\t"<<r(1)<<"\n";
+			// cout<<r2(0)<<"\t"<<r2(1)<<"\n";
 
 			if(r(0)<0)
 				{sprite.setScale(-0.040f, 0.04f);}
@@ -124,9 +145,12 @@ void Camion::draw(sf::RenderWindow & window,arma::mat Mapa,arma::mat PosNodos)
 			// cout<<nodo_pos<<"\t"<<next_pos<<"\n";
 
 			// cout<<pos_x<<"\t"<<pos_y<<"\n";
-			Print_pos();
+			//Print_pos();
 			sprite.setPosition(sf::Vector2f(pos_x,pos_y));
 			window.draw(sprite);
+			
+			
+
 
 	}
 
