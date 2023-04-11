@@ -1,10 +1,13 @@
+// Librerias estándar
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <sstream>
 
+// Librerias externas
 #include <boost/algorithm/string.hpp>
 
+// Librerias Creadas
 #include "Contenedor.h"
 #include "NodosCarretera.h"
 

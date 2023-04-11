@@ -1,1 +1,1 @@
-/home/esteban/Esteban/UN/semester12/IntroSciCompHPC/TransitoHPC/GUI_SFML/NodosCarretera.h
+/home/esteban/Esteban/UN/semester12/IntroSciCompHPC/TransitoHPC/NodosCarretera.h

@@ -1,9 +1,11 @@
+// Librerias estándar
 #include <math.h> 
 #include <string>
 // Precisión
 #include <iomanip>
 #include <sstream>
 
+// Librerías externas
 #include <SFML/Graphics.hpp>
 
 

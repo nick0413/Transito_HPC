@@ -198,3 +198,4 @@ transit.exe
 
 ./GUI/*.o
 ./GUI/*.out
+./figs/informe
