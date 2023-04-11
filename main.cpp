@@ -1,31 +1,43 @@
-//? Librerias estándar y extenas
+// Librerias estándar
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <random>
+
+// Librerias externas
 #include <armadillo>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>	// Para los Thread
 
 
-//? Clases propias
+// Clases propias
 #include "Camion.h"
 #include "Dijkstra.h"
+#include "Tools.h"
 
 
 using namespace std;
-bool verbose=false;
 
-bool isMovMyView(sf::Texture& texture,sf::View& view)
-	{
-		// Se encarga de enmarcar un movimiento
-		bool result=true;
-		if (view.getCenter().x<=0+view.getSize().x/2 || view.getCenter().x>=texture.getSize().x - view.getSize().x/2)
-			{result &= false;}
-		if(view.getCenter().y<=0 +view.getSize().y/2 || view.getCenter().y>=texture.getSize().y - view.getSize().y/2)
-			{result &= false;}
-		
-		return result;
-	}
+// SFML
+
+// https://www.sfml-dev.org/tutorials/2.5/system-thread.php
+sf::Mutex myMutex; // Se usa para la  protección de datos compartidos en thread
+
+// *** Variable globales de los contenedores ***
+
+vector<Contenedor> vectorContenedores;
+sf::Clock clockContenedor;
+sf::Time tiempoActualizarCapacidadActualContenedores =sf::seconds(1.f);
+
+// Funciones
+
+void actualizarCapacidadActualContenedores();
+
+// SFML
+
+
+bool verbose=false;
 
 
 
@@ -33,206 +45,373 @@ bool isMovMyView(sf::Texture& texture,sf::View& view)
 int main(int argc, char **argv){
 
 
-	try{if(stoi(argv[1])==1){verbose=true;};}
-	catch (...){verbose=false;}
+  try{if(stoi(argv[1])==1){verbose=true;};}
+  catch (...){verbose=false;}
 
 
-	arma::mat Mapa= load_csv_arma("Madyacencia.txt");
-	cout<< Mapa.n_cols<< "\t"<< Mapa.n_rows<<endl;
-	arma::mat PosicionNodos;
-	PosicionNodos.load("nodos-finales.csv", arma::raw_ascii);
-	if(verbose) cout<<PosicionNodos;
-	string figFondo= "./figs/Contenedores-Residuos.png";
+  arma::mat Mapa= load_csv_arma("./files/Madyacencia.txt");
+  cout<< Mapa.n_cols<< "\t"<< Mapa.n_rows<<endl;
+  arma::mat PosicionNodos;
+  PosicionNodos.load("./files/nodos-finales.csv", arma::raw_ascii);
+  if(verbose) cout<<PosicionNodos;
+
+  Camion cam1;
+  int start=11;
+  int end=0;
+  arma:: ivec Ruta1=dijkstra_arma(Mapa,start,end);
+
+  cout<< Ruta1 <<endl;
+  cam1.Inicio(start,0,Ruta1,100,10);
+
+  // ******* sfml
+  
+  // Zona de declaración de variables
+
+  // Herramientas generales
+  Tools tools;
+  
+  // Pantalla principal  
+  sf::RenderWindow window;
+
+  // *** Fondo ***
+
+  sf::Texture textFondo;
+  sf::Texture textFondoNodos;
+  // Se crea el fondo como Sprite
+  sf::Sprite sprFondo;
+  string figFondo="./figs/Contenedores-Residuos.jpg";
+  string figFondoNodos="./figs/Contenedores-Residuos-nods.png";
+  char opcionesDeFondo=1;
+  
+  // Tomado de: https://stackoverflow.com/questions/36448101/2-3-1-set-scale-of-background-texture-to-renderwindow-size
+  sf::Vector2u textureSize;  //Added to store texture size.
+  
+  // *** Vista principal ***
+
+  // //View ([left,top],[width,height])
+  sf::Vector2f viewPricipalCenter(2118.f, 3048.f);
+  sf::Vector2f viewPricipalSize(800.f, 600.f);
+  sf::View viewPrincipal(viewPricipalCenter, viewPricipalSize);
+
+    
+  // Parámetros de vista
+  float dxViewPrincipal=100.f;
+  float dyViewPrincipal=50.f;
+  float zoomViewPrincipal= 0.5;
+  
+  // ******* Contenedores *******
+  
+  string fileDataContenedores="./files/datos_contenedores.txt";
+  string fileFontInformation="./fonts/DeliusSwashCaps-Regular.ttf";
+  sf::Font fontInformation;
+  bool showInfoContenedores=false;
+
+  
+  //***  Nodos de la carreteras ***
+  
+  vector<NodosCarretera> vectorNodosCarretera;
+  string fileNodosCarretera="./files/nodos_carretera.txt";
+  
+
+  // ******* Zona de finalización de inicialización *******
+
+  // *** Configuración del fondo ***
+  
+  // Se crea la textura del fondo
+  if(!textFondo.loadFromFile(figFondo))
+    {
+      cout<< "Por favor verifique la ruta: "<<figFondo<<endl;
+      return 1;
+    }
+
+  if(!textFondoNodos.loadFromFile(figFondoNodos)){
+    cout<< "Por favor verifique la ruta: "<<figFondoNodos<<endl;
+    return 1;
+  }
+    
+  // Tomado de: https://stackoverflow.com/questions/36448101/2-3-1-set-scale-of-background-texture-to-renderwindow-size
+
+  textureSize = textFondo.getSize(); //Get size of texture.
+  // El tercer argumento es el estilo que por defecto muestra
+  // un título, redimensionamiento y para cerrar.
+  window.create(sf::VideoMode(textureSize.x, textureSize.y),"TransitoHPC");
+  // windowSize = window.getSize();             //Get size of window.
+
+  //  Sprite
+  sprFondo.setTexture(textFondo);
+
+  // *** Configuración Contenedores ***
+  
+  // Creación de contenedores
+  // https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1CircleShape.php
+    
+  if(!tools.vectorContenedores(fileDataContenedores,vectorContenedores))
+    {
+      cout<<"Por favor verifique que el archivo "<<fileDataContenedores<<" exista"<<endl;
+      return 1;
+    }
+ 
+  // *** Creación nodos de la carretera ***
+
+  if(!tools.vectorNodosCarretera(fileNodosCarretera,vectorNodosCarretera)){
+    cout<<"Por favor verifique que el archivo "<<fileNodosCarretera<<" exista"<<endl;
+    return 1;
+  }
+
+  // fuente
+  if(!fontInformation.loadFromFile(fileFontInformation)){
+    cout<<"Por favor verifique que el archivo "<<fileFontInformation<<" exista"<<endl;
+    return 1;
+  }
+
+  // Configuración de tamaño, color y estilo del texto de los nodos
+
+  sf::Text auxText;
+  for (int i=0;i< vectorContenedores.size();i++){
+    auxText=vectorContenedores[i].getTextPercentageCurrentlyCapacity();
+    
+    auxText.setFont(fontInformation);
+    auxText.setCharacterSize(40);
+    auxText.setFillColor(vectorContenedores[i].getFillColor());
+    auxText.setStyle(sf::Text::Bold);
+
+    // Outline text
+    auxText.setOutlineThickness(auxText.getCharacterSize()*0.07);
+    auxText.setOutlineColor(sf::Color::Black);
+    
+    // Se agrega al vector de contenedores
+    vectorContenedores[i].setTextPercentageCurrentlyCapacity(auxText);
+
+    // Outline shape
+    vectorContenedores[i].setOutlineThickness(-vectorContenedores[i].getRadius()*0.07);
+    vectorContenedores[i].setOutlineColor(sf::Color::Black);
+  }
+  
+  
+  // Actualización actual de los contenedores en thread
+  sf::Thread threadActualizarCapacidadActualContenedores(&actualizarCapacidadActualContenedores);
+  threadActualizarCapacidadActualContenedores.launch();
+
+
+  // ******* sfml
+
+  
+
+  
+  window.setFramerateLimit(30); //si esta en 1 se mueve en tiempo real, es cuantos pasos van a pasar por cada segundo real
+
+  double dt = 1;
+
+  
+  while(window.isOpen()){
 		
-	// un título, redimensionamiento y para cerrar.
-	sf::RenderWindow window;
-	sf::Texture textFondo;
-	// Se crea el fondo como Sprite
-	sf::Sprite sprFondo;
+    sf::Event event;
 
-	// Tomado de: https://stackoverflow.com/questions/36448101/2-3-1-set-scale-of-background-texture-to-renderwindow-size
-	sf::Vector2u textureSize;  //Added to store texture size.
+    //Se mantiene en el loop si algún evento pasa
+    while (window.pollEvent(event))
+      {   
+	bool wasUpdateByKeyboardArrows=true;
+	switch (event.type)
+	  {
+	  case sf::Event::Closed:
+	    window.close();
+	    break;
+            
+	  case sf::Event::KeyPressed:
 
+	    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	      {
+		cout<<"Move left"<<endl;
+		sf::Vector2f posActual=viewPrincipal.getCenter();
+		viewPrincipal.move(-dxViewPrincipal,0);
+                    
 
-	sf::Vector2f viewPricipalCenter(2118.f, 3048.f);
-	sf::Vector2f viewPricipalSize(800.f, 600.f);// Se inicializa una ventana de 800x600 con el título TransitoHPC
-	sf::View viewPrincipal(viewPricipalCenter, viewPricipalSize);
-
-
-	float moveViewPrincipalX=100.f;
-	float moveViewPrincipalY=50.f;
-	float zoomViewPrincipal=(float) 0.5;
-
-
-
-	// Se crea la textura
-	if(!textFondo.loadFromFile(figFondo))
-	{
-		cout<< "por favor cargue o verifique la imagen de fondo: "<<figFondo<<endl;
-		return 1;
-	}
-	// Tomado de: https://stackoverflow.com/questions/36448101/2-3-1-set-scale-of-background-texture-to-renderwindow-size
-
-	textureSize = textFondo.getSize(); //Get size of texture.
-	window.create(sf::VideoMode(textureSize.x, textureSize.y),"TransitoHPC",sf::Style::Titlebar);
-
-	//  Sprite
-	sprFondo.setTexture(textFondo);
-
-	// Tomado de: https://stackoverflow.com/questions/36448101/2-3-1-set-scale-of-background-texture-to-renderwindow-size
-	// https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1CircleShape.php
-	// Creación de contenedores
-	//---------------Camion------------
-
-	Camion cam1;
-	int start=11;
-	int end=0;
-	arma:: ivec Ruta1=dijkstra_arma(Mapa,start,end);
-
-	cout<< Ruta1 <<endl;
-	cam1.Inicio(start,0,Ruta1,100,10);
-
-
-
-	window.setFramerateLimit(30); //si esta en 1 se mueve en tiempo real, es cuantos pasos van a pasar por cada segundo real
-
-	double dt = 1;
-
-	while(window.isOpen()){
-		
-		sf::Event event;
-		while (window.pollEvent(event))
-		{   
-			bool wasUpdateByKeyboardArrows=true;
-			switch (event.type)
-			{
-			case sf::Event::Closed:
-
-			
-			window.close();
-				break;
-			
-			case sf::Event::KeyPressed:
-
-
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-				{
-					cout<<"Move left"<<endl;
-					sf::Vector2f posActual=viewPrincipal.getCenter();
-					viewPrincipal.move(-moveViewPrincipalX,0);
-					
-
-					if(!isMovMyView(textFondo,viewPrincipal)){
-						viewPrincipal.setCenter(posActual);
-						wasUpdateByKeyboardArrows=false;
-					}
-
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-				{
-					cout<<"Move Right"<<endl;
-					
-					sf::Vector2f posActual=viewPrincipal.getCenter();
-					viewPrincipal.move(moveViewPrincipalX,0);
-					
-
-					if(!isMovMyView(textFondo,viewPrincipal)){
-						viewPrincipal.setCenter(posActual);
-						wasUpdateByKeyboardArrows=false;
-					}
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-				{
-					cout<<"Move Up"<<endl;
-					
-					
-
-					sf::Vector2f posActual=viewPrincipal.getCenter();
-					viewPrincipal.move(0,-moveViewPrincipalY);
-					
-
-					if(!isMovMyView(textFondo,viewPrincipal)){
-						viewPrincipal.setCenter(posActual);
-						wasUpdateByKeyboardArrows=false;
-					}
-
-					
-
-				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-				{
-					cout<<"Move Down"<<endl;
-					
-					sf::Vector2f posActual=viewPrincipal.getCenter();
-					viewPrincipal.move(0,moveViewPrincipalY);
-					
-			
-					if(!isMovMyView(textFondo,viewPrincipal)){
-						viewPrincipal.setCenter(posActual);
-						wasUpdateByKeyboardArrows=false;
-					}
-				}
-				// Al quedarse en un ciclo sin poder actualizar vuelve a un lugar de referencia
-				if(!wasUpdateByKeyboardArrows && !isMovMyView(textFondo,viewPrincipal))
-				{
-						viewPrincipal.setCenter(viewPricipalCenter);
-				}
-				
-				break;
-			
-			case sf::Event::MouseWheelScrolled:
-
-				if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
-				{
-					// delta>o Up and delta <0 Down
-					int delta=event.mouseWheelScroll.delta;
-					// https://stackoverflow.com/questions/30961071/check-mouse-wheel-state-sfml
-					cout << "Mouse Wheel Scroll delta: " << delta << endl;
-					
-				//    viewPrincipal.setSize(textureSize.x, textureSize.y);
-
-					//Zoom de forma relativa
-					if (delta>0)
-					{
-						// Más grande
-						viewPrincipal.zoom(zoomViewPrincipal);
-			
-					}
-					else{
-						// Más pequeño
-						viewPrincipal.zoom(1/zoomViewPrincipal);
-					}
-
-					
-				
-				}
-		
-				break;
-
-			default:
-				break;
-			}
+		if(!tools.isMovMyView(textFondo,viewPrincipal)){
+		  viewPrincipal.setCenter(posActual);
+		  wasUpdateByKeyboardArrows=false;
 		}
+
+	      }
+	    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	      {
+		cout<<"Move Right"<<endl;
+                    
+		sf::Vector2f posActual=viewPrincipal.getCenter();
+		viewPrincipal.move(dxViewPrincipal,0);
+                    
+
+		if(!tools.isMovMyView(textFondo,viewPrincipal)){
+		  viewPrincipal.setCenter(posActual);
+		  wasUpdateByKeyboardArrows=false;
+		}
+	      }
+	    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+	      {
+		cout<<"Move Up"<<endl;
+                    
+		sf::Vector2f posActual=viewPrincipal.getCenter();
+		viewPrincipal.move(0,-dyViewPrincipal);
+                    
+		if(!tools.isMovMyView(textFondo,viewPrincipal)){
+		  viewPrincipal.setCenter(posActual);
+		  wasUpdateByKeyboardArrows=false;
+		}
+                    
+	      }
+	    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	      {
+		cout<<"Move Down"<<endl;
+                    
+		sf::Vector2f posActual=viewPrincipal.getCenter();
+		viewPrincipal.move(0,dyViewPrincipal);
+                    
+		    
+		if(!tools.isMovMyView(textFondo,viewPrincipal)){
+		  viewPrincipal.setCenter(posActual);
+		  wasUpdateByKeyboardArrows=false;
+		}
+	      }
+	    
+	    // Al quedarse en un ciclo sin poder actualizar vuelve a un lugar de referencia
+	    if(!wasUpdateByKeyboardArrows && !tools.isMovMyView(textFondo,viewPrincipal))
+	      {
+		viewPrincipal.setCenter(viewPricipalCenter);
+	      }
+
+	    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Tab)){
+	      // Se encarga de cambiar el fondo
+	      cout<<"Tab is pressed"<<endl;
+
+	      if(opcionesDeFondo==3){
+		opcionesDeFondo=0;
+	      }
 		
+	      switch(++opcionesDeFondo){
+	      case 1:
+		showInfoContenedores=false;
+		sprFondo.setTexture(textFondo);
+		break;
+	      case 2:
+		showInfoContenedores=false;
+		sprFondo.setTexture(textFondoNodos);
+		break;
+	      case 3:
+		showInfoContenedores=true;
+		sprFondo.setTexture(textFondo);
+		break;
+	      default:
+		showInfoContenedores=false;
+		sprFondo.setTexture(textFondo);
+		break;	  
+	      }
 		
-		//Physics
+	    }
+                
+	    break;
+            
+	  case sf::Event::MouseWheelScrolled:
 
-		if(cam1.Is_alive()) cam1.Avanzar(Mapa,dt,verbose);
-		//cout<<"---------------------\n";
-		window.clear();
-		window.setView(viewPrincipal);
+	    if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+	      {
+		// delta>o Up and delta <0 Down
+		int delta=event.mouseWheelScroll.delta;
+		// https://stackoverflow.com/questions/30961071/check-mouse-wheel-state-sfml
+		cout << "Mouse Wheel Scroll delta: " << delta << endl;
+                   
+		//    viewPrincipal.setSize(textureSize.x, textureSize.y);
 
-		// En esta parte se colocan los objetos
-		window.draw(sprFondo);
-		if(cam1.Is_alive()) cam1.draw(window,Mapa,PosicionNodos);
+		//Zoom de forma relativa
+		if (delta>0)
+		  {
+		    // Más grande
+		    viewPrincipal.zoom(zoomViewPrincipal);			
+		  }
+		else{
+		  // Más pequeño
+		  viewPrincipal.zoom(1/zoomViewPrincipal);
+		}    
+                
+	      }
+        
+	    break;
 
-		// Dibujan los contenedores
-
+	  default:
+	    break;
+	  }
+      }
+    		
 		
-		window.display();
+    //Physics
 
+    if(cam1.Is_alive()) cam1.Avanzar(Mapa,dt,verbose);
+    //cout<<"---------------------\n";
+
+    // Es una forma de actualizar
+    window.clear();
+
+    // Se ajusta la vista
+    window.setView(viewPrincipal);
+
+    
+    // En esta parte se colocan los objetos
+    window.draw(sprFondo);
+
+    // Se actualiza la posición del camión
+    if(cam1.Is_alive()) cam1.draw(window,Mapa,PosicionNodos);
+
+    // Se dibujan los contenedores y la información
+    for(auto contenedor : vectorContenedores){
+
+      window.draw(contenedor);
+
+      if(showInfoContenedores)
+	{
+	  sf::Lock lock(myMutex);
+	  window.draw(contenedor.getTextPercentageCurrentlyCapacity());
 	}
 
+    };
+    
 
-	return 0;
+    // Se muestra todo
+    window.display();
+
+  }
+
+  // Se termina el Thread de la actualización de la capacidad de los contenedores.
+  threadActualizarCapacidadActualContenedores.terminate();
+  
+  return 0;
+}
+
+void actualizarCapacidadActualContenedores(){
+  sf::Time elapsed;
+  // https://en.cppreference.com/w/cpp/numeric/random/uniform_real_distribution
+  random_device rd; // Semilla de forma aleatoria
+  mt19937 gen(rd()); // 32-bit Mersenne Twister by Matsumoto and Nishimura, 1998 
+
+  while(true){
+
+    // Se tiene en cuenta el tiempo de procesamiento  
+    elapsed = clockContenedor.restart();
+    sf::sleep(tiempoActualizarCapacidadActualContenedores-elapsed); 
+    clockContenedor.restart();
+
+    // Se actualiza el llenado de cada vectorContenedores[i]enedor
+    for(int i=0;i<vectorContenedores.size();i++){
+    
+      {
+	sf::Lock lock(myMutex);
+	uniform_real_distribution <> dis_uni(0,vectorContenedores[i].getMaximumCapacity());
+	vectorContenedores[i].setCurrentCapacity(dis_uni(gen));
+      }
+      
+    }
+  
+    
+ 
+  
+  }
+      
+  
 }
