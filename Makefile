@@ -3,16 +3,20 @@ FILES_CPP=$(wildcard *.cpp)
 MAIN=main
 MAIN_OUT=$(MAIN).out
 
+Madyacencia = ./files/Madyacencia.txt
+Matriz_mapa = ./files/Matriz_mapa.py
+
+
 all:compile link
 
-compile: Madyacencia.txt
+compile : Madyacencia
 	g++ -Isrc/include -c main.cpp
 
 link:
 	g++ main.o -o transit -Lsrc/lib -lsfml-graphics -lsfml-window -lsfml-system -lblas
 
-Madyacencia.txt: Matriz_mapa.py 
-	py Matriz_mapa.py
+Madyacencia : Matriz_mapa 
+	py Matriz_mapa
 
 
 $(MAIN_OUT) : $(FILES_CPP)
