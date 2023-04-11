@@ -175,3 +175,17 @@ transit.exe
 transit.exe
 transit.exe
 transit.exe
+transit.exe
+GUI_SFML/figs/trashmaster.png
+
+GUI_SFML/main.o
+GUI_SFML/main.out
+GUI_SFML/main.o
+GUI_SFML/test/Contenedor/test.o
+GUI_SFML/test/Contenedor/test.out
+GUI_SFML/test/NodosCarretera/test.o
+GUI_SFML/test/NodosCarretera/test.out
+GUI_SFML/test/Tools/a.out
+GUI_SFML/test/Tools/test.o
+GUI_SFML/test/Tools/test.out
+transit.exe

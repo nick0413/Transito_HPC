@@ -2,9 +2,11 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
-#include <boost/algorithm/string.hpp>
-#include "Contenedor.h"
 
+#include <boost/algorithm/string.hpp>
+
+#include "Contenedor.h"
+#include "NodosCarretera.h"
 
 
 using namespace std;
@@ -12,9 +14,14 @@ using namespace std;
 class Tools{
 
  public:
-  bool datosContenedores(string &,vector<vector<string>> &);
-  bool vectorContenedores(string &, vector<Contenedor> &);
   
+  bool datosStringFile(string &,vector<vector<string>> &);
+  
+  bool vectorContenedores(string &, vector<Contenedor> &);
+
+  bool vectorNodosCarretera(string &,vector<NodosCarretera> &);
+
+  bool isMovMyView(sf::Texture &, sf::View &);
 };
 
 
@@ -25,13 +32,17 @@ bool Tools::vectorContenedores(string &fileInfContenedores , vector<Contenedor> 
 
   
   // Verifica que se carguen los datos
-  if(!datosContenedores(fileInfContenedores,myDatosContenedores)){
+  if(!datosStringFile(fileInfContenedores,myDatosContenedores)){
     return false;
   }
 
+  
+  Contenedor auxContenedor;
+  sf::Text auxText;
+  
   for(int i=1;i<myDatosContenedores.size();i++){
     contadorInfoContenedores=0;
-    Contenedor auxContenedor;
+    
 
     // Configuración del radio
     float radius=stof(myDatosContenedores[i][contadorInfoContenedores++]);
@@ -80,6 +91,13 @@ bool Tools::vectorContenedores(string &fileInfContenedores , vector<Contenedor> 
 
     // Capacidad actual
     auxContenedor.setCurrentCapacity(stof(myDatosContenedores[i][contadorInfoContenedores++]));
+
+    // Posición texto
+    auxText=auxContenedor.getTextPercentageCurrentlyCapacity();
+    posX=stof(myDatosContenedores[i][contadorInfoContenedores++]);    
+    posY=stof(myDatosContenedores[i][contadorInfoContenedores++]); 
+    auxText.setPosition(posX,posY);
+    auxContenedor.setTextPercentageCurrentlyCapacity(auxText);
     
     // Se coloca en el vector
     vectorContenedores.push_back(auxContenedor);      
@@ -91,9 +109,36 @@ bool Tools::vectorContenedores(string &fileInfContenedores , vector<Contenedor> 
   return true;
 }
 
+bool Tools::vectorNodosCarretera(string &fileNodosCarretera, vector<NodosCarretera> &myVectorNodosCarretera){
+
+  vector<vector<string>> dataFileNodosCarretera;
+  int contador;
+  
+  if(!datosStringFile(fileNodosCarretera,dataFileNodosCarretera)){
+    return false;
+  }
+  
+
+  for(int i=1;i<dataFileNodosCarretera.size();i++){
+    contador=0;
+    int id=atoi(dataFileNodosCarretera[i][contador++].c_str());
+    float posx=stof(dataFileNodosCarretera[i][contador++]);
+
+    float posy=stof(dataFileNodosCarretera[i][contador++]);
+    
+    NodosCarretera auxNodoCarretera(id,sf::Vector2f(posx,posy));
+
+
+    myVectorNodosCarretera.push_back(auxNodoCarretera);
+    
+  }
+  return true;
+  
+}
+
 
 // https://java2blog.com/read-csv-file-in-cpp/
-bool Tools::datosContenedores(string &fname,vector<vector<string>> &content){
+bool Tools::datosStringFile(string &fname,vector<vector<string>> &content){
   vector <string> row;
   string line,word;
   fstream file (fname,ios::in);	// ios::in es para leer
@@ -124,6 +169,20 @@ bool Tools::datosContenedores(string &fname,vector<vector<string>> &content){
   
 }
 
-
-
+bool Tools::isMovMyView(sf::Texture& texture,sf::View& view)
+{
+    // Se encarga de enmarcar un movimiento
+    // cout<<"view.getCenter().x "<<view.getCenter().x<<endl;
+    // cout<<"view.getCenter().y "<<view.getCenter().y<<endl<<endl;
+    bool result=true;
+    if (view.getCenter().x<=0+view.getSize().x/2 || view.getCenter().x>=texture.getSize().x - view.getSize().x/2)
+    {
+        result &= false;
+    }
+    if(view.getCenter().y<=0 +view.getSize().y/2 || view.getCenter().y>=texture.getSize().y - view.getSize().y/2)
+    {
+        result &= false;
+    }
+    return result;
+}
 
