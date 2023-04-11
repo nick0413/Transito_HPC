@@ -104,8 +104,6 @@ bool Contenedor::setCurrentCapacity(float currentCapacity){
     stream << fixed << setprecision(2) << auxPercentage <<" %";
     this->textPercentageCurrentlyCapacity.setString(stream.str());
     
-    setTextPercentageCurrentlyCapacity(this->textPercentageCurrentlyCapacity);
-    
     return true;
   }
   else{
