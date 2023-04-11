@@ -189,3 +189,7 @@ GUI_SFML/test/Tools/a.out
 GUI_SFML/test/Tools/test.o
 GUI_SFML/test/Tools/test.out
 transit.exe
+
+# Ubuntu
+*.o
+*.out
