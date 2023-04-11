@@ -1,8 +1,6 @@
-#include <bits/stdc++.h>
 #include <armadillo>
 using namespace std ;
 
-int cost[100][100],n; 
 
 void fill_arma(arma::vec & vec, double value){
 	int q=vec.size();
@@ -18,6 +16,13 @@ arma::mat load_csv_arma (const std::string & path) {
 }
 
 arma::ivec append_vec(arma::ivec & vector, int value)
+	{
+		vector.resize(vector.n_elem+1);
+		vector(vector.n_elem-1)=value;
+		return vector;
+	}
+
+arma::vec append_vec(arma::vec & vector, double value)
 	{
 		vector.resize(vector.n_elem+1);
 		vector(vector.n_elem-1)=value;
@@ -40,17 +45,19 @@ int getMin_arma(arma::vec dist, bool visited [], int n){
 
 arma::ivec path_find(arma::ivec prev, int source, int target){
 	int node=target;
+
 	arma::ivec path(1);
 	path(0)=target;
 	while(prev(node)!=-1)
-		{
+		{	
+			//cout<<prev(prev(node))<<"\n";
 			path=append_vec(path,prev(node));
 			node=prev(node);
 		}
 	return path;
 }
 
-void dijkstra_arma(arma::mat Mapa, int source,int target)
+arma::ivec dijkstra_arma(arma::mat Mapa, int source,int target)
 	{	
 		int n=Mapa.n_rows;
 		arma:: ivec prev(n);
@@ -83,28 +90,6 @@ void dijkstra_arma(arma::mat Mapa, int source,int target)
 		prev(source)=-1;
 		
 		arma::ivec path = reverse(path_find(prev,source,target));
-
-
-		// for(int kk=0; kk<n;kk++)
-		// {
-		// 	cout<<prev[kk]<<"\n";
-		// }
-
-		for(int rr=0;rr<n;rr++)
-			{
-				cout<<path[rr]<<" ";
-				if(path[rr]==target){break;}
-			}
-		cout<<"\n";
+		return path;
 	}
 
-
-int main(int argc, char **argv) { 
-	int src,target;
-	src=stoi(argv[1]);
-	target=stoi(argv[2]);
-
-	arma::mat Mapa= load_csv_arma("Madyacencia.txt");
-	//cout<<"aqui arma\n";
-	dijkstra_arma(Mapa,src,target);
-}
