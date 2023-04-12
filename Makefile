@@ -34,8 +34,16 @@ compile_and_run:
 .PHONY : debugging
 debugging : 
 	g++ -g -c $(FILES_CPP)
-	g++ -g $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system 
+	g++ -g $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo
 	gdb $(MAIN_OUT)
+
+.PHONY : profiling
+profiling :
+	g++ -g -Wall -pg -c $(FILES_CPP)
+	g++ -g -Wall -pg $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo
+	./$(MAIN_OUT)
+	gprof $(MAIN_OUT) gmon.out > report.txt
+
 
 .PHONY : clean
 clean : 
