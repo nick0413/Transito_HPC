@@ -214,3 +214,12 @@ GUI_SFML/test/Tools/test.o
 GUI_SFML/test/Tools/test.out
 transit.exe
 >>>>>>> Stashed changes
+test/AI/DDQN_CAR/DDQN-Car-Racing-main/car.png
+test/AI/DDQN_CAR/DDQN-Car-Racing-main/ddqn_keras.py
+test/AI/DDQN_CAR/DDQN-Car-Racing-main/ddqn_model.h5
+test/AI/DDQN_CAR/DDQN-Car-Racing-main/Goals.py
+test/AI/DDQN_CAR/DDQN-Car-Racing-main/GameEnv.py
+test/AI/DDQN_CAR/DDQN-Car-Racing-main/main.py
+test/AI/DDQN_CAR/DDQN-Car-Racing-main/main_test_model.py
+test/AI/DDQN_CAR/DDQN-Car-Racing-main/track.png
+test/AI/DDQN_CAR/DDQN-Car-Racing-main/Walls.py
