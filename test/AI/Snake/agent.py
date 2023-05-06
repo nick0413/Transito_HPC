@@ -3,8 +3,8 @@ import random as rd
 import numpy as np
 from game import SnakeGame, Direction, Point
 from collections import deque
-
-
+from model import Linear_QNet, Qtrainer
+from helper import plot
 MAX_MEMORY = 100000
 BATCH_SIZE = 1000
 alpha = 0.001
@@ -13,11 +13,11 @@ class Agent:
 	def __init__(self):
 		self.number_of_games =0
 		self.epsilon = 0		
-		self.gamma = 0
+		self.gamma = 0.9 
 		self.memory = deque(maxlen=MAX_MEMORY) 	# guarda elementos secuencialmente, es decir, si añade un elemento y ya se alcanzo el numero 
 												# MAXIMO de elementos, remueve el mas viejo. Como la memoria a corto plazo real
-		self.model= None #TODO
-		self.trainer= None #TODO
+		self.model= Linear_QNet(11,256,3)
+		self.trainer= Qtrainer(self.model,alpha,self.gamma)
 
 
 	def get_state(self,game):
@@ -66,7 +66,7 @@ class Agent:
 	
 
 	def remember(self,state,action,reward,next_state,done):
-		self.memory.append((self,state,action,reward,next_state,done))
+		self.memory.append((state,action,reward,next_state,done))
 	
 	def train_long_memory(self):
 		if len(self.memory) > BATCH_SIZE:
@@ -74,7 +74,9 @@ class Agent:
 
 		else:
 			sample = self.memory
-		
+		for i in range(len(self.memory)):
+			print(len(self.memory[i]))
+			print('\n')
 		states,actions,rewards,next_states,dones = zip(*sample)
 
 		self.trainer.train_step(states,actions,rewards,next_states,dones)
@@ -91,7 +93,7 @@ class Agent:
 			move[move_idx]=1
 		else:
 			state0 = tr.tensor(state,dtype= tr.float)
-			prediction= self.model.predict(state0)
+			prediction= self.model(state0)
 			move_idx = tr.argmax(prediction).item()
 			move[move_idx]=1
 
@@ -130,10 +132,15 @@ def train():
 
 			if score> record:
 				record=score
-				# TODO agent.model.save()
+				agent.model.save_model()
 			print(f'Game {agent.number_of_games}, Score: {score}, Record: {record}')
-			#TODO  ploting
-	pass
+			
+		plot_scores.append(score)
+		size=10
+		last_totals=sum(plot_scores[len(plot_scores)-1-size:len(plot_scores)-1])/size
+	
+		plot_mean_scores.append(last_totals)
+		plot(plot_scores,plot_mean_scores)
 
 if __name__ == '__main__':
 	train()

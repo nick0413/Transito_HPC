@@ -80,12 +80,12 @@ class SnakeGame:
 		self.snake.insert(0, self.head)
 		
 		# 3. check if game over
-		rewerd=0
+		reward=0
 		game_over = False
 		if self.is_collision() or self.frame_iteration > 100*len(self.snake):
 			game_over = True
 			reward=-10
-			return game_over, self.score
+			return reward,game_over, self.score
 			
 		# 4. place new food or just move
 		if self.head == self.food:
