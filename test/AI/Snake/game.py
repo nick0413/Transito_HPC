@@ -6,7 +6,7 @@ import numpy as np
 pygame.init()
 font = pygame.font.Font('arial.ttf', 25)
 
-
+# siguiendo el tutorial https://www.youtube.com/watch?v=L8ypSXwyBds
  
 
 
