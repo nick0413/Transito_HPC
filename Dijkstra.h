@@ -1,6 +1,4 @@
 #include <armadillo>
-using namespace std ;
-
 
 void fill_arma(arma::vec & vec, double value){
   int q=vec.size();

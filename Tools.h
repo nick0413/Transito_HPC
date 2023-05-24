@@ -12,26 +12,24 @@
 #include "NodosCarretera.h"
 
 
-using namespace std;
-
 class Tools{
 
- public:
+public:
   
-  bool datosStringFile(string &,vector<vector<string>> &);
+  bool datosStringFile(std::string &,std::vector<std::vector<std::string>> &);
   
-  bool vectorContenedores(string &, vector<Contenedor> &);
+  bool vectorContenedores(std::string &, std::vector<Contenedor> &);
 
-  bool vectorNodosCarretera(string &,vector<NodosCarretera> &);
+  bool vectorNodosCarretera(std::string &, std::vector<NodosCarretera> &);
 
   bool isMovMyView(sf::Texture &, sf::View &);
 };
 
 
-bool Tools::vectorContenedores(string &fileInfContenedores , vector<Contenedor> & vectorContenedores){
+bool Tools::vectorContenedores(std::string &fileInfContenedores , std::vector<Contenedor> & vectorContenedores){
 
   int contadorInfoContenedores;
-  vector<vector<string>> myDatosContenedores;
+  std::vector<std::vector<std::string>> myDatosContenedores;
 
   
   // Verifica que se carguen los datos
@@ -43,7 +41,7 @@ bool Tools::vectorContenedores(string &fileInfContenedores , vector<Contenedor> 
   Contenedor auxContenedor;
   sf::Text auxText;
   
-  for(int i=1;i<myDatosContenedores.size();i++){
+  for(long unsigned int i=1;i<myDatosContenedores.size();i++){
     contadorInfoContenedores=0;
     
 
@@ -59,7 +57,7 @@ bool Tools::vectorContenedores(string &fileInfContenedores , vector<Contenedor> 
 
 
     // Configuración del color
-    string colorStr=myDatosContenedores[i][contadorInfoContenedores++];
+    std::string colorStr=myDatosContenedores[i][contadorInfoContenedores++];
     boost::algorithm::to_lower(colorStr);
 
     sf::Color color(0,0,0); 
@@ -112,9 +110,9 @@ bool Tools::vectorContenedores(string &fileInfContenedores , vector<Contenedor> 
   return true;
 }
 
-bool Tools::vectorNodosCarretera(string &fileNodosCarretera, vector<NodosCarretera> &myVectorNodosCarretera){
+bool Tools::vectorNodosCarretera(std::string &fileNodosCarretera, std::vector<NodosCarretera> &myVectorNodosCarretera){
 
-  vector<vector<string>> dataFileNodosCarretera;
+  std::vector<std::vector<std::string>> dataFileNodosCarretera;
   int contador;
   
   if(!datosStringFile(fileNodosCarretera,dataFileNodosCarretera)){
@@ -122,7 +120,7 @@ bool Tools::vectorNodosCarretera(string &fileNodosCarretera, vector<NodosCarrete
   }
   
 
-  for(int i=1;i<dataFileNodosCarretera.size();i++){
+  for(long unsigned int i=1;i<dataFileNodosCarretera.size();i++){
     contador=0;
     int id=atoi(dataFileNodosCarretera[i][contador++].c_str());
     float posx=stof(dataFileNodosCarretera[i][contador++]);
@@ -141,10 +139,10 @@ bool Tools::vectorNodosCarretera(string &fileNodosCarretera, vector<NodosCarrete
 
 
 // https://java2blog.com/read-csv-file-in-cpp/
-bool Tools::datosStringFile(string &fname,vector<vector<string>> &content){
-  vector <string> row;
-  string line,word;
-  fstream file (fname,ios::in);	// ios::in es para leer
+bool Tools::datosStringFile(std::string &fname,std::vector<std::vector<std::string>> &content){
+  std::vector <std::string> row;
+  std::string line,word;
+  std::fstream file (fname, std::ios::in);	// ios::in es para leer
   if(file.is_open()){
 
     while(getline(file,line)){
@@ -154,7 +152,7 @@ bool Tools::datosStringFile(string &fname,vector<vector<string>> &content){
       
       row.clear();
       
-      stringstream str(line); 	// Para extraer cada campo
+      std::stringstream str(line); 	// Para extraer cada campo
 
       while(getline(str,word,',')){
 	// https://www.geeksforgeeks.org/boosttrim-in-cpp-library/
@@ -174,18 +172,18 @@ bool Tools::datosStringFile(string &fname,vector<vector<string>> &content){
 
 bool Tools::isMovMyView(sf::Texture& texture,sf::View& view)
 {
-    // Se encarga de enmarcar un movimiento
-    // cout<<"view.getCenter().x "<<view.getCenter().x<<endl;
-    // cout<<"view.getCenter().y "<<view.getCenter().y<<endl<<endl;
-    bool result=true;
-    if (view.getCenter().x<=0+view.getSize().x/2 || view.getCenter().x>=texture.getSize().x - view.getSize().x/2)
+  // Se encarga de enmarcar un movimiento
+  // std::cout<<"view.getCenter().x "<<view.getCenter().x<<endl;
+  // std::cout<<"view.getCenter().y "<<view.getCenter().y<<endl<<endl;
+  bool result=true;
+  if (view.getCenter().x<=0+view.getSize().x/2 || view.getCenter().x>=texture.getSize().x - view.getSize().x/2)
     {
-        result &= false;
+      result &= false;
     }
-    if(view.getCenter().y<=0 +view.getSize().y/2 || view.getCenter().y>=texture.getSize().y - view.getSize().y/2)
+  if(view.getCenter().y<=0 +view.getSize().y/2 || view.getCenter().y>=texture.getSize().y - view.getSize().y/2)
     {
-        result &= false;
+      result &= false;
     }
-    return result;
+  return result;
 }
 

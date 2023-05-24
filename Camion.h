@@ -2,7 +2,6 @@
 #include <armadillo>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
-using namespace std;
 
 
 class Camion{
@@ -47,7 +46,7 @@ void Camion::Inicio(int nodo_deposito,int tipoBasura , arma::ivec ruta, double c
   Alive=true;
 
   if (!texture.loadFromFile("./figs/Camion_sprite.png"))
-    {cout<<" error loading texture\n";}
+    {std::cout<<" error loading texture\n";}
 
   sprite.setTexture(texture);
   sf::FloatRect spriteBounds = sprite.getLocalBounds();
@@ -61,7 +60,7 @@ void Camion::Avanzar(arma::mat Madyacencia, double dt, bool verbose)
   arma::uvec idx=arma::find(Ruta == Pos_nodo);
   if(idx(0)+1>Ruta.size()){Alive=false; return;}
   double cuadra=Madyacencia(Pos_nodo,Ruta(idx(0)+1));
-  if(verbose) {cout<<"cuadra actual: "<<cuadra<<"\nNodo actual:" <<Pos_nodo<<"\n"; cout<<Ruta<<"\n"; }
+  if(verbose) {std::cout<<"cuadra actual: "<<cuadra<<"\nNodo actual:" <<Pos_nodo<<"\n"; std::cout<<Ruta<<"\n"; }
   if(Pos_arista>=cuadra)
     {	
 
@@ -100,7 +99,7 @@ int Camion::Next_in_route(void)
 
 void Camion::Print_pos(void)
 {
-  cout<<Pos_nodo<<" "<<Pos_arista<<"\n";
+  std::cout<<Pos_nodo<<" "<<Pos_arista<<"\n";
 }
 arma::vec Camion::getPosition(arma::mat PosNodos, int nodo)
 {	
@@ -120,7 +119,7 @@ void Camion::draw(sf::RenderWindow & window,arma::mat Mapa,arma::mat PosNodos)
 			
   int nodo_pos=Nodo_in_route();
   int next_pos=Next_in_route();
-  if(next_pos==-100){cout<<"fin de la ruta\n";return;}
+  if(next_pos==-100){std::cout<<"fin de la ruta\n";return;}
 
   arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
   arma::vec nodo_siguiente=getPosition(PosNodos,next_pos);

@@ -2,7 +2,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-
 class NodosCarretera{
  public:
   explicit NodosCarretera(int,sf::Vector2f);  

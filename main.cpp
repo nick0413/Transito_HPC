@@ -16,9 +16,6 @@
 #include "Dijkstra.h"
 #include "Tools.h"
 
-
-using namespace std;
-
 // SFML
 
 // https://www.sfml-dev.org/tutorials/2.5/system-thread.php
@@ -26,7 +23,7 @@ sf::Mutex myMutex; // Se usa para la  protección de datos compartidos en thread
 
 // *** Variable globales de los contenedores ***
 
-vector<Contenedor> vectorContenedores;
+std::vector<Contenedor> vectorContenedores;
 sf::Clock clockContenedor;
 sf::Time tiempoActualizarCapacidadActualContenedores =sf::seconds(1.f);
 
@@ -45,22 +42,22 @@ bool verbose=false;
 int main(int argc, char **argv){
 
 
-  try{if(stoi(argv[1])==1){verbose=true;};}
+  try{if(std::stoi(argv[1])==1){verbose=true;};}
   catch (...){verbose=false;}
 
 
   arma::mat Mapa= load_csv_arma("./files/Madyacencia.txt");
-  cout<< Mapa.n_cols<< "\t"<< Mapa.n_rows<<endl;
+  std::cout<< Mapa.n_cols<< "\t"<< Mapa.n_rows<<std::endl;
   arma::mat PosicionNodos;
   PosicionNodos.load("./files/nodos-finales.csv", arma::raw_ascii);
-  if(verbose) cout<<PosicionNodos;
+  if(verbose) std::cout<<PosicionNodos;
 
   Camion cam1;
   int start=11;
   int end=0;
   arma:: ivec Ruta1=dijkstra_arma(Mapa,start,end);
 
-  cout<< Ruta1 <<endl;
+  std::cout<< Ruta1 <<std::endl;
   cam1.Inicio(start,0,Ruta1,100,10);
 
   // ******* sfml
@@ -79,8 +76,8 @@ int main(int argc, char **argv){
   sf::Texture textFondoNodos;
   // Se crea el fondo como Sprite
   sf::Sprite sprFondo;
-  string figFondo="./figs/Contenedores-Residuos.jpg";
-  string figFondoNodos="./figs/Contenedores-Residuos-nods.png";
+  std::string figFondo="./figs/Contenedores-Residuos.jpg";
+  std::string figFondoNodos="./figs/Contenedores-Residuos-nods.png";
   char opcionesDeFondo=1;
   
   // Tomado de: https://stackoverflow.com/questions/36448101/2-3-1-set-scale-of-background-texture-to-renderwindow-size
@@ -101,16 +98,16 @@ int main(int argc, char **argv){
   
   // ******* Contenedores *******
   
-  string fileDataContenedores="./files/datos_contenedores.txt";
-  string fileFontInformation="./fonts/DeliusSwashCaps-Regular.ttf";
+  std::string fileDataContenedores="./files/datos_contenedores.txt";
+  std::string fileFontInformation="./fonts/DeliusSwashCaps-Regular.ttf";
   sf::Font fontInformation;
   bool showInfoContenedores=false;
 
   
   //***  Nodos de la carreteras ***
   
-  vector<NodosCarretera> vectorNodosCarretera;
-  string fileNodosCarretera="./files/nodos_carretera.txt";
+  std::vector<NodosCarretera> vectorNodosCarretera;
+  std::string fileNodosCarretera="./files/nodos_carretera.txt";
   
 
   // ******* Zona de finalización de inicialización *******
@@ -120,12 +117,12 @@ int main(int argc, char **argv){
   // Se crea la textura del fondo
   if(!textFondo.loadFromFile(figFondo))
     {
-      cout<< "Por favor verifique la ruta: "<<figFondo<<endl;
+      std::cout<< "Por favor verifique la ruta: "<<figFondo<<std::endl;
       return 1;
     }
 
   if(!textFondoNodos.loadFromFile(figFondoNodos)){
-    cout<< "Por favor verifique la ruta: "<<figFondoNodos<<endl;
+    std::cout<< "Por favor verifique la ruta: "<<figFondoNodos<<std::endl;
     return 1;
   }
     
@@ -147,27 +144,27 @@ int main(int argc, char **argv){
     
   if(!tools.vectorContenedores(fileDataContenedores,vectorContenedores))
     {
-      cout<<"Por favor verifique que el archivo "<<fileDataContenedores<<" exista"<<endl;
+      std::cout<<"Por favor verifique que el archivo "<<fileDataContenedores<<" exista"<<std::endl;
       return 1;
     }
  
   // *** Creación nodos de la carretera ***
 
   if(!tools.vectorNodosCarretera(fileNodosCarretera,vectorNodosCarretera)){
-    cout<<"Por favor verifique que el archivo "<<fileNodosCarretera<<" exista"<<endl;
+    std::cout<<"Por favor verifique que el archivo "<<fileNodosCarretera<<" exista"<<std::endl;
     return 1;
   }
 
   // fuente
   if(!fontInformation.loadFromFile(fileFontInformation)){
-    cout<<"Por favor verifique que el archivo "<<fileFontInformation<<" exista"<<endl;
+    std::cout<<"Por favor verifique que el archivo "<<fileFontInformation<<" exista"<<std::endl;
     return 1;
   }
 
   // Configuración de tamaño, color y estilo del texto de los nodos
 
   sf::Text auxText;
-  for (int i=0;i< vectorContenedores.size();i++){
+  for (long unsigned int i=0; i<vectorContenedores.size();i++){
     auxText=vectorContenedores[i].getTextPercentageCurrentlyCapacity();
     
     auxText.setFont(fontInformation);
@@ -221,7 +218,7 @@ int main(int argc, char **argv){
 
 	    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	      {
-		cout<<"Move left"<<endl;
+		std::cout<<"Move left"<<std::endl;
 		sf::Vector2f posActual=viewPrincipal.getCenter();
 		viewPrincipal.move(-dxViewPrincipal,0);
                     
@@ -234,7 +231,7 @@ int main(int argc, char **argv){
 	      }
 	    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	      {
-		cout<<"Move Right"<<endl;
+		std::cout<<"Move Right"<<std::endl;
                     
 		sf::Vector2f posActual=viewPrincipal.getCenter();
 		viewPrincipal.move(dxViewPrincipal,0);
@@ -247,7 +244,7 @@ int main(int argc, char **argv){
 	      }
 	    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	      {
-		cout<<"Move Up"<<endl;
+		std::cout<<"Move Up"<<std::endl;
                     
 		sf::Vector2f posActual=viewPrincipal.getCenter();
 		viewPrincipal.move(0,-dyViewPrincipal);
@@ -260,7 +257,7 @@ int main(int argc, char **argv){
 	      }
 	    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	      {
-		cout<<"Move Down"<<endl;
+		std::cout<<"Move Down"<<std::endl;
                     
 		sf::Vector2f posActual=viewPrincipal.getCenter();
 		viewPrincipal.move(0,dyViewPrincipal);
@@ -280,7 +277,7 @@ int main(int argc, char **argv){
 
 	    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Tab)){
 	      // Se encarga de cambiar el fondo
-	      cout<<"Tab is pressed"<<endl;
+	      std::cout<<"Tab is pressed"<<std::endl;
 
 	      if(opcionesDeFondo==3){
 		opcionesDeFondo=0;
@@ -316,7 +313,7 @@ int main(int argc, char **argv){
 		// delta>o Up and delta <0 Down
 		int delta=event.mouseWheelScroll.delta;
 		// https://stackoverflow.com/questions/30961071/check-mouse-wheel-state-sfml
-		cout << "Mouse Wheel Scroll delta: " << delta << endl;
+		std::cout << "Mouse Wheel Scroll delta: " << delta << std::endl;
                    
 		//    viewPrincipal.setSize(textureSize.x, textureSize.y);
 
@@ -344,7 +341,7 @@ int main(int argc, char **argv){
     //Physics
 
     if(cam1.Is_alive()) cam1.Avanzar(Mapa,dt,verbose);
-    //cout<<"---------------------\n";
+    //std::cout<<"---------------------\n";
 
     // Es una forma de actualizar
     window.clear();
@@ -387,8 +384,8 @@ int main(int argc, char **argv){
 void actualizarCapacidadActualContenedores(){
   sf::Time elapsed;
   // https://en.cppreference.com/w/cpp/numeric/random/uniform_real_distribution
-  random_device rd; // Semilla de forma aleatoria
-  mt19937 gen(rd()); // 32-bit Mersenne Twister by Matsumoto and Nishimura, 1998 
+  std::random_device rd; // Semilla de forma aleatoria
+  std::mt19937 gen(rd()); // 32-bit Mersenne Twister by Matsumoto and Nishimura, 1998 
 
   while(true){
 
@@ -398,11 +395,11 @@ void actualizarCapacidadActualContenedores(){
     clockContenedor.restart();
 
     // Se actualiza el llenado de cada vectorContenedores[i]enedor
-    for(int i=0;i<vectorContenedores.size();i++){
+    for(long unsigned int i=0;i<vectorContenedores.size();i++){
     
       {
 	sf::Lock lock(myMutex);
-	uniform_real_distribution <> dis_uni(0,vectorContenedores[i].getMaximumCapacity());
+	std::uniform_real_distribution <> dis_uni(0,vectorContenedores[i].getMaximumCapacity());
 	vectorContenedores[i].setCurrentCapacity(dis_uni(gen));
       }
       

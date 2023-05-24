@@ -6,6 +6,14 @@ MAIN_OUT=$(MAIN).out
 Madyacencia = ./files/Madyacencia.txt
 Matriz_mapa = ./files/Matriz_mapa.py
 
+# Warning Flags
+WAR_FLAGS = -Wall -Wextra
+
+# Sanitizers
+SAN_FLAGS = -fsanitize=address,leak,pointer-compare,pointer-subtract,undefined
+
+# Additionals flags
+ADI_FLAGS = -g
 
 all:compile link
 
@@ -26,15 +34,15 @@ $(MAIN_OUT) : $(FILES_CPP)
 
 .PHONY : compile_and_run
 compile_and_run:
-	g++ -c $(FILES_CPP)
-	g++ $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo
+	g++ $(ADI_FLAGS) $(SAN_FLAGS) $(WAR_FLAGS) -c $(FILES_CPP)
+	g++ $(ADI_FLAGS) $(SAN_FLAGS) $(WAR_FLAGS) $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo
 	./$(MAIN_OUT) 
 
 
 .PHONY : debugging
 debugging : 
-	g++ -g -c $(FILES_CPP)
-	g++ -g $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo
+	g++ $(ADI_FLAGS) $(SAN_FLAGS) $(WAR_FLAGS) -c $(FILES_CPP)
+	g++ $(ADI_FLAGS) $(SAN_FLAGS) $(WAR_FLAGS) $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo
 	gdb $(MAIN_OUT)
 
 .PHONY : profiling
