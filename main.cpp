@@ -3,8 +3,10 @@
 #include <iostream>
 #include <fstream>
 #include <random>
+#include <cmath>
 
 // Librerias externas
+#include <omp.h>
 #include <armadillo>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -63,6 +65,9 @@ int main(int argc, char **argv){
   // ******* sfml
   
   // Zona de declaración de variables
+
+  // Aux variables
+  long unsigned int sizeVectorContendores;
 
   // Herramientas generales
   Tools tools;
@@ -163,25 +168,42 @@ int main(int argc, char **argv){
 
   // Configuración de tamaño, color y estilo del texto de los nodos
 
+  sizeVectorContendores=vectorContenedores.size();
   sf::Text auxText;
-  for (long unsigned int i=0; i<vectorContenedores.size();i++){
-    auxText=vectorContenedores[i].getTextPercentageCurrentlyCapacity();
-    
-    auxText.setFont(fontInformation);
-    auxText.setCharacterSize(40);
-    auxText.setFillColor(vectorContenedores[i].getFillColor());
-    auxText.setStyle(sf::Text::Bold);
 
-    // Outline text
-    auxText.setOutlineThickness(auxText.getCharacterSize()*0.07);
-    auxText.setOutlineColor(sf::Color::Black);
+  
+  
+  #pragma omp parallel
+  {
+    int thr_id=omp_get_thread_num();
+    int num_thr=omp_get_num_threads();
+    int Nlocal=std::ceil((float)sizeVectorContendores/num_thr);
+    long unsigned int imin=thr_id*Nlocal;
+    long unsigned int imax=imin+Nlocal;
+    if(num_thr>1 && thr_id==(num_thr-1)){
+      imax=imin+sizeVectorContendores%Nlocal;
+    }
     
-    // Se agrega al vector de contenedores
-    vectorContenedores[i].setTextPercentageCurrentlyCapacity(auxText);
+    for (long unsigned int i=imin; i<imax;i++){
+      auxText=vectorContenedores[i].getTextPercentageCurrentlyCapacity();
+    
+      auxText.setFont(fontInformation);
+      auxText.setCharacterSize(40);
+      auxText.setFillColor(vectorContenedores[i].getFillColor());
+      auxText.setStyle(sf::Text::Bold);
 
-    // Outline shape
-    vectorContenedores[i].setOutlineThickness(-vectorContenedores[i].getRadius()*0.07);
-    vectorContenedores[i].setOutlineColor(sf::Color::Black);
+      // Outline text
+      auxText.setOutlineThickness(auxText.getCharacterSize()*0.07);
+      auxText.setOutlineColor(sf::Color::Black);
+    
+      // Se agrega al vector de contenedores
+      vectorContenedores[i].setTextPercentageCurrentlyCapacity(auxText);
+
+      // Outline shape
+      vectorContenedores[i].setOutlineThickness(-vectorContenedores[i].getRadius()*0.07);
+      vectorContenedores[i].setOutlineColor(sf::Color::Black);
+    }
+  
   }
   
   
@@ -394,7 +416,7 @@ void actualizarCapacidadActualContenedores(){
     sf::sleep(tiempoActualizarCapacidadActualContenedores-elapsed); 
     clockContenedor.restart();
 
-    // Se actualiza el llenado de cada vectorContenedores[i]enedor
+    // Se actualiza el llenado de cada vectorContenedor
     for(long unsigned int i=0;i<vectorContenedores.size();i++){
     
       {

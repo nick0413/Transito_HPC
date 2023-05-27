@@ -9,11 +9,17 @@ Matriz_mapa = ./files/Matriz_mapa.py
 # Warning Flags
 WAR_FLAGS = -Wall -Wextra
 
-# Sanitizers
-SAN_FLAGS = -fsanitize=address,leak,pointer-compare,pointer-subtract,undefined
+# Libraries
+LIB_FLAGS = -lsfml-graphics -lsfml-window -lsfml-system -larmadillo -fopenmp
 
 # Additionals flags
 ADI_FLAGS = -g
+
+# Sanitizers
+SAN_FLAGS = -fsanitize=undefined,thread
+
+# OPENMP
+NUM_THR = 8
 
 all:compile link
 
@@ -35,8 +41,8 @@ $(MAIN_OUT) : $(FILES_CPP)
 .PHONY : compile_and_run
 compile_and_run:
 	g++ $(ADI_FLAGS) $(SAN_FLAGS) $(WAR_FLAGS) -c $(FILES_CPP)
-	g++ $(ADI_FLAGS) $(SAN_FLAGS) $(WAR_FLAGS) $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo
-	./$(MAIN_OUT) 
+	g++ $(ADI_FLAGS) $(SAN_FLAGS) $(WAR_FLAGS) $(MAIN).o -o $(MAIN_OUT) $(LIB_FLAGS)
+	OMP_NUM_THREADS=$(NUM_THR) ./$(MAIN_OUT) 
 
 
 .PHONY : debugging
