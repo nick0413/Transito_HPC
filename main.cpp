@@ -169,18 +169,17 @@ int main(int argc, char **argv){
   // Configuración de tamaño, color y estilo del texto de los nodos
 
   sizeVectorContendores=vectorContenedores.size();
-  sf::Text auxText;
-
-  
   
   #pragma omp parallel
   {
+    sf::Text auxText;
     int thr_id=omp_get_thread_num();
     int num_thr=omp_get_num_threads();
     int Nlocal=std::ceil((float)sizeVectorContendores/num_thr);
     long unsigned int imin=thr_id*Nlocal;
     long unsigned int imax=imin+Nlocal;
-    if(num_thr>1 && thr_id==(num_thr-1)){
+    
+    if(num_thr>1 && thr_id==(num_thr-1) && (sizeVectorContendores%Nlocal)!=0){
       imax=imin+sizeVectorContendores%Nlocal;
     }
     
