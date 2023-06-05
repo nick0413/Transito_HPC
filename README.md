@@ -5,6 +5,7 @@
 * Diana Del Mar Muñoz Valencia
 * Nicolás Cordoba Garzón
 * Esteban Ladino Fajardo
+* Victor Manuel Davila Castañeda
 
 ## [GUI](./GUI)
 
