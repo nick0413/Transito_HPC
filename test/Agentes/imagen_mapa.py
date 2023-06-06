@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pylab as plt 
 import imageio.v3 as iio
-import networkx as nx
-from itertools import count
+
 
 
 im = iio.imread('./Environment/mapa_v5.png')
@@ -13,4 +12,5 @@ np.savetxt("./Environment/Aceso.csv", mapa_c, delimiter=",",fmt='%0d')
 print(mapa_c.shape)
 plt.figure(dpi=600)
 plt.imshow(mapa_c)
+plt.savefig("./Environment/mapa.png")
 
