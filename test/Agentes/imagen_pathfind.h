@@ -1,7 +1,5 @@
 #include "Dijkstra.h"
-
 #include <armadillo>
-#include <fstream>
 #include <iostream>
 #include <string>
 
@@ -31,11 +29,3 @@ arma::ivec Ruta_imagen(int start, int end, std::string Usables_file, std::string
 		Ruta1.print();
 	}
 
-
-int main()
-	{	
-
-		//Ruta2.print();
-		
-
-	}
