@@ -24,32 +24,40 @@ class Agente_Universitario{
         bool en_actividad;
         bool en_ruta;
         arma::vec Ruta;
-        arma::vec posicion;
-        arma::vec velocidad;
+        double Pos_nodo;
+        double Pos_arista;
+        double Vel;
     
     public:
-        void inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
-        bool en_actividad0, bool en_ruta0, arma::vec Ruta0, arma::vec posicion0, arma::vec velocidad0, double t);
+        void inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  
+        float cap_basura, float t_actividad, arma::vec Ruta0, double posicion0, double velocidad0, double t);
         void asignar_rol(double prob_rol);
         void Actividad(double prob_tipo_actividad, double prob_actv_academica,double t);
         std::tuple<double, double, double> prob_actividad_est(double spawn_time, double t);
         std::tuple<double, double, double> prob_actividad_admin(double t);
-        void asignar_rol(double prob_rol);
-               
+        void Avanzar(arma::mat Madyacencia, double dt, bool verbose);
+        int Nodo(void);
+        double Arista(arma::mat Madyacencia);
+        int Nodo_in_route(void);
+        int Next_in_route(void);
+        void Print_pos(void);
+        arma::vec getPosition(arma::mat PosNodos, int nodo);
 };
 
 void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
-        bool en_actividad0, bool en_ruta0, arma::vec Ruta0, arma::vec posicion0, arma::vec velocidad0, double t){
+         arma::vec Ruta0, double posicion0, double velocidad0, double t){
             asignar_rol(rand_rol_un);
             Actividad(prob_tipo_actividad, prob_actv_academica,t);
             spawn_time = t_spawn;
             capacidad_basura = cap_basura;
             tiempo_actividad = t_actividad;
-            en_actividad = bool(actividad);
-            en_ruta = en_ruta0;
+            en_actividad = false;
+            en_ruta=true; //se asume que siempre que se inicializa se entra a la U y se toma un camino
             Ruta = Ruta0;
-            posicion = posicion0;
-            velocidad = velocidad0;
+            Pos_nodo = posicion0;
+            Vel = velocidad0;
+            Pos_arista = 0;
+            
         }
 
 void Agente_Universitario::asignar_rol(double prob_rol){
@@ -397,3 +405,61 @@ std::tuple<double, double, double> Agente_Universitario::prob_actividad_admin(do
                 return std::make_tuple(P_a, P_o, P_i);  
             }
         } 
+void Agente_Universitario::Avanzar(arma::mat Madyacencia, double dt, bool verbose)
+{	
+		
+  Pos_arista+=dt*Vel;
+  arma::uvec idx=arma::find(Ruta == Pos_nodo);
+  if(idx(0)+1>Ruta.size()){en_ruta=false; return;}
+  double cuadra=Madyacencia(Pos_nodo,Ruta(idx(0)+1));
+  if(verbose) {std::cout<<"cuadra actual: "<<cuadra<<"\nNodo actual:" <<Pos_nodo<<"\n"; std::cout<<Ruta<<"\n"; }
+  if(Pos_arista>=cuadra)
+    {	
+
+      Pos_nodo=Ruta(idx(0)+1);
+      Pos_arista=0;
+      // cout<<Pos_nodo<<"\n";
+      // cout<<Ruta.size()<<"\n";
+      // cout<<Ruta.t()<<"\n";
+    }
+
+}
+int Agente_Universitario::Nodo(void)
+{
+  return Pos_nodo;
+}
+double Agente_Universitario::Arista(arma::mat Madyacencia)
+{	
+  arma::uvec idx=arma::find(Ruta == Pos_nodo);
+  double cuadra=Madyacencia(Pos_nodo,Ruta(idx(0)+1));
+  return Pos_arista/cuadra;
+}
+
+int Agente_Universitario::Nodo_in_route(void)
+{
+  arma::uvec idx=arma::find(Ruta == Pos_nodo);
+  return Ruta(idx(0));
+}
+int Agente_Universitario::Next_in_route(void)
+{	
+		
+  arma::uvec idx=arma::find(Ruta == Pos_nodo);
+  if (idx(0)+1>=Ruta.size()){en_ruta=false;return-100;}
+  return Ruta(idx(0)+1);
+}
+
+void Agente_Universitario::Print_pos(void)
+{
+  std::cout<<Pos_nodo<<" "<<Pos_arista<<"\n";
+}
+arma::vec Agente_Universitario::getPosition(arma::mat PosNodos, int nodo)
+{	
+
+  double posx= PosNodos(nodo, 1);
+  double posy= PosNodos(nodo, 2);
+  arma::vec position = {posx, posy};
+		
+  return position;
+
+		
+}
