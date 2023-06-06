@@ -61,7 +61,7 @@ arma::mat Aceso(arma::mat imagen, arma::mat Adyacencia)
 		int numCols= imagen.n_cols;
 		int element=0;
 		arma::ivec Usables(Adyacencia.n_rows);
-		Usables.fill(1);
+		Usables.fill(3);
 		if(numRows!=numCols) 
 			{
 				std::cout<<"Alerta: imagen no es cuadrada\n";
@@ -77,16 +77,23 @@ arma::mat Aceso(arma::mat imagen, arma::mat Adyacencia)
 			{for(int jj=0;jj<numCols;jj++)
 				{	
 					// std::cout<<imagen(ii,jj)<<"\n";
+					element=ii*numRows+jj;
 					if(imagen(ii,jj)==0)
 						{
-							element=ii*numRows+jj;
-							// std::cout<<element<<" "<<ii<<" "<<jj <<"\n";
+							
+							
 							Adyacencia.row(element).fill(9999);
 							Adyacencia.col(element).fill(9999);
+
+
 							Usables(element)=0;
+							std::cout<<element<<"\t"<<ii<<"\t"<<jj<< "\t" <<Usables(element) <<"\n";
 						}
+					else if(imagen(ii,jj)!=0)
+						{Usables(element)=1;}
 					else
-						{Usables(element)=1;};
+						{Usables(element)=2;
+						std::cout<<"Alerta: Error en asigancion de Madyacencia\n";}
 				}
 			}
 		// std::cout<<"||||||\n";
