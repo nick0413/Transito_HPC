@@ -28,6 +28,7 @@ arma::ivec Ruta_imagen(int start, int end, std::string Usables_file, std::string
 		if(Usables(end)==1)
 				{std::cout<<"Si\n";}
 			else
+
 				{
 					std::cout<<end<<" No es un nodo accesible"; 
 					end=next_node(Usables,end);
@@ -43,7 +44,7 @@ arma::ivec Ruta_imagen(int start, int end, std::string Usables_file, std::string
 				}
 		arma:: ivec Ruta1=dijkstra_arma(Mapa,start,end);
 		std::cout<<"_\n";
-		Ruta1.print();
+		//Ruta1.print();
 		return Ruta1;
 	}
 
