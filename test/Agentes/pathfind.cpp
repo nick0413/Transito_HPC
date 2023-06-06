@@ -7,6 +7,9 @@
 
 
 int main()
-	{
+	{	
+		arma::mat Imagen= load_csv_arma("./Environment/Aceso.csv");
+		
+		
 
 	}

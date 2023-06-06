@@ -7,6 +7,13 @@ void fill_arma(arma::vec & vec, double value){
       vec(ii)=value;
     }
 }
+
+
+arma::vec mat_to_vec(arma::mat matrix)
+	{
+		arma::vec vector = arma::vectorise(matrix);
+		return vector;
+	}
 arma::mat load_csv_arma (const std::string & path) {
   arma::mat X;
   X.load(path, arma::csv_ascii);
