@@ -96,7 +96,7 @@ arma::mat Aceso(arma::mat imagen, arma::mat Adyacencia)
 						std::cout<<"Alerta: Error en asigancion de Madyacencia\n";}
 				}
 			}
-		// std::cout<<"||||||\n";
+		
 		for(int ll=0;ll<Adyacencia.n_cols;ll++)
 			{for(int tt=0; tt<Adyacencia.n_rows;tt++)
 				{
