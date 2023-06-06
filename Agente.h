@@ -31,8 +31,8 @@ class Agente_Universitario{
     public:
         void inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  
         float cap_basura, float t_actividad, arma::ivec Ruta0, double posicion0, double velocidad0, double t);
-        void asignar_rol(double prob_rol);
-        void Actividad(double prob_tipo_actividad, double prob_actv_academica,double t);
+        void asignar_rol(double prob_rol, double prob_actv_academica);
+        void Actividad(double prob_tipo_actividad,double t);
         std::tuple<double, double, double> prob_actividad_est(double spawn_time, double t);
         std::tuple<double, double, double> prob_actividad_admin(double t);
 
@@ -52,8 +52,8 @@ class Agente_Universitario{
 
 void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
          arma::ivec Ruta0, double posicion0, double velocidad0, double t){
-            asignar_rol(rand_rol_un);
-            Actividad(prob_tipo_actividad, prob_actv_academica,t);
+            asignar_rol(rand_rol_un,prob_actv_academica);
+            Actividad(prob_tipo_actividad,t);
             spawn_time = t_spawn;
             capacidad_basura = cap_basura;
             tiempo_actividad = t_actividad;
@@ -66,7 +66,7 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
             
         }
 
-void Agente_Universitario::asignar_rol(double prob_rol){
+void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academica){
             
             if(prob_rol<0.91){
                 rol = 0; //Es estudiante
@@ -79,22 +79,8 @@ void Agente_Universitario::asignar_rol(double prob_rol){
                 else{
                     rol = 2; //Es docente
                 }   
-            }
 
-
-void Agente_Universitario::Actividad(double prob_tipo_actividad, double prob_actv_academica,double t){
-            double P_a;
-            double P_o;
-            double P_i;
-
-            if(rol==0){//Si es estudiante
-                auto result = prob_actividad_est(spawn_time,t);
-                P_a = std::get<0>(result);
-                P_o = std::get<1>(result);
-                P_i= std::get<2>(result);
-
-                
-                if(t==spawn_time){
+            {
                     //Se desarrolla una actividad academica 
                     /*Actividades 
                         2 clase ing
@@ -153,6 +139,20 @@ void Agente_Universitario::Actividad(double prob_tipo_actividad, double prob_act
                    else{facultad = 12;}
                     
                 }
+            }
+
+
+void Agente_Universitario::Actividad(double prob_tipo_actividad,double t){
+            double P_a;
+            double P_o;
+            double P_i;
+
+            if(rol==0){//Si es estudiante
+                auto result = prob_actividad_est(spawn_time,t);
+                P_a = std::get<0>(result);
+                P_o = std::get<1>(result);
+                P_i= std::get<2>(result);
+
                 if(0<prob_tipo_actividad<=P_a){
                     actividad = 1; //actividad academica
                 }
@@ -170,65 +170,7 @@ void Agente_Universitario::Actividad(double prob_tipo_actividad, double prob_act
                 P_a = std::get<0>(result);
                 P_o = std::get<1>(result);
                 P_i= std::get<2>(result);
-                if(t==spawn_time){
-                    //Asignacion facultad
-                    /*
-                        2 ing
-                        3 humanas
-                        4 ciencias
-                        5 Medicina
-                        6 economicas
-                        7 artes
-                        8 derecho
-                        9 veterinaria
-                        10 agrarias 
-                        11 enfermeria
-                        12 odontologia
-                    
-                    */
-                   if(0<prob_actv_academica<=0.24){
-                    facultad = 2;
-                   }
-
-                   else if(0.24<prob_actv_academica<=0.38){
-                    facultad = 3;
-                   }
-
-                   else if(0.38<prob_actv_academica<=0.52){
-                    facultad = 4;
-                   }
-
-                   else if(0.52<prob_actv_academica<=0.62){
-                    facultad = 5;
-                   }
-
-                   else if(0.62<prob_actv_academica<=0.72){
-                    facultad = 6;
-                   }
-
-                   else if(0.72<prob_actv_academica<=0.81){
-                    facultad = 7;
-                   }
-
-                   else if(0.81<prob_actv_academica<=0.88){
-                    facultad = 8;
-                   }
-
-                   else if(0.88<prob_actv_academica<=0.92){
-                    facultad = 9;
-                   }
-
-                   else if(0.92<prob_actv_academica<=0.95){
-                    facultad = 10;
-                   }
-
-                   else if(0.95<prob_actv_academica<=0.98){
-                    facultad = 11;
-                   }
-
-                   else{facultad = 12;}
-                    
-                }
+                
             
                 if(0<prob_tipo_actividad<=P_a){
                     actividad = 1; //actividad academica
@@ -248,65 +190,8 @@ void Agente_Universitario::Actividad(double prob_tipo_actividad, double prob_act
                 P_a = std::get<0>(result);
                 P_o = std::get<1>(result);
                 P_i= std::get<2>(result);
-                if(t==spawn_time){
-                    //Asignacion facultad
-                    /*
-                        2 ing
-                        3 humanas
-                        4 ciencias
-                        5 Medicina
-                        6 economicas
-                        7 artes
-                        8 derecho
-                        9 veterinaria
-                        10 agrarias 
-                        11 enfermeria
-                        12 odontologia
+                
                     
-                    */
-                   if(0<prob_actv_academica<=0.24){
-                    facultad = 2;
-                   }
-
-                   else if(0.24<prob_actv_academica<=0.38){
-                    facultad = 3;
-                   }
-
-                   else if(0.38<prob_actv_academica<=0.52){
-                    facultad = 4;
-                   }
-
-                   else if(0.52<prob_actv_academica<=0.62){
-                    facultad = 5;
-                   }
-
-                   else if(0.62<prob_actv_academica<=0.72){
-                    facultad = 6;
-                   }
-
-                   else if(0.72<prob_actv_academica<=0.81){
-                    facultad = 7;
-                   }
-
-                   else if(0.81<prob_actv_academica<=0.88){
-                    facultad = 8;
-                   }
-
-                   else if(0.88<prob_actv_academica<=0.92){
-                    facultad = 9;
-                   }
-
-                   else if(0.92<prob_actv_academica<=0.95){
-                    facultad = 10;
-                   }
-
-                   else if(0.95<prob_actv_academica<=0.98){
-                    facultad = 11;
-                   }
-
-                   else{facultad = 12;}
-                    
-                }
             
                 if(0<prob_tipo_actividad<=P_a){
                     actividad = 1; //actividad academica
