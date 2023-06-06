@@ -7,6 +7,8 @@
 #include <vector>
 #include <random>
 #include <armadillo>
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 using namespace std;
 
 
@@ -36,6 +38,7 @@ class Agente_Universitario
         void Actividad(double prob_tipo_actividad,double t);
         std::tuple<double, double, double> prob_actividad_est(double spawn_time, double t);
         std::tuple<double, double, double> prob_actividad_admin(double t);
+        void draw(sf::RenderWindow & window,arma::mat Mapa,arma::mat PosNodos);
 
 			void Avanzar(arma::mat Madyacencia, double dt, bool verbose);
 			int Nodo(void);
@@ -359,4 +362,41 @@ arma::vec Agente_Universitario::getPosition(arma::mat PosNodos, int nodo)
   return position;
 
 		
+}
+
+void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::mat PosNodos)
+{	
+			
+  int nodo_pos=Nodo_in_route();
+  int next_pos=Next_in_route();
+  if(next_pos==-100){std::cout<<"fin de la ruta\n";return;}
+
+  arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
+  arma::vec nodo_siguiente=getPosition(PosNodos,next_pos);
+
+
+  arma::vec r=nodo_siguiente-nodo_actual;
+
+  arma::vec r2=arma::normalise(r,1);
+  // cout<<"||||||||||||||||||||||\n";
+  // cout<<r(0)<<"\t"<<r(1)<<"\n";
+  // cout<<r2(0)<<"\t"<<r2(1)<<"\n";
+
+  if(r(0)<0)
+    {sprite.setScale(-0.040f, 0.04f);}
+  else
+    {sprite.setScale(0.040f, 0.04f);}
+
+			
+  double pos_x=r2(0)*Pos_arista+nodo_actual(0);
+  double pos_y=r2(1)*Pos_arista+nodo_actual(1);
+
+  // cout<<nodo_pos<<"\t"<<next_pos<<"\n";
+
+  // cout<<pos_x<<"\t"<<pos_y<<"\n";
+  //Print_pos();
+  sprite.setPosition(sf::Vector2f(pos_x,pos_y));
+  window.draw(sprite);
+			
+
 }
