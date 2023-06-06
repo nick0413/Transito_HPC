@@ -23,18 +23,19 @@ class Agente_Universitario{
         float tiempo_actividad;
         bool en_actividad;
         bool en_ruta;
-        arma::vec Ruta;
+        arma::ivec Ruta;
         double Pos_nodo;
         double Pos_arista;
         double Vel;
     
     public:
         void inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  
-        float cap_basura, float t_actividad, arma::vec Ruta0, double posicion0, double velocidad0, double t);
+        float cap_basura, float t_actividad, arma::ivec Ruta0, double posicion0, double velocidad0, double t);
         void asignar_rol(double prob_rol);
         void Actividad(double prob_tipo_actividad, double prob_actv_academica,double t);
         std::tuple<double, double, double> prob_actividad_est(double spawn_time, double t);
         std::tuple<double, double, double> prob_actividad_admin(double t);
+
         void Avanzar(arma::mat Madyacencia, double dt, bool verbose);
         int Nodo(void);
         double Arista(arma::mat Madyacencia);
@@ -42,10 +43,13 @@ class Agente_Universitario{
         int Next_in_route(void);
         void Print_pos(void);
         arma::vec getPosition(arma::mat PosNodos, int nodo);
+        int getRol(void){return rol;};
+        int getActividad(void){return actividad;};
+        int getFacultad(void){return facultad;};
 };
 
 void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
-         arma::vec Ruta0, double posicion0, double velocidad0, double t){
+         arma::ivec Ruta0, double posicion0, double velocidad0, double t){
             asignar_rol(rand_rol_un);
             Actividad(prob_tipo_actividad, prob_actv_academica,t);
             spawn_time = t_spawn;
