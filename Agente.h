@@ -381,6 +381,7 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::m
   if(next_pos==-100){std::cout<<"fin de la ruta\n";return;}
 
   arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
+	nodo_actual.print();
   arma::vec nodo_siguiente=getPosition(PosNodos,next_pos);
 
 
@@ -389,15 +390,15 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::m
   arma::vec r2=arma::normalise(r,1);
 
   if(r(0)<0)
-    {sprite.setScale(-0.040f, 0.04f);}
+    {sprite.setScale(-0.1f, 0.1f);}
   else
-    {sprite.setScale(0.040f, 0.04f);}
+    {sprite.setScale(0.1f, 0.1f);}
 
 			
-  double pos_x=(r2(0)*Pos_arista)+nodo_actual(0);
-  double pos_y=(r2(1)*Pos_arista)+nodo_actual(1);
-
-  sprite.setPosition(sf::Vector2f(pos_x,pos_y));
+  double pos_x=(100*r2(0)*Pos_arista)+nodo_actual(0);
+  double pos_y=(100*r2(1)*Pos_arista)+nodo_actual(1);
+	std::cout<<pos_x<<"\t"<<pos_y<<"\n";
+  sprite.setPosition(sf::Vector2f(pos_y,pos_x));
   window.draw(sprite);
 			
 

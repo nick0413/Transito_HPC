@@ -13,7 +13,6 @@
 
 // Clases propias
 #include "Camion.h"
-#include "Dijkstra.h"
 #include "Tools.h"
 #include "Agente.h"
 #include "imagen_pathfind.h"
@@ -55,9 +54,9 @@ int main(int argc, char **argv)
 	if(verbose) std::cout<<PosicionNodos;
 	Agente_Universitario Persona;
 	int nimagen = 10;
-	int nodo_inicio = 6;//xy_to_node(inicio, nimagen);
+	int nodo_inicio = 1;//xy_to_node(inicio, nimagen);
 				
-	int nodo_destino = 7;//xy_to_node(destino, nimagen);
+	int nodo_destino = 5;//xy_to_node(destino, nimagen);
 	// std::cout << "Inicio: "<< nodo_inicio << "\t" << "Final: " << nodo_destino << std::endl;
 	arma::ivec Ruta1 = Ruta_imagen(nodo_inicio,nodo_destino,"Environment/Usables.csv",Mapa_file,false);
 	
@@ -181,7 +180,7 @@ int main(int argc, char **argv)
 
 	double dt = 1;
 
-
+	
 	while(window.isOpen())
 		{
 				

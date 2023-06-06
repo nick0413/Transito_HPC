@@ -1,63 +1,7 @@
-FILES_CPP=$(wildcard *.cpp)
+all: h
 
-MAIN=main
-MAIN_OUT=$(MAIN).out
-
-Madyacencia = ./files/Madyacencia.txt
-Matriz_mapa = ./files/Matriz_mapa.py
-
-# Warning Flags
-WAR_FLAGS = -Wall -Wextra
-
-# Sanitizers
-SAN_FLAGS = -fsanitize=address,leak,pointer-compare,pointer-subtract,undefined
-
-# Additionals flags
-ADI_FLAGS = -g
-
-all:compile link
-
-compile : Madyacencia
-	g++ -Isrc/include -c main.cpp
-
-link:
-	g++ main.o -o transit -Lsrc/lib -lsfml-graphics -lsfml-window -lsfml-system -lblas
-
-Madyacencia : Matriz_mapa 
-	py Matriz_mapa
-
-
-$(MAIN_OUT) : $(FILES_CPP)
-	g++ -c $^
-	g++ $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system
-	./$(MAIN_OUT) 
-
-.PHONY : compile_and_run
-compile_and_run:
-	g++ $(ADI_FLAGS) $(SAN_FLAGS) $(WAR_FLAGS) -c $(FILES_CPP)
-	g++ $(ADI_FLAGS) $(SAN_FLAGS) $(WAR_FLAGS) $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo
-	./$(MAIN_OUT) 
-
-
-.PHONY : debugging
-debugging : 
-	g++ $(ADI_FLAGS) $(SAN_FLAGS) $(WAR_FLAGS) -c $(FILES_CPP)
-	g++ $(ADI_FLAGS) $(SAN_FLAGS) $(WAR_FLAGS) $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo
-	gdb $(MAIN_OUT)
-
-.PHONY : profiling
-profiling :
-	g++ -g -Wall -pg -c $(FILES_CPP)
-	g++ -g -Wall -pg $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo
-	./$(MAIN_OUT)
-	gprof $(MAIN_OUT) gmon.out > report.txt
-
-
-.PHONY : clean
-clean : 
-	rm -f *.o
-	rm -f *.out
-
-
-## Agradecimientos
-# -larmadillo : https://stackoverflow.com/questions/17062110/undefined-reference-to-lapack-wrapper-of-armadillo
+h:
+	g++ -Isrc/include -c .\Dispersion_social.cpp
+	g++ .\Dispersion_social.o -o Dispersion_social -Lsrc/lib -lsfml-graphics -lsfml-window -lsfml-system -lblas
+	.\Dispersion_social.exe  
+	

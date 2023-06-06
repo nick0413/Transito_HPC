@@ -20,12 +20,12 @@ def fill_array():
 def x_coord(n):
     # Replace with your custom function logic
     x=int(n/10)
-    return x
+    return x*100
 
 def y_coord(n):
     # Replace with your custom function logic
     y=n%10
-    return y
+    return y*100
 
 # Call the function to fill the array
 result = fill_array()
