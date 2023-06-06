@@ -177,11 +177,13 @@ int main(int argc, char **argv){
     int num_thr=omp_get_num_threads();
     int Nlocal=sizeVectorContendores/num_thr;
 
+    
+    long unsigned int imin=thr_id*Nlocal;
+
     if(num_thr>1 && thr_id==(num_thr-1) && (sizeVectorContendores%Nlocal)!=0){
       Nlocal+=sizeVectorContendores%num_thr;
     }
-    
-    long unsigned int imin=thr_id*Nlocal;
+
     long unsigned int imax=imin+Nlocal;
     
     
