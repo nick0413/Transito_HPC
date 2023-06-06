@@ -10,7 +10,9 @@ int xy_to_node(arma::vec coordenadas, int nimagen){
 	return nodo;
 }
 int main(int argc, char **argv){
-		//const double TMAX = stoi(argv[2]);
+		std::string Mapa_file = "Environment/Matriz_adyacencia_mapa.csv";
+		arma::mat Mapa= load_csv_arma(Mapa_file);
+		const double TMAX = stoi(argv[1]);
 		int Pob_max=10; //Poblacion maxima de la universidad
 		int Ni = 2; //poblacion inicial
 		Agente_Universitario Poblacion_unal[Pob_max]; 							//Array de bichines con numero maximo de bichines
@@ -44,7 +46,7 @@ int main(int argc, char **argv){
 					int nodo_inicio =  0;//int_dist(gen);//xy_to_node(inicio, nimagen);
 					int nodo_destino = 5;//int_dist(gen);//xy_to_node(destino, nimagen);
 					std::cout << "Inicio: "<< nodo_inicio << "\t" << "Final: " << nodo_destino << std::endl;
-					arma::ivec ruta = Ruta_imagen(nodo_inicio,nodo_destino,"Environment/Usables.csv","Environment/Matriz_adyacencia_mapa.csv");
+					arma::ivec ruta = Ruta_imagen(nodo_inicio,nodo_destino,"Environment/Usables.csv",Mapa_file);
 					
 					double rand_rol = real_dist(gen);
 					double rand_type_actv = real_dist(gen);
@@ -54,7 +56,12 @@ int main(int argc, char **argv){
 					
 					//std::cout << ruta << std::endl;
 				}
-
+			int dt = 2;
+			
+			for (int t = 0, tdibujo = 0; t < TMAX; t +=dt)
+				{if(Poblacion_unal[0].IsEnRuta()) Poblacion_unal[0].Avanzar(Mapa,dt,false);
+				
+				}
 		/*
 		
 		StartAnimacion(); // Dibujar
