@@ -27,6 +27,8 @@ class Agente_Universitario
         bool en_actividad;
         bool en_ruta;
         arma::ivec Ruta;
+		sf::Sprite sprite;
+  		sf::Texture texture;
         double Pos_nodo;
         double Pos_arista;
         double Vel;
@@ -69,6 +71,13 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
             Pos_nodo = posicion0;
             Vel = velocidad0;
             Pos_arista = 0;
+			
+			if (!texture.loadFromFile("./figs/Agente_sprite.png"))
+				{std::cout<<" error loading texture\n";}
+
+			sprite.setTexture(texture);
+			sf::FloatRect spriteBounds = sprite.getLocalBounds();
+			sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
             
         }
 
@@ -378,9 +387,6 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::m
   arma::vec r=nodo_siguiente-nodo_actual;
 
   arma::vec r2=arma::normalise(r,1);
-  // cout<<"||||||||||||||||||||||\n";
-  // cout<<r(0)<<"\t"<<r(1)<<"\n";
-  // cout<<r2(0)<<"\t"<<r2(1)<<"\n";
 
   if(r(0)<0)
     {sprite.setScale(-0.040f, 0.04f);}
@@ -388,13 +394,9 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::m
     {sprite.setScale(0.040f, 0.04f);}
 
 			
-  double pos_x=r2(0)*Pos_arista+nodo_actual(0);
-  double pos_y=r2(1)*Pos_arista+nodo_actual(1);
+  double pos_x=(r2(0)*Pos_arista)+nodo_actual(0);
+  double pos_y=(r2(1)*Pos_arista)+nodo_actual(1);
 
-  // cout<<nodo_pos<<"\t"<<next_pos<<"\n";
-
-  // cout<<pos_x<<"\t"<<pos_y<<"\n";
-  //Print_pos();
   sprite.setPosition(sf::Vector2f(pos_x,pos_y));
   window.draw(sprite);
 			

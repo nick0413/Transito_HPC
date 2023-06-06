@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 	//arma::mat Mapa= load_csv_arma("./files/Madyacencia.txt");
 	//std::cout<< Mapa.n_cols<< "\t"<< Mapa.n_rows<<std::endl;
 	arma::mat PosicionNodos;
-	PosicionNodos.load("./files/nodos-finales.csv", arma::raw_ascii);
+	PosicionNodos.load("nodos-finales.csv", arma::raw_ascii);
 	if(verbose) std::cout<<PosicionNodos;
 	Agente_Universitario Persona;
 	int nimagen = 10;
@@ -335,11 +335,7 @@ int main(int argc, char **argv)
 			// Se actualiza la posición del camión
 			if(Persona.EnRuta()) Persona.draw(window,Mapa,PosicionNodos);
 
-			// Se dibujan los contenedores y la información
-			
-			
 
-			// Se muestra todo
 			window.display();
 
 		}

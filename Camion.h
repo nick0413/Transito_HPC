@@ -45,7 +45,7 @@ void Camion::Inicio(int nodo_deposito,int tipoBasura , arma::ivec ruta, double c
   Vel=velocidad;
   Alive=true;
 
-  if (!texture.loadFromFile("./figs/Camion_sprite.png"))
+  if (!texture.loadFromFile("./figs/Agente_sprite.png"))
     {std::cout<<" error loading texture\n";}
 
   sprite.setTexture(texture);
