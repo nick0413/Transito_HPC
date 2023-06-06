@@ -43,9 +43,11 @@ class Agente_Universitario{
         int Next_in_route(void);
         void Print_pos(void);
         arma::vec getPosition(arma::mat PosNodos, int nodo);
+        arma::ivec getRuta(void){return Ruta;};
         int getRol(void){return rol;};
         int getActividad(void){return actividad;};
         int getFacultad(void){return facultad;};
+        bool IsEnRuta(void){return en_ruta;};
 };
 
 void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,

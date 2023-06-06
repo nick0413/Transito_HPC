@@ -41,7 +41,7 @@ int main(int argc, char **argv){
 					int rand_destino = int_dist(gen);
 					//arma::vec destino = coord_edificios.row(rand_destino);
 					//arma::vec inicio = {5,5};
-					int nodo_inicio =  1;//int_dist(gen);//xy_to_node(inicio, nimagen);
+					int nodo_inicio =  0;//int_dist(gen);//xy_to_node(inicio, nimagen);
 					int nodo_destino = 5;//int_dist(gen);//xy_to_node(destino, nimagen);
 					std::cout << "Inicio: "<< nodo_inicio << "\t" << "Final: " << nodo_destino << std::endl;
 					arma::ivec ruta = Ruta_imagen(nodo_inicio,nodo_destino,"Environment/Usables.csv","Environment/Matriz_adyacencia_mapa.csv");
