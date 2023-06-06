@@ -4,12 +4,20 @@
 #include <string>
 
 int next_node(arma::vec Usables, int nodo)
-	{
-		for(int ii=nodo-2; ii<Usables.size(); ii++)
+	{   int ii;
+		if(nodo-2<0){
+			ii=0;
+		}
+		else{
+			ii=nodo-2;
+		}
+		for( ; ii<Usables.size(); ii++)
 			{
 				if (Usables(ii)==1)
 					{return ii;}
 			}
+		std::cout<< "No hay nodos accesibles"<<std::endl;
+		return 0;
 	}
 
 arma::ivec Ruta_imagen(int start, int end, std::string Usables_file, std::string Mapa_file)
@@ -26,7 +34,7 @@ arma::ivec Ruta_imagen(int start, int end, std::string Usables_file, std::string
 			}
 
 		if(Usables(end)==1)
-				{std::cout<<"Si\n";}
+				{std::cout<<"Si end\n";}
 			else
 
 				{
@@ -35,12 +43,12 @@ arma::ivec Ruta_imagen(int start, int end, std::string Usables_file, std::string
 					std::cout<<", Se usara "<<end; 
 				}
 		if(Usables(start)==1)
-				{std::cout<<"Si\n";}
+				{std::cout<<"Si start\n";}
 			else
 				{
 					std::cout<<start<<" No es un nodo accesible"; 
 					end=next_node(Usables,start);
-					std::cout<<", Se usara "<<end; 
+					std::cout<<", Se usara "<< start; 
 				}
 		arma:: ivec Ruta1=dijkstra_arma(Mapa,start,end);
 		std::cout<<"_\n";
