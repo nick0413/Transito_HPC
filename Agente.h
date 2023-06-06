@@ -12,43 +12,46 @@ using namespace std;
 
 class Agente_Universitario; 
 
-class Agente_Universitario{
+class Agente_Universitario
+	{
 
-    private:
-        int rol;
-        int actividad;
-        int facultad;
-        int spawn_time;
-        float capacidad_basura;
-        float tiempo_actividad;
-        bool en_actividad;
-        bool en_ruta;
-        arma::ivec Ruta;
-        double Pos_nodo;
-        double Pos_arista;
-        double Vel;
-    
-    public:
-        void inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  
-        float cap_basura, float t_actividad, arma::ivec Ruta0, double posicion0, double velocidad0, double t);
-        void asignar_rol(double prob_rol);
-        void Actividad(double prob_tipo_actividad, double prob_actv_academica,double t);
-        std::tuple<double, double, double> prob_actividad_est(double spawn_time, double t);
-        std::tuple<double, double, double> prob_actividad_admin(double t);
+		private:
+				int rol;
+				int actividad;
+				int facultad;
+				int spawn_time;
+				float capacidad_basura;
+				float tiempo_actividad;
+				bool en_actividad;
+				bool en_ruta;
+				arma::ivec Ruta;
+				double Pos_nodo;
+				double Pos_arista;
+				double Vel;
+		
+		public:
+			void inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  
+			float cap_basura, float t_actividad, arma::ivec Ruta0, double posicion0, double velocidad0, double t);
+			void asignar_rol(double prob_rol);
+			void Actividad(double prob_tipo_actividad, double prob_actv_academica,double t);
+			std::tuple<double, double, double> prob_actividad_est(double spawn_time, double t);
+			std::tuple<double, double, double> prob_actividad_admin(double t);
 
-        void Avanzar(arma::mat Madyacencia, double dt, bool verbose);
-        int Nodo(void);
-        double Arista(arma::mat Madyacencia);
-        int Nodo_in_route(void);
-        int Next_in_route(void);
-        void Print_pos(void);
-        arma::vec getPosition(arma::mat PosNodos, int nodo);
-        arma::ivec getRuta(void){return Ruta;};
-        int getRol(void){return rol;};
-        int getActividad(void){return actividad;};
-        int getFacultad(void){return facultad;};
-        bool IsEnRuta(void){return en_ruta;};
-};
+			void Avanzar(arma::mat Madyacencia, double dt, bool verbose);
+			int Nodo(void);
+			double Arista(arma::mat Madyacencia);
+			int Nodo_in_route(void);
+			int Next_in_route(void);
+			void Print_pos(void);
+			arma::vec getPosition(arma::mat PosNodos, int nodo);
+			arma::ivec getRuta(void){return Ruta;};
+			int getRol(void){return rol;};
+			int getActividad(void){return actividad;};
+			int getFacultad(void){return facultad;};
+			bool EnRuta(void){return en_ruta;};
+			void asignar_pos_nodo(double pos_nodo){Pos_nodo=pos_nodo;}
+			void asignar_pos_arista(double pos_arista){Pos_arista=pos_arista;}
+	};
 
 void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
          arma::ivec Ruta0, double posicion0, double velocidad0, double t){
@@ -412,28 +415,31 @@ std::tuple<double, double, double> Agente_Universitario::prob_actividad_admin(do
             }
         } 
 void Agente_Universitario::Avanzar(arma::mat Madyacencia, double dt, bool verbose)
-{	
-		
-  Pos_arista+=dt*Vel;
-  arma::uvec idx=arma::find(Ruta == Pos_nodo);
-  if(idx(0)+1>Ruta.size()){en_ruta=false; return;}
-  double cuadra=Madyacencia(Pos_nodo,Ruta(idx(0)+1));
-  if(verbose) {std::cout<<"cuadra actual: "<<cuadra<<"\nNodo actual:" <<Pos_nodo<<"\n"; std::cout<<Ruta<<"\n"; }
-  if(Pos_arista>=cuadra)
-    {	
+	{	
+		if(verbose)std::cout<<Pos_arista<<"->"<<Pos_arista	+dt*Vel<<"\n";
+		Pos_arista+=dt*Vel;
+		arma::uvec idx=arma::find(Ruta == Pos_nodo);
+		// Ruta.as_row().print();
+		if(verbose)std::cout<<"\t\t"<<Pos_nodo<<"\n";
+		if(verbose)std::cout<<idx.size()<<"\n";
+		if(verbose)std::cout<<idx(0)<<"\n";
+		if(verbose)std::cout<<"Condicion:"<<(idx(0)+1>Ruta.size())<<"\n";
+		if(idx(0)+1>=Ruta.size()){en_ruta=false; return;}
+		if(verbose)std::cout<<"----\n";
+		double cuadra=Madyacencia(Pos_nodo,Ruta(idx(0)+1));
+		if(verbose) {std::cout<<"cuadra actual: "<<cuadra<<"\nNodo actual:" <<Pos_nodo<<"\n"; }
+		if(Pos_arista>=cuadra)
+			{	
+				Pos_nodo=Ruta(idx(0)+1);
+				Pos_arista=0;
+			}
 
-      Pos_nodo=Ruta(idx(0)+1);
-      Pos_arista=0;
-      // cout<<Pos_nodo<<"\n";
-      // cout<<Ruta.size()<<"\n";
-      // cout<<Ruta.t()<<"\n";
-    }
+	}
 
-}
 int Agente_Universitario::Nodo(void)
-{
-  return Pos_nodo;
-}
+	{
+		return Pos_nodo;
+	}
 double Agente_Universitario::Arista(arma::mat Madyacencia)
 {	
   arma::uvec idx=arma::find(Ruta == Pos_nodo);

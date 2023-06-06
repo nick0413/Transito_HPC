@@ -118,14 +118,15 @@ int main(int argc, char **argv)
 	// Se crea la textura del fondo
 	if(!textFondo.loadFromFile(figFondo))
 		{
-		std::cout<< "Por favor verifique la ruta: "<<figFondo<<std::endl;
-		return 1;
+			std::cout<< "Por favor verifique la ruta: "<<figFondo<<std::endl;
+			return 1;
 		}
 
-	if(!textFondoNodos.loadFromFile(figFondoNodos)){
-		std::cout<< "Por favor verifique la ruta: "<<figFondoNodos<<std::endl;
-		return 1;
-	}
+	if(!textFondoNodos.loadFromFile(figFondoNodos))
+		{
+			std::cout<< "Por favor verifique la ruta: "<<figFondoNodos<<std::endl;
+			return 1;
+		}
 		
 	// Tomado de: https://stackoverflow.com/questions/36448101/2-3-1-set-scale-of-background-texture-to-renderwindow-size
 
@@ -145,8 +146,8 @@ int main(int argc, char **argv)
 		
 	if(!tools.vectorContenedores(fileDataContenedores,vectorContenedores))
 		{
-		std::cout<<"Por favor verifique que el archivo "<<fileDataContenedores<<" exista"<<std::endl;
-		return 1;
+			std::cout<<"Por favor verifique que el archivo "<<fileDataContenedores<<" exista"<<std::endl;
+			return 1;
 		}
 
 	// *** Creación nodos de la carretera ***
