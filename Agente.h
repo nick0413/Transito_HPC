@@ -425,7 +425,7 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::m
   double pos_x=(100*r2(0)*Pos_arista)+nodo_actual(0);
   double pos_y=(100*r2(1)*Pos_arista)+nodo_actual(1);
 	//std::cout<<pos_x<<"\t"<<pos_y<<"\n";
-  sprite.setPosition(sf::Vector2f(pos_y,pos_x));
+  sprite.setPosition(sf::Vector2f(pos_y+50,pos_x+50));
   window.draw(sprite);
 			
 
