@@ -17,6 +17,7 @@
 #include "imagen_pathfind.h"
 #include "Tools.h"
 
+ofstream rol;
 // SFML
 
 // https://www.sfml-dev.org/tutorials/2.5/system-thread.php
@@ -42,7 +43,7 @@ bool verbose=false;
 //-------
 int main(int argc, char **argv)
 	{
-
+	rol.open("rol.txt");
 
 	try{if(std::stoi(argv[1])==1){verbose=false;};}
 	catch (...){verbose=false;}
@@ -54,12 +55,13 @@ int main(int argc, char **argv)
 	arma::mat PosicionNodos = load_csv_arma("./nodos-finales.csv");
 	std::cout<< PosicionNodos.n_cols<< "\t"<< PosicionNodos.n_rows<<std::endl;
 	if(verbose) std::cout<<PosicionNodos;
-	const int N=10;
+	const int N=20;
 	Agente_Universitario Persona[N];
 	int start=11;
 	int end=0;
+	int seed = std::stoi(argv[2]);
 	std::random_device rd;
-	std::mt19937 gen(1);
+	std::mt19937 gen(seed);
 	std::uniform_real_distribution<double> real_dist(0.0,1.0);
 	std::uniform_int_distribution<int> int_dist(0,99); 
 	int nimagen = 10;
@@ -68,7 +70,7 @@ int main(int argc, char **argv)
 	float t_actividad=7200;
 	double vel=0.005;
 	double t;
-	std::cout << "vivo" << std::endl;
+	
 		for (int jj = 0; jj < N; jj++)
 			{   
 				t=0; //tiempo inicial
@@ -86,11 +88,12 @@ int main(int argc, char **argv)
 				double rand_type_actv = real_dist(gen);
 				double rand_actv_acad = real_dist(gen);
 				Persona[jj].inicializar(rand_rol,rand_type_actv,rand_actv_acad,t_spawn,cap_basura,t_actividad,ruta,nodo_inicio,vel,t);
+				rol<<"Rol: " << Persona[jj].getRol()<<"\t"<< rand_rol<<std::endl;
 				// std::cout << Poblacion_unal[jj].getRol()<<"\t" << Poblacion_unal[jj].getFacultad()<<"\t" << Poblacion_unal[jj].getActividad()<< std::endl;
 
 			}
 	// ******* sfml
-
+		rol.close();
 	// Zona de declaración de variables
 
 	// Herramientas generales
@@ -351,8 +354,8 @@ int main(int argc, char **argv)
 				{	
 					if(Persona[jj].EnRuta()) 
 						{	
-							std::cout<<"holi\n";
-							Persona[jj].Avanzar(Mapa,dt,true);
+							//std::cout<<"holi\n";
+							Persona[jj].Avanzar(Mapa,dt,false);
 						}
 				}
 			//std::cout<<"---------------------\n";
@@ -375,7 +378,7 @@ int main(int argc, char **argv)
 				{	
 					if(Persona[jj].EnRuta()) 
 						{	
-							std::cout<<"holi\n";
+							//std::cout<<"holi\n";
 							Persona[jj].draw(window,Mapa,PosicionNodos);
 						}
 				}

@@ -32,6 +32,7 @@ class Agente_Universitario
         double Pos_nodo;
         double Pos_arista;
         double Vel;
+        float scale;
     
     public:
         void inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  
@@ -71,14 +72,8 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
             Pos_nodo = posicion0;
             Vel = velocidad0;
             Pos_arista = 0;
+            
 			
-			if (!texture.loadFromFile("./figs/Agente_sprite.png"))
-				{std::cout<<" error loading texture\n";}
-			// sf::FloatRect bounds = sprite.getLocalBounds();
-			// sprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
-			sprite.setTexture(texture);
-			sf::FloatRect spriteBounds = sprite.getLocalBounds();
-			sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
             
         }
 
@@ -86,15 +81,46 @@ void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academi
             
             if(prob_rol<0.91){
                 rol = 0; //Es estudiante
+                if (!texture.loadFromFile("./figs/Agente_sprite.png"))
+				{std::cout<<" error loading texture\n";}
+
+			    sprite.setTexture(texture);
+			    sf::FloatRect spriteBounds = sprite.getLocalBounds();
+			    sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+                scale = 0.15f;
                 }
 
-                else if(0.91< prob_rol < 0.95){
+                else if(0.5< prob_rol <= 0.8){
                     rol = 1; //Es administrativo
+                    if (!texture.loadFromFile("./figs/Adim_sprite.png"))
+				    {std::cout<<" error loading texture\n";}
+
+                sprite.setTexture(texture);
+                sf::FloatRect spriteBounds = sprite.getLocalBounds();
+                sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+                scale = 0.3f;
                 }
             
-                else{
+                else if(0.8< prob_rol <= 1){
                     rol = 2; //Es docente
-                }   
+                    if (!texture.loadFromFile("./figs/Profesor_sprite.png"))
+				    {std::cout<<" error loading texture\n";}
+
+                    sprite.setTexture(texture);
+                    sf::FloatRect spriteBounds = sprite.getLocalBounds();
+                    sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+                    scale = 0.4f;
+                } 
+                else{
+                    rol = 3;
+                    if (!texture.loadFromFile("./figs/Camion_sprite.png"))
+				    {std::cout<<" error loading texture\n";}
+
+                    sprite.setTexture(texture);
+                    sf::FloatRect spriteBounds = sprite.getLocalBounds();
+                    sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+                    scale = 0.4f;
+                }  
 
             {
                     //Se desarrolla una actividad academica 
@@ -389,7 +415,7 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::m
   arma::vec r=nodo_siguiente-nodo_actual;
 
   arma::vec r2=arma::normalise(r,1);
-float scale=0.15f;
+
   if(r(0)<0)
     {sprite.setScale(-scale, scale);}
   else
@@ -398,8 +424,8 @@ float scale=0.15f;
 			
   double pos_x=(100*r2(0)*Pos_arista)+nodo_actual(0);
   double pos_y=(100*r2(1)*Pos_arista)+nodo_actual(1);
-	std::cout<<pos_x<<"\t"<<pos_y<<"\n";
-  sprite.setPosition(sf::Vector2f(pos_y+50,pos_x+50));
+	//std::cout<<pos_x<<"\t"<<pos_y<<"\n";
+  sprite.setPosition(sf::Vector2f(pos_y,pos_x));
   window.draw(sprite);
 			
 
