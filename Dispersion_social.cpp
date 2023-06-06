@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 	{
 
 
-	try{if(std::stoi(argv[1])==1){verbose=true;};}
+	try{if(std::stoi(argv[1])==1){verbose=false;};}
 	catch (...){verbose=false;}
 
 
@@ -59,14 +59,14 @@ int main(int argc, char **argv)
 	int start=11;
 	int end=0;
 	std::random_device rd;
-	std::mt19937 gen(rd());
+	std::mt19937 gen(1);
 	std::uniform_real_distribution<double> real_dist(0.0,1.0);
 	std::uniform_int_distribution<int> int_dist(0,99); 
 	int nimagen = 10;
 	int t_spawn=0; //por ahora todos se crean al tiempo
 	float cap_basura=0.2; //ahora mismo no hace nada
 	float t_actividad=7200;
-	double vel=0.01;
+	double vel=0.005;
 	double t;
 	std::cout << "vivo" << std::endl;
 		for (int jj = 0; jj < N; jj++)

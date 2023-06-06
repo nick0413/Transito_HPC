@@ -74,7 +74,8 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
 			
 			if (!texture.loadFromFile("./figs/Agente_sprite.png"))
 				{std::cout<<" error loading texture\n";}
-
+			// sf::FloatRect bounds = sprite.getLocalBounds();
+			// sprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
 			sprite.setTexture(texture);
 			sf::FloatRect spriteBounds = sprite.getLocalBounds();
 			sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
@@ -388,17 +389,17 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::m
   arma::vec r=nodo_siguiente-nodo_actual;
 
   arma::vec r2=arma::normalise(r,1);
-
+float scale=0.15f;
   if(r(0)<0)
-    {sprite.setScale(-0.1f, 0.1f);}
+    {sprite.setScale(-scale, scale);}
   else
-    {sprite.setScale(0.1f, 0.1f);}
+    {sprite.setScale(scale, scale);}
 
 			
   double pos_x=(100*r2(0)*Pos_arista)+nodo_actual(0);
   double pos_y=(100*r2(1)*Pos_arista)+nodo_actual(1);
 	std::cout<<pos_x<<"\t"<<pos_y<<"\n";
-  sprite.setPosition(sf::Vector2f(pos_y,pos_x));
+  sprite.setPosition(sf::Vector2f(pos_y+50,pos_x+50));
   window.draw(sprite);
 			
 
