@@ -43,7 +43,7 @@ bool verbose=false;
 //-------
 int main(int argc, char **argv)
 	{
-	rol.open("rol.txt");
+	rol.open("rol.csv");
 
 	try{if(std::stoi(argv[1])==1){verbose=false;};}
 	catch (...){verbose=false;}
@@ -51,11 +51,11 @@ int main(int argc, char **argv)
 
 	std::string Mapa_file = "Environment/Matriz_adyacencia_mapa.csv";
 	arma::mat Mapa= load_csv_arma(Mapa_file);
-	std::cout<< Mapa.n_cols<< "\t"<< Mapa.n_rows<<std::endl;
+	//std::cout<< Mapa.n_cols<< "\t"<< Mapa.n_rows<<std::endl;
 	arma::mat PosicionNodos = load_csv_arma("./nodos-finales.csv");
 	std::cout<< PosicionNodos.n_cols<< "\t"<< PosicionNodos.n_rows<<std::endl;
 	if(verbose) std::cout<<PosicionNodos;
-	const int N=20;
+	const int N=200;
 	Agente_Universitario Persona[N];
 	int start=11;
 	int end=0;
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 	float t_actividad=7200;
 	double vel=0.005;
 	double t;
-	
+	rol<< "rol"<<" "<< "prob"<<std::endl;
 		for (int jj = 0; jj < N; jj++)
 			{   
 				t=0; //tiempo inicial
@@ -79,18 +79,17 @@ int main(int argc, char **argv)
 				//arma::vec inicio = {5,5};
 				int nodo_inicio = int_dist(gen);//xy_to_node(inicio, nimagen);
 				int nodo_destino = int_dist(gen);//xy_to_node(destino, nimagen);
-				// std::cout << "Inicio: "<< nodo_inicio << "\t" << "Final: " << nodo_destino << std::endl;
+				
 				arma::ivec ruta = Ruta_imagen(nodo_inicio,nodo_destino,"Environment/Usables.csv",Mapa_file,false);
-				ruta.print();
+				//ruta.print();
 				nodo_inicio=ruta(0);
 				
 				double rand_rol = real_dist(gen);
 				double rand_type_actv = real_dist(gen);
 				double rand_actv_acad = real_dist(gen);
 				Persona[jj].inicializar(rand_rol,rand_type_actv,rand_actv_acad,t_spawn,cap_basura,t_actividad,ruta,nodo_inicio,vel,t);
-				rol<<"Rol: " << Persona[jj].getRol()<<"\t"<< rand_rol<<std::endl;
-				// std::cout << Poblacion_unal[jj].getRol()<<"\t" << Poblacion_unal[jj].getFacultad()<<"\t" << Poblacion_unal[jj].getActividad()<< std::endl;
-
+				rol<< Persona[jj].getRol()<<" "<< rand_rol<<std::endl;
+				
 			}
 	// ******* sfml
 		rol.close();
@@ -354,11 +353,11 @@ int main(int argc, char **argv)
 				{	
 					if(Persona[jj].EnRuta()) 
 						{	
-							//std::cout<<"holi\n";
+							
 							Persona[jj].Avanzar(Mapa,dt,false);
 						}
 				}
-			//std::cout<<"---------------------\n";
+			
 
 			// Es una forma de actualizar
 			window.clear();
@@ -372,29 +371,20 @@ int main(int argc, char **argv)
 
 			// Se actualiza la posición del camión
 			// if(cam1.Is_alive()) cam1.draw(window,Mapa,PosicionNodos);
-
+			
 
 			for(int jj = 0; jj < N; jj++)
 				{	
 					if(Persona[jj].EnRuta()) 
 						{	
-							//std::cout<<"holi\n";
+						
 							Persona[jj].draw(window,Mapa,PosicionNodos);
 						}
 				}
 
-			// Se dibujan los contenedores y la información
-			for(auto contenedor : vectorContenedores)
-				{
-					window.draw(contenedor);
-					if(showInfoContenedores)
-						{
-							sf::Lock lock(myMutex);
-							window.draw(contenedor.getTextPercentageCurrentlyCapacity());
-						}
-				};
+		
 			
-
+			
 			// Se muestra todo
 			window.display();
 
