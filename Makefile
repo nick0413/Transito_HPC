@@ -13,7 +13,7 @@ windows_run :
 
 windows_compile :
 	g++ -Isrc/include -c .\Dispersion_social.cpp
-	g++ .\Dispersion_social.o -o Dispersion_social -Lsrc/lib -lsfml-graphics -lsfml-window -lsfml-system -l	
+	g++ .\Dispersion_social.o -o Dispersion_social -Lsrc/lib -lsfml-graphics -lsfml-window -lsfml-system -lblas
 .PHONY : ubuntu
 
 ubuntu:
