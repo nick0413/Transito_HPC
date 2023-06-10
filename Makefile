@@ -5,7 +5,7 @@ MAIN_OUT=$(MAIN).out
 
 
 .PHONY : windows
-# First compile and then run
+# First compile and then run [Nicolas]
 windows : windows_compile windows_run
 
 windows_run :
@@ -14,7 +14,21 @@ windows_run :
 windows_compile :
 	g++ -Isrc/include -c .\Dispersion_social.cpp
 	g++ .\Dispersion_social.o -o Dispersion_social -Lsrc/lib -lsfml-graphics -lsfml-window -lsfml-system -lblas
-.PHONY : ubuntu
+
+.PHONY : windows2
+# First compile and then run for extra armadillo [Victor]
+windows2 : windows_compile2 windows_run2
+
+windows_run2 :
+	.\Dispersion_social.exe  
+
+windows_compile2 :
+	g++ -Isrc/include -c .\Dispersion_social.cpp
+	g++ .\Dispersion_social.o -o Dispersion_social -Lsrc/lib -lsfml-graphics -lsfml-window -lsfml-system -lblas -larmadillo
+
+
+
+.PHONY : ubuntu	
 
 ubuntu:
 	g++ -c $(MAIN_CPP)
