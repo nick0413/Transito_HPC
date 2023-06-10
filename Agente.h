@@ -32,6 +32,7 @@ class Agente_Universitario
         double Pos_nodo;
         double Pos_arista;
         double Vel;
+        float scale;
     
     public:
         void inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  
@@ -71,14 +72,8 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
             Pos_nodo = posicion0;
             Vel = velocidad0;
             Pos_arista = 0;
+            
 			
-			if (!texture.loadFromFile("./figs/Agente_sprite.png"))
-				{std::cout<<" error loading texture\n";}
-			// sf::FloatRect bounds = sprite.getLocalBounds();
-			// sprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
-			sprite.setTexture(texture);
-			sf::FloatRect spriteBounds = sprite.getLocalBounds();
-			sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
             
         }
 
@@ -86,17 +81,40 @@ void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academi
             
             if(prob_rol<0.91){
                 rol = 0; //Es estudiante
+                if (!texture.loadFromFile("./figs/Agente_sprite.png"))
+				{std::cout<<" error loading texture\n";}
+
+			    sprite.setTexture(texture);
+			    sf::FloatRect spriteBounds = sprite.getLocalBounds();
+			    sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+                scale = 0.15f;
                 }
 
-                else if(0.91< prob_rol < 0.95){
+                 else if(0.91< prob_rol && prob_rol<= 0.95){
+                    std::cout<<"rol de admin"<<std::endl;
                     rol = 1; //Es administrativo
+                    if (!texture.loadFromFile("./figs/Adim_sprite.png"))
+				    {std::cout<<" error loading texture\n";}
+
+                sprite.setTexture(texture);
+                sf::FloatRect spriteBounds = sprite.getLocalBounds();
+                sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+                scale = 0.3f;
                 }
             
                 else{
                     rol = 2; //Es docente
-                }   
+                    if (!texture.loadFromFile("./figs/Profesor_sprite.png"))
+				    {std::cout<<" error loading texture\n";}
 
-            {
+                    sprite.setTexture(texture);
+                    sf::FloatRect spriteBounds = sprite.getLocalBounds();
+                    sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+                    scale = 0.4f;
+                } 
+                 
+
+            
                     //Se desarrolla una actividad academica 
                     /*Actividades 
                         2 clase ing
@@ -112,49 +130,49 @@ void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academi
                         12 clase odontologia
                     
                     */
-                   if(0<prob_actv_academica<=0.24){
+                   if(0<prob_actv_academica && prob_actv_academica<=0.24){
                     facultad = 2;
                    }
 
-                   else if(0.24<prob_actv_academica<=0.38){
+                   else if(0.24<prob_actv_academica && prob_actv_academica<=0.38){
                     facultad = 3;
                    }
 
-                   else if(0.38<prob_actv_academica<=0.52){
+                   else if(0.38<prob_actv_academica && prob_actv_academica<=0.52){
                     facultad = 4;
                    }
 
-                   else if(0.52<prob_actv_academica<=0.62){
+                   else if(0.52<prob_actv_academica && prob_actv_academica<=0.62){
                     facultad = 5;
                    }
 
-                   else if(0.62<prob_actv_academica<=0.72){
+                   else if(0.62<prob_actv_academica && prob_actv_academica<=0.72){
                     facultad = 6;
                    }
 
-                   else if(0.72<prob_actv_academica<=0.81){
+                   else if(0.72<prob_actv_academica && prob_actv_academica<=0.81){
                     facultad = 7;
                    }
 
-                   else if(0.81<prob_actv_academica<=0.88){
+                   else if(0.81<prob_actv_academica && prob_actv_academica<=0.88){
                     facultad = 8;
                    }
 
-                   else if(0.88<prob_actv_academica<=0.92){
+                   else if(0.88<prob_actv_academica && prob_actv_academica<=0.92){
                     facultad = 9;
                    }
 
-                   else if(0.92<prob_actv_academica<=0.95){
+                   else if(0.92<prob_actv_academica && prob_actv_academica<=0.95){
                     facultad = 10;
                    }
 
-                   else if(0.95<prob_actv_academica<=0.98){
+                   else if(0.95<prob_actv_academica && prob_actv_academica<=0.98){
                     facultad = 11;
                    }
 
                    else{facultad = 12;}
                     
-                }
+                
             }
 
 
@@ -382,14 +400,14 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::m
   if(next_pos==-100){std::cout<<"fin de la ruta\n";return;}
 
   arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
-	nodo_actual.print();
+	//nodo_actual.print();
   arma::vec nodo_siguiente=getPosition(PosNodos,next_pos);
 
 
   arma::vec r=nodo_siguiente-nodo_actual;
 
   arma::vec r2=arma::normalise(r,1);
-float scale=0.15f;
+
   if(r(0)<0)
     {sprite.setScale(-scale, scale);}
   else
@@ -398,7 +416,7 @@ float scale=0.15f;
 			
   double pos_x=(100*r2(0)*Pos_arista)+nodo_actual(0);
   double pos_y=(100*r2(1)*Pos_arista)+nodo_actual(1);
-	std::cout<<pos_x<<"\t"<<pos_y<<"\n";
+	//std::cout<<pos_x<<"\t"<<pos_y<<"\n";
   sprite.setPosition(sf::Vector2f(pos_y+50,pos_x+50));
   window.draw(sprite);
 			
