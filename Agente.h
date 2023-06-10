@@ -9,6 +9,7 @@
 #include <armadillo>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include "imagen_pathfind.h"
 
 using namespace std;
 
@@ -61,6 +62,7 @@ class Agente_Universitario
 			void asignar_pos_nodo(double pos_nodo){Pos_nodo=pos_nodo;};
 			void asignar_pos_arista(double pos_arista){Pos_arista=pos_arista;};
             void asignar_ruta(int simulationTime,arma::ivec ruta);
+            void hacer_actividad(double t,double dt);
 	};
 
 void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
@@ -348,7 +350,8 @@ void Agente_Universitario::Avanzar(arma::mat Madyacencia, double dt, bool verbos
 		if(verbose)std::cout<<idx.size()<<"\n";
 		if(verbose)std::cout<<idx(0)<<"\n";
 		if(verbose)std::cout<<"Condicion:"<<(idx(0)+1>Ruta.size())<<"\n";
-		if(idx(0)+1>=Ruta.size()){en_ruta=false; return;}
+		if(idx(0)+1>=Ruta.size()){en_ruta=false;
+        en_actividad=true; return;}
 		if(verbose)std::cout<<"----\n";
 		double cuadra=Madyacencia(Pos_nodo,Ruta(idx(0)+1));
 		if(verbose) {std::cout<<"cuadra actual: "<<cuadra<<"\nNodo actual:" <<Pos_nodo<<"\n"; }
@@ -455,3 +458,7 @@ void Agente_Universitario::asignar_ruta(int simulationTime, arma::ivec ruta) {
     
 }
 
+ void hacer_actividad(double t,double dt){
+
+
+ }

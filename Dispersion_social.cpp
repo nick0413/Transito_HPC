@@ -15,7 +15,7 @@
 #include "Camion.h"
 #include "Agente.h"
 #include "Tools.h"
-#include "imagen_pathfind.h"
+
 ofstream rol;
 // SFML
 
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 	float t_actividad=7200;
 	double vel=0.005;
 	double t;
-	std::cout << "vivo" << std::endl;
+	
 		for (int jj = 0; jj < N; jj++)
 			{   
 				t=0; //tiempo inicial
@@ -353,6 +353,7 @@ int main(int argc, char **argv)
 							
 							Persona[jj].Avanzar(Mapa,dt,false);
 						}
+					//else{Persona[jj].hacer_actividad(t,dt);  }
 				}
 			//std::cout<<"---------------------\n";
 
@@ -376,8 +377,9 @@ int main(int argc, char **argv)
 						{	
 							//std::cout<<"holi\n";
 							Persona[jj].draw(window,Mapa,PosicionNodos);
-							rol<<Persona[jj].getRol()<<" "<<Persona[jj].getScale()<<std::endl;
+							//rol<<Persona[jj].getRol()<<" "<<Persona[jj].getScale()<<std::endl;
 						}
+					
 				}
 
 			// Se dibujan los contenedores y la información
