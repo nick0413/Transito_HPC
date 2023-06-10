@@ -14,9 +14,9 @@
 // Clases propias
 #include "Camion.h"
 #include "Agente.h"
-#include "imagen_pathfind.h"
 #include "Tools.h"
-
+#include "imagen_pathfind.h"
+ofstream rol;
 // SFML
 
 // https://www.sfml-dev.org/tutorials/2.5/system-thread.php
@@ -42,7 +42,7 @@ bool verbose=false;
 //-------
 int main(int argc, char **argv)
 	{
-
+	rol.open("rol.csv");
 
 	try{if(std::stoi(argv[1])==1){verbose=false;};}
 	catch (...){verbose=false;}
@@ -54,12 +54,12 @@ int main(int argc, char **argv)
 	arma::mat PosicionNodos = load_csv_arma("./nodos-finales.csv");
 	std::cout<< PosicionNodos.n_cols<< "\t"<< PosicionNodos.n_rows<<std::endl;
 	if(verbose) std::cout<<PosicionNodos;
-	const int N=10;
+	const int N=40;
 	Agente_Universitario Persona[N];
 	int start=11;
 	int end=0;
 	std::random_device rd;
-	std::mt19937 gen(1);
+	std::mt19937 gen(4);
 	std::uniform_real_distribution<double> real_dist(0.0,1.0);
 	std::uniform_int_distribution<int> int_dist(0,99); 
 	int nimagen = 10;
@@ -79,15 +79,14 @@ int main(int argc, char **argv)
 				int nodo_destino = int_dist(gen);//xy_to_node(destino, nimagen);
 				// std::cout << "Inicio: "<< nodo_inicio << "\t" << "Final: " << nodo_destino << std::endl;
 				arma::ivec ruta = Ruta_imagen(nodo_inicio,nodo_destino,"Environment/Usables.csv",Mapa_file,false);
-				ruta.print();
+				//ruta.print();
 				nodo_inicio=ruta(0);
 				
 				double rand_rol = real_dist(gen);
 				double rand_type_actv = real_dist(gen);
 				double rand_actv_acad = real_dist(gen);
 				Persona[jj].inicializar(rand_rol,rand_type_actv,rand_actv_acad,t_spawn,cap_basura,t_actividad,ruta,nodo_inicio,vel,t);
-				// std::cout << Poblacion_unal[jj].getRol()<<"\t" << Poblacion_unal[jj].getFacultad()<<"\t" << Poblacion_unal[jj].getActividad()<< std::endl;
-
+				//rol<< Persona[jj].getRol()<<" "<< rand_rol<<std::endl;
 			}
 	// ******* sfml
 
@@ -351,8 +350,8 @@ int main(int argc, char **argv)
 				{	
 					if(Persona[jj].EnRuta()) 
 						{	
-							std::cout<<"holi\n";
-							Persona[jj].Avanzar(Mapa,dt,true);
+							
+							Persona[jj].Avanzar(Mapa,dt,false);
 						}
 				}
 			//std::cout<<"---------------------\n";
@@ -375,8 +374,9 @@ int main(int argc, char **argv)
 				{	
 					if(Persona[jj].EnRuta()) 
 						{	
-							std::cout<<"holi\n";
+							//std::cout<<"holi\n";
 							Persona[jj].draw(window,Mapa,PosicionNodos);
+							rol<<Persona[jj].getRol()<<" "<<Persona[jj].getScale()<<std::endl;
 						}
 				}
 
