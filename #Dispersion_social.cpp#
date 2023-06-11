@@ -389,6 +389,7 @@ int main(int argc, char **argv)
       // Se actualiza la posición del camión
       // if(cam1.Is_alive()) cam1.d3raw(window,Mapa,PosicionNodos);
 
+      
 #pragma omp parallel
       {
 	int thr_id=omp_get_thread_num();
@@ -413,6 +414,7 @@ int main(int argc, char **argv)
 	      }
 	  }
       }
+      
 
       // Se dibujan los contenedores y la información
       for(auto contenedor : vectorContenedores)
