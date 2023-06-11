@@ -35,12 +35,14 @@ class Agente_Universitario
         double Pos_arista;
         double Vel;
         float scale;
+
         std::string Mapa_file;
         arma::mat Mapa;
         bool verbose;
         arma::mat PosicionNodos;
         double tactividad;
     
+
     
     public:
         void inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  
@@ -85,6 +87,7 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
             en_ruta=true; //se asume que siempre que se inicializa se entra a la U y se toma un camino
             Vel = velocidad0;
             Pos_arista = 0;
+
 			Mapa_file = "Environment/Matriz_adyacencia_mapa.csv";
             Mapa= load_csv_arma(Mapa_file);
             verbose= verbose0;
@@ -98,6 +101,7 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
 			
 			sf::FloatRect spriteBounds = sprite.getLocalBounds();
 			sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+
             
         }
 
@@ -123,6 +127,7 @@ void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academi
                 sprite.setTexture(texture);
                 sf::FloatRect spriteBounds = sprite.getLocalBounds();
                 sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+
                 scale = 0.2f;
                 }
             
@@ -134,8 +139,9 @@ void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academi
                     sprite.setTexture(texture);
                     sf::FloatRect spriteBounds = sprite.getLocalBounds();
                     sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+
                     scale = 0.3f;
-                } 
+
                  
 
             
@@ -431,6 +437,7 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::m
 				arma::vec nodo_siguiente;	
 				arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
 
+
 				if(next_pos==-100)
 					{
 						std::cout<<"fin de la ruta"<<en_actividad<<std::endl;
@@ -440,6 +447,7 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::m
 				else{
 						nodo_siguiente=getPosition(PosNodos,next_pos);
 				}
+
 
 
 				arma::vec r=nodo_siguiente-nodo_actual;
@@ -526,5 +534,6 @@ void Agente_Universitario::asignar_ruta(int simulationTime, int nodo_i,int nodo_
         }
         //generar nuevos nodos, crear ruta, asignar ruta
     } 
+
 
  }

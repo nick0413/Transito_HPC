@@ -1,2 +1,35 @@
 
+<<<<<<< HEAD
 .vscode/c_cpp_properties.json
+.vscode/settings.json
+=======
+
+a.exe
+main.exe
+main.o
+
+transit.exe
+
+
+# GUI/figs/trashmaster.png
+GUI/main.o
+GUI/main.out
+GUI/main.o
+GUI/test/Contenedor/test.o
+GUI/test/Contenedor/test.out
+GUI/test/NodosCarretera/test.o
+GUI/test/NodosCarretera/test.out
+GUI/test/Tools/a.out
+GUI/test/Tools/test.o
+GUI/test/Tools/test.out
+transit.exe
+
+# Ubuntu
+
+*.o
+*.out
+
+./GUI/*.o
+./GUI/*.out
+./figs/informe
+>>>>>>> main

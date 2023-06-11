@@ -47,12 +47,25 @@ int main(int argc, char **argv)
 	try{if(std::stoi(argv[1])==1){verbose=false;};}
 	catch (...){verbose=false;}
 
+
 	const int N=40;
+
+	std::string Mapa_file = "Environment/Matriz_adyacencia_mapa.csv";
+	arma::mat Mapa= load_csv_arma(Mapa_file);
+	//std::cout<< Mapa.n_cols<< "\t"<< Mapa.n_rows<<std::endl;
+	arma::mat PosicionNodos = load_csv_arma("./nodos-finales.csv");
+	std::cout<< PosicionNodos.n_cols<< "\t"<< PosicionNodos.n_rows<<std::endl;
+	if(verbose) std::cout<<PosicionNodos;
+	const int N=200;
+
 	Agente_Universitario Persona[N];
 	int start=11;
 	int end=0;
+	int seed = std::stoi(argv[2]);
 	std::random_device rd;
+
 	std::mt19937 gen(68);
+
 	std::uniform_real_distribution<double> real_dist(0.0,1.0);
 	std::uniform_int_distribution<int> int_dist(0,99); 
 	int nimagen = 10;
@@ -62,6 +75,7 @@ int main(int argc, char **argv)
 	double vel=0.05;
 	double t;
 	rol<< "agente"<< " " << "rol"<<" "<< "prob"<< " "<< "actividad" << std::endl;
+
 		for (int jj = 0; jj < N; jj++)
 			{   
 				t=0; //tiempo inicial
@@ -76,14 +90,17 @@ int main(int argc, char **argv)
 				Persona[jj].inicializar(rand_rol,rand_type_actv,rand_actv_acad,t_spawn,cap_basura,t_actividad,nodo_inicio,nodo_destino,vel,t,verbose);
 				
 				rol<< jj<< " " << Persona[jj].getRol()<<" "<< rand_rol<<" "<<Persona[jj].getActividad() << std::endl;
+
 			}
 	
 	std::cout<< Persona[0].getMapa().n_cols<< "\t"<< Persona[0].getMapa().n_rows<<std::endl;
 	std::cout<< Persona[0].getPosicionNodos().n_cols<< "\t"<< Persona[0].getPosicionNodos().n_rows<<std::endl;
 	if(verbose) std::cout<<Persona[0].getPosicionNodos()<<std::endl;
 	// ******* sfml
+
 	arma::mat PosicionNodos=Persona[0].getPosicionNodos();
 	arma::mat Mapa=Persona[0].getMapa();
+
 	// Zona de declaración de variables
 	// Herramientas generales
 	Tools tools;
@@ -344,6 +361,7 @@ int main(int argc, char **argv)
 					//std::cout<<jj<<std::endl;
 					if(Persona[jj].EnRuta()) 
 						{	
+
 							Persona[jj].Avanzar(Mapa,dt,false);
 						}
 					if(Persona[jj].EnActividad()){
@@ -358,7 +376,7 @@ int main(int argc, char **argv)
 					//else{Persona[jj].hacer_actividad(t,dt);  }
 				}
 			
-			//std::cout<<"---------------------\n";
+
 
 			// Es una forma de actualizar
 			window.clear();
@@ -373,18 +391,17 @@ int main(int argc, char **argv)
 			// Se actualiza la posición del camión
 			// if(cam1.Is_alive()) cam1.draw(window,Mapa,PosicionNodos);
 
-			//std::cout<<"holi"<<std::endl;
 			for(int jj = 0; jj < N; jj++)
 				{	
 					if(Persona[jj].getActividad()!=0) 
 						{	
-							
 							Persona[jj].draw(window,Mapa,PosicionNodos);
 							//rol<<Persona[jj].getRol()<<" "<<Persona[jj].getScale()<<std::endl;
 						}
 					
 					
 				}
+
 			//std::cout<<"holi"<<std::endl;
 			// Se dibujan los contenedores y la información
 			for(auto contenedor : vectorContenedores)
@@ -397,7 +414,6 @@ int main(int argc, char **argv)
 						}
 				};
 			
-
 			// Se muestra todo
 			window.display();
 
@@ -433,9 +449,6 @@ void actualizarCapacidadActualContenedores()
 			}
 			
 			}
-
-			
-
 
 		}
 		
