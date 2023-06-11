@@ -1,14 +1,8 @@
-.vscode
-umbrello
-Entregas
-learn_wxwidgets
-GUI_wxWidgets/prueba
-docs
-GUI/learn
-GUI/prueba
-Mapa.csv
-main.out
 
+<<<<<<< HEAD
+.vscode/c_cpp_properties.json
+.vscode/settings.json
+=======
 
 a.exe
 main.exe
@@ -38,3 +32,4 @@ transit.exe
 ./GUI/*.o
 ./GUI/*.out
 ./figs/informe
+>>>>>>> main
