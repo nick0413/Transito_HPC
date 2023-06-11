@@ -9,6 +9,8 @@
 #include <armadillo>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include "imagen_pathfind.h"
+
 using namespace std;
 
 
@@ -33,10 +35,18 @@ class Agente_Universitario
         double Pos_arista;
         double Vel;
         float scale;
+
+        std::string Mapa_file;
+        arma::mat Mapa;
+        bool verbose;
+        arma::mat PosicionNodos;
+        double tactividad;
+    
+
     
     public:
         void inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  
-        float cap_basura, float t_actividad, arma::ivec Ruta0, double posicion0, double velocidad0, double t);
+        float cap_basura, float t_actividad, int posicion0,int destino0, double velocidad0, double t,bool verbose0);
         void asignar_rol(double prob_rol, double prob_actv_academica);
         void Actividad(double prob_tipo_actividad,double t);
         std::tuple<double, double, double> prob_actividad_est(double spawn_time, double t);
@@ -52,15 +62,22 @@ class Agente_Universitario
 			arma::vec getPosition(arma::mat PosNodos, int nodo);
 			arma::ivec getRuta(void){return Ruta;};
 			int getRol(void){return rol;};
+            float getScale(void){return scale;};
 			int getActividad(void){return actividad;};
 			int getFacultad(void){return facultad;};
 			bool EnRuta(void){return en_ruta;};
-			void asignar_pos_nodo(double pos_nodo){Pos_nodo=pos_nodo;}
-			void asignar_pos_arista(double pos_arista){Pos_arista=pos_arista;}
+            bool EnActividad(void){return en_actividad;};
+			void asignar_pos_nodo(double pos_nodo){Pos_nodo=pos_nodo;};
+			void asignar_pos_arista(double pos_arista){Pos_arista=pos_arista;};
+            void asignar_ruta(int simulationTime,int nodo_i,int nodo_f);
+            void hacer_actividad(double t,double dt);
+            arma::mat getMapa(void){return Mapa;};  
+            arma::mat getPosicionNodos(void){return PosicionNodos;};
+            void hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad);
 	};
 
 void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
-         arma::ivec Ruta0, double posicion0, double velocidad0, double t){
+          int posicion0,int destino0, double velocidad0, double t,bool verbose0){
             asignar_rol(rand_rol_un,prob_actv_academica);
             Actividad(prob_tipo_actividad,t);
             spawn_time = t_spawn;
@@ -68,18 +85,29 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
             tiempo_actividad = t_actividad;
             en_actividad = false;
             en_ruta=true; //se asume que siempre que se inicializa se entra a la U y se toma un camino
-            Ruta = Ruta0;
-            Pos_nodo = posicion0;
             Vel = velocidad0;
             Pos_arista = 0;
-            
+
+			Mapa_file = "Environment/Matriz_adyacencia_mapa.csv";
+            Mapa= load_csv_arma(Mapa_file);
+            verbose= verbose0;
+            PosicionNodos = load_csv_arma("./nodos-finales.csv");
+            Ruta = Ruta_imagen(posicion0,destino0,"Environment/Usables.csv",Mapa_file,false);
+            Pos_nodo = Ruta(0);
+            tactividad=0;
+            //asignar_ruta(spawn_time,Ruta);
+			// sf::FloatRect bounds = sprite.getLocalBounds();
+			// sprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
 			
+			sf::FloatRect spriteBounds = sprite.getLocalBounds();
+			sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+
             
         }
 
 void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academica){
             
-            if(prob_rol<0.91){
+            if(prob_rol<0.91){ //0.91
                 rol = 0; //Es estudiante
                 if (!texture.loadFromFile("./figs/Agente_sprite.png"))
 				{std::cout<<" error loading texture\n";}
@@ -99,7 +127,8 @@ void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academi
                 sprite.setTexture(texture);
                 sf::FloatRect spriteBounds = sprite.getLocalBounds();
                 sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
-                scale = 0.3f;
+
+                scale = 0.2f;
                 }
             
                 else{
@@ -110,8 +139,9 @@ void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academi
                     sprite.setTexture(texture);
                     sf::FloatRect spriteBounds = sprite.getLocalBounds();
                     sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
-                    scale = 0.4f;
-                } 
+
+                    scale = 0.3f;
+
                  
 
             
@@ -183,14 +213,14 @@ void Agente_Universitario::Actividad(double prob_tipo_actividad,double t){
 
             if(rol==0){//Si es estudiante
                 auto result = prob_actividad_est(spawn_time,t);
-                P_a = std::get<0>(result);
-                P_o = std::get<1>(result);
-                P_i= std::get<2>(result);
-
-                if(0<prob_tipo_actividad<=P_a){
+                P_a = 0.5;//std::get<0>(result);
+                P_o = 0.3;//std::get<1>(result);
+                P_i= 0.2;//std::get<2>(result);
+				std::cout<<"Probabilidad de irse:" <<P_i<<std::endl;
+                if(0<prob_tipo_actividad && prob_tipo_actividad <=P_a){
                     actividad = 1; //actividad academica
                 }
-                else if(P_a<prob_tipo_actividad<=(P_a+P_o)){
+                else if(P_a<prob_tipo_actividad && prob_tipo_actividad <=(P_a+P_o)){
                     actividad = 2; //ocio o comer
                 }
 
@@ -205,12 +235,12 @@ void Agente_Universitario::Actividad(double prob_tipo_actividad,double t){
                 P_o = std::get<1>(result);
                 P_i= std::get<2>(result);
                 
-            
-                if(0<prob_tipo_actividad<=P_a){
+				std::cout<<"Probabilidad de irse:" <<P_i<<std::endl;
+                if(0<prob_tipo_actividad && prob_tipo_actividad <=P_a){
                     actividad = 1; //actividad academica
                 }
                 
-                else if(P_a<prob_tipo_actividad<=(P_a+P_o)){
+                else if(P_a<prob_tipo_actividad && prob_tipo_actividad<=(P_a+P_o)){
                     actividad = 2; //ocio o comer
                 }
 
@@ -227,11 +257,11 @@ void Agente_Universitario::Actividad(double prob_tipo_actividad,double t){
                 
                     
             
-                if(0<prob_tipo_actividad<=P_a){
+                if(0<prob_tipo_actividad && prob_tipo_actividad<=P_a){
                     actividad = 1; //actividad academica
                 }
                 
-                else if(P_a<prob_tipo_actividad<=(P_a+P_o)){
+                else if(P_a<prob_tipo_actividad && prob_tipo_actividad<=(P_a+P_o)){
                     actividad = 2; //ocio o comer
                 }
 
@@ -287,16 +317,16 @@ std::tuple<double, double, double> Agente_Universitario::prob_actividad_est(doub
             return std::make_tuple(P_a, P_o, P_i);
          }
 std::tuple<double, double, double> Agente_Universitario::prob_actividad_admin(double t){
-            double inicio_dia = 7*3600;
-            double inicio_descanso = 12*3600; 
-            double final_descanso = 14*3600;
-            double final_dia = 17*3600;
+            double inicio_dia = 0;//7*3600
+            double inicio_descanso = 3600; //12*3600
+            double final_descanso = 4600; //14*3600
+            double final_dia = 5600; //17*3600
             double P_a;
             double P_o;
             double P_i;
             double x=t;
-            double d=13*3600;
-            double s = 0.5*3600;
+            double d=4000; //13*3600
+            double s = 0.5*3600; 
             if(inicio_dia<t<=inicio_descanso){
                 P_a = 0.8;
                 P_o = 0.2;
@@ -340,7 +370,10 @@ void Agente_Universitario::Avanzar(arma::mat Madyacencia, double dt, bool verbos
 		if(verbose)std::cout<<idx.size()<<"\n";
 		if(verbose)std::cout<<idx(0)<<"\n";
 		if(verbose)std::cout<<"Condicion:"<<(idx(0)+1>Ruta.size())<<"\n";
-		if(idx(0)+1>=Ruta.size()){en_ruta=false; return;}
+		if(idx(0)+1>=Ruta.size()){
+        en_ruta=false;
+        en_actividad=true;
+        return;}
 		if(verbose)std::cout<<"----\n";
 		double cuadra=Madyacencia(Pos_nodo,Ruta(idx(0)+1));
 		if(verbose) {std::cout<<"cuadra actual: "<<cuadra<<"\nNodo actual:" <<Pos_nodo<<"\n"; }
@@ -372,7 +405,7 @@ int Agente_Universitario::Next_in_route(void)
 {	
 		
   arma::uvec idx=arma::find(Ruta == Pos_nodo);
-  if (idx(0)+1>=Ruta.size()){en_ruta=false;return-100;}
+  if (idx(0)+1>=Ruta.size()){en_ruta=false;en_actividad=true;return-100;}
   return Ruta(idx(0)+1);
 }
 
@@ -393,32 +426,114 @@ arma::vec Agente_Universitario::getPosition(arma::mat PosNodos, int nodo)
 }
 
 void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::mat PosNodos)
-{	
-			
-  int nodo_pos=Nodo_in_route();
-  int next_pos=Next_in_route();
-  if(next_pos==-100){std::cout<<"fin de la ruta\n";return;}
+	{	
+		double pos_x;
+		double pos_y;
+		
+		if(en_ruta)
+			{
+				int nodo_pos=Nodo_in_route();
+				int next_pos=Next_in_route();
+				arma::vec nodo_siguiente;	
+				arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
 
-  arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
-	//nodo_actual.print();
-  arma::vec nodo_siguiente=getPosition(PosNodos,next_pos);
+
+				if(next_pos==-100)
+					{
+						std::cout<<"fin de la ruta"<<en_actividad<<std::endl;
+						nodo_siguiente=nodo_actual;
+						return;
+					}
+				else{
+						nodo_siguiente=getPosition(PosNodos,next_pos);
+				}
 
 
-  arma::vec r=nodo_siguiente-nodo_actual;
 
-  arma::vec r2=arma::normalise(r,1);
+				arma::vec r=nodo_siguiente-nodo_actual;
 
-  if(r(0)<0)
-    {sprite.setScale(-scale, scale);}
-  else
-    {sprite.setScale(scale, scale);}
+				arma::vec r2=arma::normalise(r,1);
 
-			
-  double pos_x=(100*r2(0)*Pos_arista)+nodo_actual(0);
-  double pos_y=(100*r2(1)*Pos_arista)+nodo_actual(1);
-	//std::cout<<pos_x<<"\t"<<pos_y<<"\n";
-  sprite.setPosition(sf::Vector2f(pos_y+50,pos_x+50));
-  window.draw(sprite);
-			
+				if(r(0)<0)
+					{sprite.setScale(-scale, scale);}
+				else
+					{sprite.setScale(scale, scale);}
 
+							
+				pos_x=(100*r2(0)*Pos_arista)+nodo_actual(0);
+				pos_y=(100*r2(1)*Pos_arista)+nodo_actual(1);
+
+			}
+		
+		if(en_actividad)
+			{
+				int nodo_pos=Nodo_in_route();
+				arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
+				pos_x=nodo_actual(0);
+				pos_y=nodo_actual(1);
+				sprite.setScale(scale, scale);
+				//std::cout<<pos_x<<"\t"<<pos_y<<"\n";
+
+
+			}
+				
+			sprite.setPosition(sf::Vector2f(pos_y+50,pos_x+50));
+			window.draw(sprite);
+	}
+
+
+void Agente_Universitario::asignar_ruta(int simulationTime, int nodo_i,int nodo_f) {
+    
+    // Check if it's the first assignment
+    bool isFirstAssignment = (simulationTime == spawn_time);
+    // Actividad = 0 -> Irse /// Actividad = 1 -> actv academica /// Actividad = 2 -> ocio o comer
+    // Check if the activity is leisure
+    bool isLeisureActivity = (actividad == 2);
+
+    // Assign a route based on different conditions
+    if (rol == 1 || rol == 2)//si es profesor o admin solo recibe ruta si es la inicializacion o si es actividad de ocio
+		{ 
+			if (isLeisureActivity) 
+				{	std::cout<<"Actividad ocio "<<actividad <<std::endl; 
+					// Calculate the route using ruta_imagen function
+					Ruta = Ruta_imagen(nodo_i,nodo_f,"Environment/Usables.csv",Mapa_file,false);
+					en_ruta=true;
+					en_actividad=false;
+				}
+			else
+				{   std::cout<<"entra en el else"<<std::endl;
+					en_ruta=false; //Profesores y administrativos solo cambian de locacion para comer/ocio
+					en_actividad=true;
+				}
+		}
+	else 
+		{ //los estudiantes siempre cambian de locacion
+			Ruta = Ruta_imagen(nodo_i,nodo_f,"Environment/Usables.csv",Mapa_file,false);
+			en_ruta=true;
+			en_actividad=false;
+		}
+
+    
 }
+
+ void Agente_Universitario::hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad){
+    tactividad+=dt;
+    double tmax_actividad = 50;
+    double trestante =  tmax_actividad-tactividad;
+	nodo_i=Nodo_in_route();
+    //std::cout<<trestante<<" "<<actividad<<std::endl;
+    if(trestante<=0){
+        en_actividad=false;
+		tactividad=0;
+        Actividad(prob_tipo_actividad,t);
+		std::cout<<"Nueva actividad: "<<actividad<<"tiempo "<< t <<std::endl;
+        if(actividad !=0){
+        en_ruta=true;
+        asignar_ruta(t,nodo_i, nodo_f);
+		std::cout<<"Ruta asignada"<<std::endl;
+        }
+        //generar nuevos nodos, crear ruta, asignar ruta
+    } 
+
+
+ }
