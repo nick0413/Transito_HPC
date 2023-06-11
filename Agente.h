@@ -103,7 +103,7 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
 
 void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academica){
             
-            if(prob_rol<0.91){
+            if(prob_rol<0.91){ //0.91
                 rol = 0; //Es estudiante
                 if (!texture.loadFromFile("./figs/Agente_sprite.png"))
 				{std::cout<<" error loading texture\n";}
@@ -207,14 +207,14 @@ void Agente_Universitario::Actividad(double prob_tipo_actividad,double t){
 
             if(rol==0){//Si es estudiante
                 auto result = prob_actividad_est(spawn_time,t);
-                P_a = std::get<0>(result);
-                P_o = std::get<1>(result);
-                P_i= std::get<2>(result);
-
-                if(0<prob_tipo_actividad<=P_a){
+                P_a = 0.5;//std::get<0>(result);
+                P_o = 0.3;//std::get<1>(result);
+                P_i= 0.2;//std::get<2>(result);
+				std::cout<<"Probabilidad de irse:" <<P_i<<std::endl;
+                if(0<prob_tipo_actividad && prob_tipo_actividad <=P_a){
                     actividad = 1; //actividad academica
                 }
-                else if(P_a<prob_tipo_actividad<=(P_a+P_o)){
+                else if(P_a<prob_tipo_actividad && prob_tipo_actividad <=(P_a+P_o)){
                     actividad = 2; //ocio o comer
                 }
 
@@ -229,12 +229,12 @@ void Agente_Universitario::Actividad(double prob_tipo_actividad,double t){
                 P_o = std::get<1>(result);
                 P_i= std::get<2>(result);
                 
-            
-                if(0<prob_tipo_actividad<=P_a){
+				std::cout<<"Probabilidad de irse:" <<P_i<<std::endl;
+                if(0<prob_tipo_actividad && prob_tipo_actividad <=P_a){
                     actividad = 1; //actividad academica
                 }
                 
-                else if(P_a<prob_tipo_actividad<=(P_a+P_o)){
+                else if(P_a<prob_tipo_actividad && prob_tipo_actividad<=(P_a+P_o)){
                     actividad = 2; //ocio o comer
                 }
 
@@ -251,11 +251,11 @@ void Agente_Universitario::Actividad(double prob_tipo_actividad,double t){
                 
                     
             
-                if(0<prob_tipo_actividad<=P_a){
+                if(0<prob_tipo_actividad && prob_tipo_actividad<=P_a){
                     actividad = 1; //actividad academica
                 }
                 
-                else if(P_a<prob_tipo_actividad<=(P_a+P_o)){
+                else if(P_a<prob_tipo_actividad && prob_tipo_actividad<=(P_a+P_o)){
                     actividad = 2; //ocio o comer
                 }
 
@@ -311,16 +311,16 @@ std::tuple<double, double, double> Agente_Universitario::prob_actividad_est(doub
             return std::make_tuple(P_a, P_o, P_i);
          }
 std::tuple<double, double, double> Agente_Universitario::prob_actividad_admin(double t){
-            double inicio_dia = 7*3600;
-            double inicio_descanso = 12*3600; 
-            double final_descanso = 14*3600;
-            double final_dia = 17*3600;
+            double inicio_dia = 0;//7*3600
+            double inicio_descanso = 3600; //12*3600
+            double final_descanso = 4600; //14*3600
+            double final_dia = 5600; //17*3600
             double P_a;
             double P_o;
             double P_i;
             double x=t;
-            double d=13*3600;
-            double s = 0.5*3600;
+            double d=4000; //13*3600
+            double s = 0.5*3600; 
             if(inicio_dia<t<=inicio_descanso){
                 P_a = 0.8;
                 P_o = 0.2;
@@ -485,15 +485,15 @@ void Agente_Universitario::asignar_ruta(int simulationTime, int nodo_i,int nodo_
     // Assign a route based on different conditions
     if (rol == 1 || rol == 2)//si es profesor o admin solo recibe ruta si es la inicializacion o si es actividad de ocio
 		{ 
-			if (isFirstAssignment || isLeisureActivity) 
-				{
+			if (isLeisureActivity) 
+				{	std::cout<<"Actividad ocio "<<actividad <<std::endl; 
 					// Calculate the route using ruta_imagen function
 					Ruta = Ruta_imagen(nodo_i,nodo_f,"Environment/Usables.csv",Mapa_file,false);
 					en_ruta=true;
 					en_actividad=false;
 				}
 			else
-				{
+				{   std::cout<<"entra en el else"<<std::endl;
 					en_ruta=false; //Profesores y administrativos solo cambian de locacion para comer/ocio
 					en_actividad=true;
 				}
@@ -510,15 +510,15 @@ void Agente_Universitario::asignar_ruta(int simulationTime, int nodo_i,int nodo_
 
  void Agente_Universitario::hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad){
     tactividad+=dt;
-    double tmax_actividad = 100;
+    double tmax_actividad = 50;
     double trestante =  tmax_actividad-tactividad;
 	nodo_i=Nodo_in_route();
-    std::cout<<trestante<<" "<<actividad<<std::endl;
+    //std::cout<<trestante<<" "<<actividad<<std::endl;
     if(trestante<=0){
         en_actividad=false;
 		tactividad=0;
         Actividad(prob_tipo_actividad,t);
-		std::cout<<"Nueva actividad: "<<actividad<<std::endl;
+		std::cout<<"Nueva actividad: "<<actividad<<"tiempo "<< t <<std::endl;
         if(actividad !=0){
         en_ruta=true;
         asignar_ruta(t,nodo_i, nodo_f);

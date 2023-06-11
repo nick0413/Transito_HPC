@@ -47,12 +47,12 @@ int main(int argc, char **argv)
 	try{if(std::stoi(argv[1])==1){verbose=false;};}
 	catch (...){verbose=false;}
 
-	const int N=20;
+	const int N=40;
 	Agente_Universitario Persona[N];
 	int start=11;
 	int end=0;
 	std::random_device rd;
-	std::mt19937 gen(6);
+	std::mt19937 gen(68);
 	std::uniform_real_distribution<double> real_dist(0.0,1.0);
 	std::uniform_int_distribution<int> int_dist(0,99); 
 	int nimagen = 10;
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 	float t_actividad=7200;
 	double vel=0.05;
 	double t;
-	rol<< "rol"<<" "<< "prob"<< " "<< "actividad" << std::endl;
+	rol<< "agente"<< " " << "rol"<<" "<< "prob"<< " "<< "actividad" << std::endl;
 		for (int jj = 0; jj < N; jj++)
 			{   
 				t=0; //tiempo inicial
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 				double rand_actv_acad = real_dist(gen);
 				Persona[jj].inicializar(rand_rol,rand_type_actv,rand_actv_acad,t_spawn,cap_basura,t_actividad,nodo_inicio,nodo_destino,vel,t,verbose);
 				
-				rol<< Persona[jj].getRol()<<" "<< rand_rol<<" "<<Persona[jj].getActividad() << std::endl;
+				rol<< jj<< " " << Persona[jj].getRol()<<" "<< rand_rol<<" "<<Persona[jj].getActividad() << std::endl;
 			}
 	
 	std::cout<< Persona[0].getMapa().n_cols<< "\t"<< Persona[0].getMapa().n_rows<<std::endl;
@@ -204,7 +204,7 @@ int main(int argc, char **argv)
 
 	while(window.isOpen())
 		{ 
-				
+				t+=dt;
 			sf::Event event;
 
 			//Se mantiene en el loop si algún evento pasa
@@ -347,11 +347,13 @@ int main(int argc, char **argv)
 							Persona[jj].Avanzar(Mapa,dt,false);
 						}
 					if(Persona[jj].EnActividad()){
-						std::cout<<"Agente "<< jj<<std::endl;
+						
 						int nodo_inicio = int_dist(gen);//xy_to_node(inicio, nimagen);
 						int nodo_destino = int_dist(gen);
 						double prob_actv = real_dist(gen);
+						//
 						Persona[jj].hacer_actividad(t,dt,nodo_inicio,nodo_destino,prob_actv); //da una nueva ruta si acaba la actividad
+						//std::cout<<"Agente "<< jj<< " " << "Actividad: "<< Persona[jj].getActividad()<<std::endl;
 					}
 					//else{Persona[jj].hacer_actividad(t,dt);  }
 				}
