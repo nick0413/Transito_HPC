@@ -1,8 +1,4 @@
 
-<<<<<<< HEAD
-.vscode/c_cpp_properties.json
-.vscode/settings.json
-=======
 
 a.exe
 main.exe
@@ -32,4 +28,5 @@ transit.exe
 ./GUI/*.o
 ./GUI/*.out
 ./figs/informe
->>>>>>> main
+.vscode/c_cpp_properties.json
+.vscode/settings.json
