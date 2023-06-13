@@ -3,13 +3,14 @@
 #include <iostream>
 #include <fstream>
 #include <random>
+#include <cstdio>
 
 // Librerias externas
 #include <armadillo>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
-#include <SFML/System.hpp>	// Para los Thread
-
+#include <SFML/System.hpp>	// To threads in SFML
+#include <omp.h> 		// To OpenMP
 
 // Clases propias
 #include "Camion.h"
@@ -45,6 +46,7 @@ sf::Time timeUpdatePhysics = sf::milliseconds(1); // milliseconds (Int32) or mic
 // Init persons activities
 void init_persons_activities(int t_spawn, float cap_basura,
 			     float t_actividad, double vel, bool verbose);
+
 // Manager sfml evets
 void events_sfml_manager(sf::RenderWindow &window, sf::Event &event,
 			 sf::View &viewPrincipal, sf::Texture &textFondo,
@@ -70,11 +72,12 @@ int main(int argc, char **argv)
   catch (...){verbose=false;}
 
  // Person number
-  int N=40;
+  int N=100;
   // Array Person
   persons.resize(N);
 
-  
+
+  t=0;
   int t_spawn=0; //por ahora todos se crean al tiempo
   float cap_basura=0.2; //ahora mismo no hace nada
   float t_actividad=7200;
@@ -84,7 +87,7 @@ int main(int argc, char **argv)
   rol<< "agente"<< " " << "rol"<<" "<< "prob"<< " "<< "actividad" << std::endl;
 
   // Init persons activities
-  init_persons_activities(t_spawn, cap_basura, t_actividad, vel, verbose);
+  init_persons_activities(t_spawn, cap_basura, t_actividad, vel, verbose); 
   
   	
   std::cout<< persons[0].getMapa().n_cols<< "\t"<< persons[0].getMapa().n_rows<<std::endl;
@@ -236,17 +239,15 @@ int main(int argc, char **argv)
       // if(cam1.Is_alive()) cam1.draw(window,Mapa,PosicionNodos);
 
 
-      for(int jj = 0; jj < N; jj++)
-	{	
-	  if(persons[jj].getActividad()!=0) 
-	    {	
+      // Update persons
+      for(int jj = 0; jj < N; jj++) {	
+	if(persons[jj].getActividad()!=0) 
+	  {	
 							
-	      persons[jj].draw(window,Mapa,PosicionNodos);
-	      //rol<<persons[jj].getRol()<<" "<<persons[jj].getScale()<<std::endl;
-	    }
-					
-					
-	}
+	    persons[jj].draw(window,Mapa,PosicionNodos);
+	    //rol<<persons[jj].getRol()<<" "<<persons[jj].getScale()<<std::endl;
+	  }			       					
+      }
 
       // Se dibujan los contenedores y la información
       /*
@@ -279,41 +280,59 @@ int main(int argc, char **argv)
 
 // Persons's movement
 void physics(){
-
+  sf::Time elapsed; // Se tiene en cuenta el tiempo de procesamiento  
   int N = persons.size();
+
   int nodo_inicio;
   int nodo_destino;
   double prob_actv;
-
-  sf::Time elapsed;
-    // Se tiene en cuenta el tiempo de procesamiento  
   
   
+    
   while(true){
-    // Calaculate time to sleep exactly timeUpdatePhysics was defined 
-    elapsed = clockPhysics.restart();
+    // Calculate time to sleep exactly timeUpdatePhysics was defined 
+      elapsed = clockPhysics.restart();
 
-    if (timeUpdatePhysics>=elapsed)
+    if (timeUpdatePhysics>elapsed)
       sf::sleep(timeUpdatePhysics-elapsed); 
 
     clockPhysics.restart();
 
-    for(int jj = 0; jj < N; jj++) {	
-      //std::cout<<jj<<std::endl;
-      if(persons[jj].EnRuta()){	
-	persons[jj].Avanzar(Mapa,dt,false);
+
+    #pragma omp parallel private(nodo_inicio, nodo_destino, prob_actv)
+    {
+      int thr_id=omp_get_thread_num();
+      int num_thr=omp_get_num_threads();
+      int Nlocal=N/num_thr;
+
+      int imin=thr_id*Nlocal;
+      if(num_thr>1 && thr_id==(num_thr-1) && (N%Nlocal)!=0){
+	Nlocal+=N%num_thr;
       }
-      if(persons[jj].EnActividad()){
+
+      int imax=imin+Nlocal;
+
+      fprintf(stderr,"physics:: imin:%i imax:%i \n",imin,imax);
+    
+      for (int jj = imin; jj < imax; ++jj){ 	
+	//std::cout<<jj<<std::endl;
+	if(persons[jj].EnRuta()){	
+	  persons[jj].Avanzar(Mapa,dt,false);
+	}
+	if(persons[jj].EnActividad()){
 	    
-	//xy_to_node(inicio, nimagen);	
-	nodo_inicio = int_dist(gen);
-	nodo_destino = int_dist(gen);
-	prob_actv = real_dist(gen);
-	//da una nueva ruta si acaba la actividad
-	persons[jj].hacer_actividad(t,dt,nodo_inicio,nodo_destino,prob_actv); 
-	//std::cout<<"Agente "<< jj<< " " << "Actividad: "<< persons[jj].getActividad()<<std::endl;
+	  //xy_to_node(inicio, nimagen);	
+	  nodo_inicio = int_dist(gen);
+	  nodo_destino = int_dist(gen);
+	  prob_actv = real_dist(gen);
+	  //da una nueva ruta si acaba la actividad
+	  persons[jj].hacer_actividad(t,dt,nodo_inicio,nodo_destino,prob_actv); 
+	  //std::cout<<"Agente "<< jj<< " " << "Actividad: "<< persons[jj].getActividad()<<std::endl;
+	}
+	//else{persons[jj].hacer_actividad(t,dt);  }
       }
-      //else{persons[jj].hacer_actividad(t,dt);  }
+      
+
     }
   }
 
@@ -322,17 +341,31 @@ void physics(){
 
 void init_persons_activities(int t_spawn, float cap_basura,
 			     float t_actividad, double vel, bool verbose){
-
   int N=persons.size();
   int nodo_inicio;
   int nodo_destino;
   double rand_rol;
   double rand_type_actv;
   double rand_actv_acad;
-  for (int jj = 0; jj < N; jj++)
-    {
-      //tiempo inicial  
-      t=0; 
+
+  #pragma omp parallel private(nodo_inicio, nodo_destino, rand_rol, rand_type_actv, rand_actv_acad)
+  {
+    int thr_id=omp_get_thread_num();
+    int num_thr=omp_get_num_threads();
+    int Nlocal=N/num_thr;
+
+    int imin=thr_id*Nlocal;
+
+    if(num_thr>1 && thr_id==(num_thr-1) && (N%Nlocal)!=0){
+      Nlocal+=N%num_thr;
+    }
+
+    int imax=imin+Nlocal;
+
+  
+    fprintf(stderr,"init_persons_activities:: imin:%i imax:%i \n",imin,imax);
+
+    for (int jj = imin; jj < imax; ++jj){ 
       // xy_to_node(inicio, nimagen);
       nodo_inicio = int_dist(gen);
       nodo_destino = int_dist(gen); 
@@ -346,6 +379,10 @@ void init_persons_activities(int t_spawn, float cap_basura,
       rol<< jj<< " " << persons[jj].getRol()<<" "<< rand_rol<<" "
 	 <<persons[jj].getActividad() << std::endl;
     }
+  }
+  
+
+  return;
 
 } 
 
@@ -485,6 +522,8 @@ void events_sfml_manager(sf::RenderWindow &window, sf::Event &event,
 	  break;
 	}
     }
+
+  return;
 }
 
 
