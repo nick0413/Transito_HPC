@@ -297,6 +297,10 @@ void physics(){
   double prob_actv;
   
   int total =0;
+  int threads=0;
+  FILE *fp;
+  fp = fopen("physics.txt","a");
+      
     
   while(true){
     // Calculate time to sleep exactly timeUpdatePhysics was defined 
@@ -314,7 +318,8 @@ void physics(){
       int thr_id=omp_get_thread_num();
       int num_thr=omp_get_num_threads();
       if(thr_id==1 && total<3){
-        times<<num_thr<<" ";
+        //times<<num_thr<<" ";
+	threads=num_thr;
       }
       int Nlocal=N/num_thr;
 
@@ -348,14 +353,22 @@ void physics(){
 
     }
     auto end = std::chrono::steady_clock::now();
-    if(total <3 ){
+    if(total <10 ){
       std::chrono::duration<double> diff = end - start;
       time = diff.count();
-      times<<time<<" ";
-    }else if(total <4 ){{
-      times<<"\n";
+
+      fprintf(fp,"%i %f ",threads, time);
+      //times<<time<<" ";
+  
+      
+    }else if(total <11 ){{
+	fprintf(fp,"\n");
+	fclose(fp);
+	//times<<"\n";
     }}
   }
+
+  
 
   return;
 }
