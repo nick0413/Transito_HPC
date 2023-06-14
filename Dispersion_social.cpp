@@ -4,6 +4,7 @@
 #include <fstream>
 #include <random>
 #include <cstdio>
+#include <chrono>
 
 // Librerias externas
 #include <armadillo>
@@ -18,6 +19,8 @@
 #include "Tools.h"
 
 ofstream rol;
+ofstream times;
+//#define NUM_THREADS 3
 // SFML
 
 // https://www.sfml-dev.org/tutorials/2.5/system-thread.php
@@ -66,7 +69,11 @@ bool verbose=false;
 int main(int argc, char **argv)
 {
   
+
   rol.open("rol.csv");
+  times.open("times.txt", ios:: app);
+  //omp_set_num_threads(NUM_THREADS);
+
 
   try{if(std::stoi(argv[1])==1){verbose=false;};}
   catch (...){verbose=false;}
@@ -83,8 +90,10 @@ int main(int argc, char **argv)
   float t_actividad=7200;
   double vel=0.05;
   
+  
 
   rol<< "agente"<< " " << "rol"<<" "<< "prob"<< " "<< "actividad" << std::endl;
+  
 
   // Init persons activities
   init_persons_activities(t_spawn, cap_basura, t_actividad, vel, verbose); 
@@ -287,27 +296,31 @@ void physics(){
   int nodo_destino;
   double prob_actv;
   
-  
+  int total =0;
     
   while(true){
     // Calculate time to sleep exactly timeUpdatePhysics was defined 
       elapsed = clockPhysics.restart();
-
+    total++;
     if (timeUpdatePhysics>elapsed)
       sf::sleep(timeUpdatePhysics-elapsed); 
 
     clockPhysics.restart();
-
+    double time;
+    auto start = std::chrono::steady_clock::now();
 
     #pragma omp parallel private(nodo_inicio, nodo_destino, prob_actv)
     {
       int thr_id=omp_get_thread_num();
       int num_thr=omp_get_num_threads();
+      if(thr_id==1 && total<3){
+        times<<num_thr<<" ";
+      }
       int Nlocal=N/num_thr;
 
       int imin=thr_id*Nlocal;
       if(num_thr>1 && thr_id==(num_thr-1) && (N%Nlocal)!=0){
-	Nlocal+=N%num_thr;
+	      Nlocal+=N%num_thr;
       }
 
       int imax=imin+Nlocal;
@@ -315,25 +328,33 @@ void physics(){
       fprintf(stderr,"physics:: imin:%i imax:%i \n",imin,imax);
     
       for (int jj = imin; jj < imax; ++jj){ 	
-	//std::cout<<jj<<std::endl;
-	if(persons[jj].EnRuta()){	
-	  persons[jj].Avanzar(Mapa,dt,false);
-	}
-	if(persons[jj].EnActividad()){
-	    
-	  //xy_to_node(inicio, nimagen);	
-	  nodo_inicio = int_dist(gen);
-	  nodo_destino = int_dist(gen);
-	  prob_actv = real_dist(gen);
-	  //da una nueva ruta si acaba la actividad
-	  persons[jj].hacer_actividad(t,dt,nodo_inicio,nodo_destino,prob_actv); 
-	  //std::cout<<"Agente "<< jj<< " " << "Actividad: "<< persons[jj].getActividad()<<std::endl;
-	}
-	//else{persons[jj].hacer_actividad(t,dt);  }
+        //std::cout<<jj<<std::endl;
+        if(persons[jj].EnRuta()){	
+          persons[jj].Avanzar(Mapa,dt,false);
+        }
+        if(persons[jj].EnActividad()){
+            
+          //xy_to_node(inicio, nimagen);	
+          nodo_inicio = int_dist(gen);
+          nodo_destino = int_dist(gen);
+          prob_actv = real_dist(gen);
+          //da una nueva ruta si acaba la actividad
+          persons[jj].hacer_actividad(t,dt,nodo_inicio,nodo_destino,prob_actv); 
+          //std::cout<<"Agente "<< jj<< " " << "Actividad: "<< persons[jj].getActividad()<<std::endl;
+        }
+        //else{persons[jj].hacer_actividad(t,dt);  }
       }
       
 
     }
+    auto end = std::chrono::steady_clock::now();
+    if(total <3 ){
+      std::chrono::duration<double> diff = end - start;
+      time = diff.count();
+      times<<time<<" ";
+    }else if(total <4 ){{
+      times<<"\n";
+    }}
   }
 
   return;
@@ -347,11 +368,16 @@ void init_persons_activities(int t_spawn, float cap_basura,
   double rand_rol;
   double rand_type_actv;
   double rand_actv_acad;
+  double time;
 
+  auto start = std::chrono::steady_clock::now();
   #pragma omp parallel private(nodo_inicio, nodo_destino, rand_rol, rand_type_actv, rand_actv_acad)
   {
     int thr_id=omp_get_thread_num();
     int num_thr=omp_get_num_threads();
+    if(thr_id==1){
+      times<<num_thr<<" ";
+    }
     int Nlocal=N/num_thr;
 
     int imin=thr_id*Nlocal;
@@ -380,6 +406,10 @@ void init_persons_activities(int t_spawn, float cap_basura,
 	 <<persons[jj].getActividad() << std::endl;
     }
   }
+  auto end = std::chrono::steady_clock::now();
+  std::chrono::duration<double> diff = end - start;
+  time = diff.count();
+  times<<time<<" ";
   
 
   return;
