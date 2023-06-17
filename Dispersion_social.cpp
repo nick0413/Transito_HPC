@@ -47,14 +47,17 @@ int main(int argc, char **argv)
 	try{if(std::stoi(argv[1])==1){verbose=false;};}
 	catch (...){verbose=false;}
 
-	const int N=40;
+	const int N=2;
 	Agente_Universitario Persona[N];
 	int start=11;
 	int end=0;
 	std::random_device rd;
-	std::mt19937 gen(68);
+	std::mt19937 gen(69);
 	std::uniform_real_distribution<double> real_dist(0.0,1.0);
 	std::uniform_int_distribution<int> int_dist(0,99); 
+	std::string Mapa_file  = "Environment/Matriz_adyacencia_mapa.csv";
+	arma::mat Mapa_0=load_csv_arma(Mapa_file);
+	arma::mat PosicionNodos_0=load_csv_arma("./nodos-finales.csv");
 	int nimagen = 10;
 	int t_spawn=0; //por ahora todos se crean al tiempo
 	float cap_basura=0.2; //ahora mismo no hace nada
@@ -62,24 +65,27 @@ int main(int argc, char **argv)
 	double vel=0.05;
 	double t;
 	rol<< "agente"<< " " << "rol"<<" "<< "prob"<< " "<< "actividad" << std::endl;
-		for (int jj = 0; jj < N; jj++)
-			{   
-				t=0; //tiempo inicial
-				int rand_destino = int_dist(gen);
-				//arma::vec destino = coord_edificios.row(rand_destino);
-				//arma::vec inicio = {5,5};
-				int nodo_inicio = int_dist(gen);//xy_to_node(inicio, nimagen);
-				int nodo_destino = int_dist(gen);//xy_to_node(destino, nimagen				
-				double rand_rol = real_dist(gen);
-				double rand_type_actv = real_dist(gen);
-				double rand_actv_acad = real_dist(gen);
-				Persona[jj].inicializar(rand_rol,rand_type_actv,rand_actv_acad,t_spawn,cap_basura,t_actividad,nodo_inicio,nodo_destino,vel,t,verbose);
-				
-				rol<< jj<< " " << Persona[jj].getRol()<<" "<< rand_rol<<" "<<Persona[jj].getActividad() << std::endl;
-			}
+	for (int jj = 0; jj < N; jj++)
+		{   
+			t=0; //tiempo inicial
+			int rand_destino = int_dist(gen);
+			//arma::vec destino = coord_edificios.row(rand_destino);
+			//arma::vec inicio = {5,5};
+			int nodo_inicio = int_dist(gen);//xy_to_node(inicio, nimagen);
+			int nodo_destino = int_dist(gen);//xy_to_node(destino, nimagen				
+			double rand_rol = real_dist(gen);
+			double rand_type_actv = real_dist(gen);
+			double rand_actv_acad = real_dist(gen);
+		
+			Persona[jj].inicializar(rand_rol,rand_type_actv,rand_actv_acad,t_spawn,cap_basura,t_actividad,
+									nodo_inicio,nodo_destino,vel,t,verbose,Mapa_0,PosicionNodos_0,Mapa_file);
+			
+			rol<< jj<< " " << Persona[jj].getRol()<<" "<< rand_rol<<" "<<Persona[jj].getActividad() << std::endl;
+		}
 	
-	std::cout<< Persona[0].getMapa().n_cols<< "\t"<< Persona[0].getMapa().n_rows<<std::endl;
-	std::cout<< Persona[0].getPosicionNodos().n_cols<< "\t"<< Persona[0].getPosicionNodos().n_rows<<std::endl;
+	
+	// std::cout<< Persona[0].getMapa().n_cols<< "\t"<< Persona[0].getMapa().n_rows<<std::endl;
+	// std::cout<< Persona[0].getPosicionNodos().n_cols<< "\t"<< Persona[0].getPosicionNodos().n_rows<<std::endl;
 	if(verbose) std::cout<<Persona[0].getPosicionNodos()<<std::endl;
 	// ******* sfml
 	arma::mat PosicionNodos=Persona[0].getPosicionNodos();
@@ -97,7 +103,7 @@ int main(int argc, char **argv)
 	sf::Texture textFondoNodos;
 	// Se crea el fondo como Sprite
 	sf::Sprite sprFondo;
-	std::string figFondo="./Environment/mapa_v7.png";
+	std::string figFondo="./Environment/10_10_high_res.png";
 	// std::string figFondoNodos="./figs/Contenedores-Residuos-nods.png";
 	char opcionesDeFondo=1;
 
@@ -136,6 +142,7 @@ int main(int argc, char **argv)
 	// *** Configuración del fondo ***
 
 	// Se crea la textura del fondo
+	
 	if(!textFondo.loadFromFile(figFondo))
 		{
 			std::cout<< "Por favor verifique la ruta: "<<figFondo<<std::endl;
@@ -341,10 +348,9 @@ int main(int argc, char **argv)
 		
 			for(int jj = 0; jj < N; jj++)
 				{	
-					//std::cout<<jj<<std::endl;
 					if(Persona[jj].EnRuta()) 
 						{	
-							Persona[jj].Avanzar(Mapa,dt,false);
+							Persona[jj].Avanzar(Mapa,dt,true);
 						}
 					if(Persona[jj].EnActividad()){
 						
@@ -353,9 +359,9 @@ int main(int argc, char **argv)
 						double prob_actv = real_dist(gen);
 						//
 						Persona[jj].hacer_actividad(t,dt,nodo_inicio,nodo_destino,prob_actv); //da una nueva ruta si acaba la actividad
-						//std::cout<<"Agente "<< jj<< " " << "Actividad: "<< Persona[jj].getActividad()<<std::endl;
+						// std::cout<<"Agente "<< jj<< " " << "Actividad: "<< Persona[jj].getActividad()<<std::endl;
 					}
-					//else{Persona[jj].hacer_actividad(t,dt);  }
+
 				}
 			
 			//std::cout<<"---------------------\n";
@@ -379,7 +385,7 @@ int main(int argc, char **argv)
 					if(Persona[jj].getActividad()!=0) 
 						{	
 							
-							Persona[jj].draw(window,Mapa,PosicionNodos);
+							Persona[jj].draw(window,Mapa,PosicionNodos_0);
 							//rol<<Persona[jj].getRol()<<" "<<Persona[jj].getScale()<<std::endl;
 						}
 					

@@ -15,11 +15,14 @@ int next_node(arma::vec Usables, int nodo)
 	}
 
 arma::ivec Ruta_imagen(int start, int end, std::string Usables_file, std::string Mapa_file,bool verbose)
-	{
+	{	
+
+		// std::cout<<"Llama a Load_csv_arma---\n";
+
 		arma::mat Usables_mat= load_csv_arma(Usables_file);
 		arma::vec Usables = Usables_mat.as_col();
 		arma::mat Mapa= load_csv_arma(Mapa_file);
-
+		// std::cout<<"termino los llamados---\n";
 
 		if (start>Usables.size() || end>Usables.size())
 			{
@@ -29,21 +32,23 @@ arma::ivec Ruta_imagen(int start, int end, std::string Usables_file, std::string
 
 		if(Usables(end)==1)
 				{ if(verbose)std::cout<<"Si end\n";}
-			else
+		else
 
-				{
-					if(verbose)std::cout<<end<<" No es un nodo accesible"; 
-					end=next_node(Usables,end);
-					if(verbose)std::cout<<", Se usara "<<end; 
-				}
+			{
+				if(verbose)std::cout<<end<<" No es un nodo accesible"; 
+				end=next_node(Usables,end);
+				if(verbose)std::cout<<", Se usara "<<end; 
+			}
 		if(Usables(start)==1)
-				{if(verbose)std::cout<<"Si start\n";}
-			else
-				{
-					if(verbose)std::cout<<start<<" No es un nodo accesible"; 
-					start=next_node(Usables,start);
-					if(verbose)std::cout<<", Se usara "<< start<<"\n"; 
-				}
+			{if(verbose)std::cout<<"Si start\n";}
+		else
+			{
+				if(verbose)std::cout<<start<<" No es un nodo accesible"; 
+				start=next_node(Usables,start);
+				if(verbose)std::cout<<", Se usara "<< start<<"\n"; 
+			}
+		
+		
 		arma:: ivec Ruta1=dijkstra_arma(Mapa,start,end);
 
 		//Ruta1.print();

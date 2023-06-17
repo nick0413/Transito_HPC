@@ -44,24 +44,27 @@ arma::mat matriz_nn(int n){
 
 				if((ii-n==jj-1 && (jj%n)!=0))
 					{	
-						std::cout<<ii<<" "<<jj<<"\n";
+						if(ii==20 || jj==20){std::cout<<ii<<" "<<jj<<"\t1\n";}
 						M(ii,jj)=1;
 					};
 				if((jj-n==ii-1 && (ii%n)!=0))
 					{	
-						std::cout<<ii<<" "<<jj<<"\n";
+						if(ii==20 || jj==20){std::cout<<ii<<" "<<jj<<"\t2\n";}
+						// std::cout<<ii<<" "<<jj<<"\n";
 						M(ii,jj)=1;
 					};
 
 
 				if((ii+n==jj-1 && (jj%n)!=0))
 					{	
+						if(ii==20 || jj==20){std::cout<<ii<<" "<<jj<<"\t3\n";}
 						// std::cout<<ii<<" "<<jj<<"\n";
 						M(ii,jj)=1;
 					};
 
-				if((jj+n==ii-1 && (jj%n)!=0))
+				if((jj+n==ii-1 && (ii%n)!=0))
 					{	
+						if(ii==20 || jj==20){std::cout<<ii<<" "<<jj<<"\t4\n";}
 						// std::cout<<ii<<" "<<jj<<"\n";
 						M(ii,jj)=1;
 					};
@@ -106,9 +109,10 @@ arma::mat Aceso(arma::mat imagen, arma::mat Adyacencia)
 				std::cout<<"Alerta: imagen no es cuadrada\n";
 				return Adyacencia;
 			}
+		// std::cout<<"Alerta: imagen no es del tamaño apropiado nxn "<<numRows*numCols<<" "<<Adyacencia.n_rows << "\n";
 		if((numRows*numCols)!=Adyacencia.n_rows)
 			{
-				std::cout<<"Alerta: imagen no es del tamaño apropiado nxn"<<numRows*numCols<<" "<<Adyacencia.n_rows << "\n";
+				std::cout<<"Alerta: imagen no es del tamaño apropiado nxn "<<numRows*numCols<<" "<<Adyacencia.n_rows << "\n";
 				return Adyacencia;
 			}
 		//std::cout<<0<<"\t"<<4<<"\t"<<Adyacencia(0,4) <<"----\n";
@@ -137,14 +141,14 @@ arma::mat Aceso(arma::mat imagen, arma::mat Adyacencia)
 			}
 
 
-		//std::cout<<0<<"\t"<<4<<"\t"<<Adyacencia(0,4) <<"----\n";
-		// for(int ll=0;ll<Adyacencia.n_cols;ll++)
-		// 	{for(int tt=0; tt<Adyacencia.n_rows;tt++)
-		// 		{
-		// 		if(Adyacencia(ll,tt)==0)
-		// 			{Adyacencia(ll,tt)=9999;}
-		// 		}
-		// 	}
+		// std::cout<<0<<"\t"<<4<<"\t"<<Adyacencia(0,4) <<"----\n";
+		for(int ll=0;ll<Adyacencia.n_cols;ll++)
+			{for(int tt=0; tt<Adyacencia.n_rows;tt++)
+				{
+				if(Adyacencia(ll,tt)==0)
+					{Adyacencia(ll,tt)=9999;}
+				}
+			}
 		save_vector(Usables);
 		return Adyacencia;
 
@@ -173,7 +177,7 @@ void save_matrix(arma::mat Matrix)
 
 int main()
 	{	
-		int n=4;
+		int n=10;
 		salida.open("./Environment/Matriz_adyacencia_mapa.csv");
 		usab.open("./Environment/Usables.csv");
 		arma::mat imagen= load_csv_arma("./Environment/Acceso.csv");
