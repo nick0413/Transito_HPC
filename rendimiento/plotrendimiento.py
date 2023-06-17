@@ -9,7 +9,7 @@ a=np.loadtxt("../physics.txt")
 maxcol=len(a[1])
 maxrows=len(a)
 total=0
-print(N[-1])
+#print(N[-1])
 for i in range(int(maxcol/2)):
     Act1=np.loadtxt("../physics.txt", usecols=[2*i+1], unpack=True)
     Act.append(Act1)
@@ -20,6 +20,8 @@ for i in range(int(maxcol/2)):
     Actsu.append(Acts)
     #print(Actsu[i])
 #calcular promedio por num threads
+
+total=total/maxrows
 totalsu=total[0]/total
 
 
