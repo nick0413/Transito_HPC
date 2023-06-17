@@ -353,15 +353,15 @@ void physics(){
 
     }
     auto end = std::chrono::steady_clock::now();
-    if(total <10 ){
+    if(total <40 ){
       std::chrono::duration<double> diff = end - start;
       time = diff.count();
 
-      fprintf(fp,"%i %f ",threads, time);
+      fprintf(fp,"%i %f \n",threads, time);
       //times<<time<<" ";
   
       
-    }else if(total <11 ){{
+    }else if(total <41 ){{
 	fprintf(fp,"\n");
 	fclose(fp);
 	//times<<"\n";
@@ -382,6 +382,9 @@ void init_persons_activities(int t_spawn, float cap_basura,
   double rand_type_actv;
   double rand_actv_acad;
   double time;
+  FILE *fp;
+  fp = fopen("inits.txt","a");
+  int threads=0;
 
   auto start = std::chrono::steady_clock::now();
   #pragma omp parallel private(nodo_inicio, nodo_destino, rand_rol, rand_type_actv, rand_actv_acad)
@@ -390,6 +393,7 @@ void init_persons_activities(int t_spawn, float cap_basura,
     int num_thr=omp_get_num_threads();
     if(thr_id==1){
       times<<num_thr<<" ";
+      threads=num_thr;
     }
     int Nlocal=N/num_thr;
 
@@ -423,7 +427,8 @@ void init_persons_activities(int t_spawn, float cap_basura,
   std::chrono::duration<double> diff = end - start;
   time = diff.count();
   times<<time<<" ";
-  
+  fprintf(fp,"%i %f", threads, time);
+  fclose(fp);
 
   return;
 
