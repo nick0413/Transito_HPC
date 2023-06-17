@@ -40,6 +40,7 @@ class Agente_Universitario
 		bool verbose;
 		arma::mat PosicionNodos;
 		double tactividad;
+		bool vivo=true;
     
     
     public:
@@ -367,10 +368,12 @@ void Agente_Universitario::Avanzar(arma::mat Madyacencia, double dt, bool verbos
 		// if(verbose)std::cout<<idx.size()<<"\n";
 		// if(verbose)std::cout<<idx(0)<<"\n";
 		// if(verbose)std::cout<<"Condicion:"<<(idx(0)+1>Ruta.size())<<"\n";
-		if(idx(0)+1>=Ruta.size()){
-        en_ruta=false;
-        en_actividad=true;
-        return;}
+		if(idx(0)+1>=Ruta.size())
+			{
+				en_ruta=false;
+				en_actividad=true;
+				return;
+			}
 		// if(verbose)std::cout<<"----\n";
 		double cuadra=Madyacencia(Pos_nodo,Ruta(idx(0)+1));
 
@@ -381,7 +384,7 @@ void Agente_Universitario::Avanzar(arma::mat Madyacencia, double dt, bool verbos
 			}
 		if(verbose) {
 			std::cout<<Pos_arista<<"->"<<Pos_arista	+dt*Vel<<"\t";
-			std::cout<<"arista actual: "<<Pos_arista<<"\tEntre nodos:" <<Pos_nodo<<"->"<<Ruta(idx(0)+1)<<"\n"; 
+			std::cout<<"arista actual: "<<Pos_arista<<"\tEntre nodos:" <<Pos_nodo<<"->"<<Ruta(idx(0)+1); 
 			}
 
 	}
@@ -442,7 +445,6 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::m
 					{
 						std::cout<<"fin de la ruta"<<en_actividad<<std::endl;
 						nodo_siguiente=nodo_actual;
-						return;
 					}
 				else{
 						nodo_siguiente=getPosition(PosNodos,next_pos);
@@ -473,11 +475,10 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::m
 				sprite.setScale(scale, scale);
 				//std::cout<<pos_x<<"\t"<<pos_y<<"\n";
 
-
 			}
 		else
-			{std::cout<<"--------------------------\n";}
-				
+			{std::cout<<"Error en draw, no tiene actividad definida----\n";}
+			std::cout<<"\t"<<pos_x<<"\t"<<pos_y<<"\n";
 			sprite.setPosition(sf::Vector2f(pos_y+50,pos_x+50));
 			window.draw(sprite);
 	}

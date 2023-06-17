@@ -44,29 +44,29 @@ arma::mat matriz_nn(int n){
 
 				if((ii-n==jj-1 && (jj%n)!=0))
 					{	
-						if(ii==20 || jj==20){std::cout<<ii<<" "<<jj<<"\t1\n";}
-						M(ii,jj)=1;
+						// if(ii==20 || jj==20){std::cout<<ii<<" "<<jj<<"\t1\n";}
+						M(ii,jj)=1.41;
 					};
 				if((jj-n==ii-1 && (ii%n)!=0))
 					{	
-						if(ii==20 || jj==20){std::cout<<ii<<" "<<jj<<"\t2\n";}
+						// if(ii==20 || jj==20){std::cout<<ii<<" "<<jj<<"\t2\n";}
 						// std::cout<<ii<<" "<<jj<<"\n";
-						M(ii,jj)=1;
+						M(ii,jj)=1.41;
 					};
 
 
 				if((ii+n==jj-1 && (jj%n)!=0))
 					{	
-						if(ii==20 || jj==20){std::cout<<ii<<" "<<jj<<"\t3\n";}
+						// if(ii==20 || jj==20){std::cout<<ii<<" "<<jj<<"\t3\n";}
 						// std::cout<<ii<<" "<<jj<<"\n";
-						M(ii,jj)=1;
+						M(ii,jj)=1.41;
 					};
 
 				if((jj+n==ii-1 && (ii%n)!=0))
 					{	
-						if(ii==20 || jj==20){std::cout<<ii<<" "<<jj<<"\t4\n";}
+						// if(ii==20 || jj==20){std::cout<<ii<<" "<<jj<<"\t4\n";}
 						// std::cout<<ii<<" "<<jj<<"\n";
-						M(ii,jj)=1;
+						M(ii,jj)=1.41;
 					};
 
 

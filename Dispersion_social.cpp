@@ -47,12 +47,12 @@ int main(int argc, char **argv)
 	try{if(std::stoi(argv[1])==1){verbose=false;};}
 	catch (...){verbose=false;}
 
-	const int N=2;
+	const int N=1;
 	Agente_Universitario Persona[N];
 	int start=11;
 	int end=0;
 	std::random_device rd;
-	std::mt19937 gen(69);
+	std::mt19937 gen(50);
 	std::uniform_real_distribution<double> real_dist(0.0,1.0);
 	std::uniform_int_distribution<int> int_dist(0,99); 
 	std::string Mapa_file  = "Environment/Matriz_adyacencia_mapa.csv";
@@ -211,7 +211,8 @@ int main(int argc, char **argv)
 
 	while(window.isOpen())
 		{ 
-				t+=dt;
+			
+			t+=dt;
 			sf::Event event;
 
 			//Se mantiene en el loop si algún evento pasa
@@ -345,12 +346,12 @@ int main(int argc, char **argv)
 					
 				
 			//Physics
-		
+			sf::sleep(sf::seconds(0.6f));
 			for(int jj = 0; jj < N; jj++)
 				{	
 					if(Persona[jj].EnRuta()) 
 						{	
-							Persona[jj].Avanzar(Mapa,dt,true);
+							Persona[jj].Avanzar(Mapa,dt,false);
 						}
 					if(Persona[jj].EnActividad()){
 						
@@ -386,7 +387,9 @@ int main(int argc, char **argv)
 						{	
 							
 							Persona[jj].draw(window,Mapa,PosicionNodos_0);
+							std::cout<<"------------\n";
 							//rol<<Persona[jj].getRol()<<" "<<Persona[jj].getScale()<<std::endl;
+							// std::cout<<Persona[jj].getRol()<<" "<<Persona[jj].getScale()<<"\n";
 						}
 					
 					
