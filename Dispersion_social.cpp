@@ -262,7 +262,7 @@ void physics(){
 
       fprintf(fp,"%i %f ",threads, time);
       
-    }else if(total <42 ){
+    }else if(total <41 ){
       fprintf(fp,"\n");
       fclose(fp);
     }
