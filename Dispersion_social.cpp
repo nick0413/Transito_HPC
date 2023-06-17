@@ -260,24 +260,12 @@ void physics(){
       std::chrono::duration<double> diff = end - start;
       time = diff.count();
 
-<<<<<<< HEAD
-      fprintf(fp,"%i %f \n",threads, time);
-      //times<<time<<" ";
-  
-      
-    }else if(total <41 ){{
-	fprintf(fp,"\n");
-	fclose(fp);
-	//times<<"\n";
-    }}
-=======
       fprintf(fp,"%i %f ",threads, time);
       
-    }else if(total <11 ){
+    }else if(total <42 ){
       fprintf(fp,"\n");
       fclose(fp);
     }
->>>>>>> ebdfa66e76f6797518a10657a9ad506715709ff7
   }
 
   return;
@@ -302,12 +290,8 @@ void init_persons_activities(int t_spawn, float cap_basura,
     int thr_id=omp_get_thread_num();
     int num_thr=omp_get_num_threads();
     if(thr_id==1){
-<<<<<<< HEAD
-      times<<num_thr<<" ";
-      threads=num_thr;
-=======
       //times<<num_thr<<" ";
->>>>>>> ebdfa66e76f6797518a10657a9ad506715709ff7
+      threads=num_thr;
     }
     int Nlocal=N/num_thr;
 
@@ -340,14 +324,9 @@ void init_persons_activities(int t_spawn, float cap_basura,
   auto end = std::chrono::steady_clock::now();
   std::chrono::duration<double> diff = end - start;
   time = diff.count();
-<<<<<<< HEAD
-  times<<time<<" ";
+  //times<<time<<" ";
   fprintf(fp,"%i %f", threads, time);
   fclose(fp);
-=======
-  //times<<time<<" ";
-  
->>>>>>> ebdfa66e76f6797518a10657a9ad506715709ff7
 
   return;
 
