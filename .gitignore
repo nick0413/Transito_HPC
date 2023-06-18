@@ -1,11 +1,7 @@
-
 Dispersion_social.exe
 .vscode/c_cpp_properties.json
-<<<<<<< HEAD
-Dispersion_social.exe
 Dispersion_social.o
-Dispersion_social.out
-=======
 .vscode/settings.json
->>>>>>> main
 rol.csv
+basura.txt
+Dispersion_social.out

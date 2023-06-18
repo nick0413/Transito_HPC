@@ -11,7 +11,6 @@
 #include <SFML/Graphics.hpp>
 #include "imagen_pathfind.h"
 
-using namespace std;
 
 
 class Agente_Universitario; 
@@ -23,8 +22,7 @@ private:
   int rol;
   int actividad;
   int facultad;
-  int spawn_time;
-  float capacidad_basura;
+  int spawn_time;  
   float tiempo_actividad;
   bool en_actividad;
   bool en_ruta;
@@ -40,7 +38,12 @@ private:
   bool verbose;
   arma::mat PosicionNodos;
   double tactividad;
-    
+
+  // Basura
+  float capacidad_basura; // kg/kg Normalizado
+  float delta_produccion_basura; // kg/kg*s Normalizado
+  float basura_actual; // kg/kg Normalizado
+
     
 public:
   void inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  
@@ -72,7 +75,37 @@ public:
   arma::mat getMapa(void){return Mapa;};  
   arma::mat getPosicionNodos(void){return PosicionNodos;};
   void hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad);
+
+  // Basura
+  bool setBasuraActual(float);
+  float getBasuraActual(void);
+  
 };
+
+float Agente_Universitario::getBasuraActual(){
+  return this->basura_actual;
+}
+
+bool Agente_Universitario::setBasuraActual(float basura_actual){
+
+  float auxBasuraActual=this->basura_actual+this->delta_produccion_basura;
+
+  if(basura_actual<=1){
+    // Se le puede colocar un valor directo a la basura actual
+    this->basura_actual = basura_actual;
+  }
+  else if(auxBasuraActual<=capacidad_basura){
+    // Cuando el argumenro basura actual es mayor a uno, se hace ac
+    // actualización por incremento.
+    // Solo se actualiza cuando no se supera la capacidad de basura
+    this->basura_actual=auxBasuraActual;
+  }
+  else{
+    return false;
+  }
+
+  return true;
+}
 
 void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
 				       int posicion0,int destino0, double velocidad0, double t,bool verbose0){
@@ -98,7 +131,23 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
 			
   sf::FloatRect spriteBounds = sprite.getLocalBounds();
   sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
-            
+
+  // inicialización de la basura
+  this->basura_actual=0.0;
+  
+  if(rol==0){
+    // Estudiante
+    this->delta_produccion_basura=0.1; 
+  }
+  else if(rol==1){
+    // Administrativo
+    this->delta_produccion_basura=0.05;
+  }
+  else{
+    // Docente
+    this->delta_produccion_basura=0.025;
+  }
+  
 }
 
 void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academica){
@@ -321,14 +370,14 @@ std::tuple<double, double, double> Agente_Universitario::prob_actividad_admin(do
   double x=t;
   double d=4000; //13*3600
   double s = 0.5*3600; 
-  if(inicio_dia<t<=inicio_descanso){
+  if(inicio_dia<t && t<=inicio_descanso){
     P_a = 0.8;
     P_o = 0.2;
     P_i = 0.0;
     return std::make_tuple(P_a, P_o, P_i);
   }
 
-  else if(inicio_descanso<t<=final_descanso){
+  else if(inicio_descanso<t && t<=final_descanso){
     double a =  exp(-pow((x - d) / (2.0 * pow(s, 2.0)), 2.0));
     double o = 0.5* exp(-pow((x - d) / (2.0 * pow(s, 2.0)), 2.0));
     double i = 0; 
@@ -340,7 +389,7 @@ std::tuple<double, double, double> Agente_Universitario::prob_actividad_admin(do
 
   }
 
-  else if(final_descanso<t<=final_dia){
+  else if(final_descanso<t && t<=final_dia){
     P_a = 0.8;
     P_o = 0.2;
     P_i = 0.0;
@@ -514,6 +563,7 @@ void Agente_Universitario::hacer_actividad(double t,double dt,int nodo_i,int nod
   double trestante =  tmax_actividad-tactividad;
   nodo_i=Nodo_in_route();
   //std::cout<<trestante<<" "<<actividad<<std::endl;
+  
   if(trestante<=0){
     en_actividad=false;
     tactividad=0;
@@ -525,6 +575,9 @@ void Agente_Universitario::hacer_actividad(double t,double dt,int nodo_i,int nod
       std::cout<<"Ruta asignada"<<std::endl;
     }
     //generar nuevos nodos, crear ruta, asignar ruta
-  } 
+  }
+
+  // Se actualiza la basura de manera incremental según delta_produccion_basura
+  setBasuraActual(2.0);
 
 }
