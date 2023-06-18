@@ -54,7 +54,7 @@ void events_sfml_manager(sf::RenderWindow &window, sf::Event &event,
 // Persons's movement
 void physics();
 
-bool verbose=false;
+bool verbose=false; // Print intermediate steps
 
 
 // ******* Main *******
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
   catch (...){verbose=false;}
 
   // Person number
-  int N=100;
+  int N=500;
   // Array Person
   Persons.resize(N);
 
@@ -281,15 +281,15 @@ void init_persons_activities(int t_spawn, float cap_basura,
   double rand_actv_acad;
   double time;
   FILE *fp;
-  fp = fopen("inits.txt","a");
+  fp = fopen("./metrics/inits.txt","a");
   int threads=0;
 
   auto start = std::chrono::steady_clock::now();
-#pragma omp parallel private(nodo_inicio, nodo_destino, rand_rol, rand_type_actv, rand_actv_acad)
+  #pragma omp parallel private(nodo_inicio, nodo_destino, rand_rol, rand_type_actv, rand_actv_acad)
   {
     int thr_id=omp_get_thread_num();
     int num_thr=omp_get_num_threads();
-    if(thr_id==1){
+    if(thr_id==0){
       //times<<num_thr<<" ";
       threads=num_thr;
     }
@@ -325,7 +325,7 @@ void init_persons_activities(int t_spawn, float cap_basura,
   std::chrono::duration<double> diff = end - start;
   time = diff.count();
   //times<<time<<" ";
-  fprintf(fp,"%i %f", threads, time);
+  fprintf(fp,"%i %f\n", threads, time);
   fclose(fp);
 
   return;

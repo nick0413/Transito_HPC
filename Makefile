@@ -35,9 +35,10 @@ windows_compile2 :
 .PHONY : ubuntu	
 
 ubuntu:
+	rm -f ./metrics/*.txt
 	g++ -c $(MAIN_CPP) -fopenmp
 	g++ $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo -fopenmp
-	OMP_NUM_THREADS=$(NUM_THR) ./$(MAIN_OUT)
+	echo "OMP_NUM_THREADS=$(NUM_THR) ./$(MAIN_OUT)"
 
 .PHONY : clean
 clean : 
