@@ -2,9 +2,13 @@
 MAIN = Dispersion_social
 MAIN_CPP = $(MAIN).cpp
 MAIN_OUT=$(MAIN).out
+<<<<<<< HEAD
 
 #OpenMP
 NUM_THR = 4
+=======
+MAIN_exe=$(MAIN).exe
+>>>>>>> main
 
 .PHONY : windows
 # First compile and then run [Nicolas]

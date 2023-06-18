@@ -5,7 +5,6 @@
 
 int next_node(arma::vec Usables, int nodo)
 	{  
-
 		for( int ii=nodo; ii<Usables.size(); ii++)
 			{
 				if (Usables(ii)==1)
