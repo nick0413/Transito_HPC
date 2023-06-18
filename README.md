@@ -14,13 +14,13 @@ Se desarolla a modo de aplicacion ejecutable donde se observa la evolucion en el
 
 In Figure [4](#org63f2cdd) hola hola
 
-<div id="org63f2cdd"> 
+<a id="#org63f2cdd"></a> 
 ![img](./figs/Agente_sprite.png "This is the caption for the next figure link (or table)")
-</div>
 
-<div id="org3d61bd5">
+
+<a id="org3d61bd5"></a>
 ![img](./figs/Agente_sprite.png "This is the caption for the next figure link (or table)")
-</div>
+
 
 En la Figura [5](#org3d61bd5)
-
+In Figure [4](#org63f2cdd) hola hola
