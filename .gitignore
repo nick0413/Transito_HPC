@@ -4,3 +4,6 @@
 .vscode/settings.json
 *.exe
 *.exe
+a.exe
+*.exe
+*.o

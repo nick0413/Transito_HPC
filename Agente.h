@@ -9,7 +9,7 @@
 #include <armadillo>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
-#include "imagen_pathfind.h"
+#include "Manejo_mapa.h"
 
 using namespace std;
 
@@ -36,8 +36,8 @@ class Agente_Universitario
 		double Pos_arista;
 		double Vel;
 		float scale;
-		arma::mat Mapa;
-		std::string Mapa_file;
+		arma::sp_mat  Mapa;
+		arma::ivec  Usables;
 		bool verbose;
 		arma::mat PosicionNodos;
 		double tactividad;
@@ -46,13 +46,14 @@ class Agente_Universitario
     
     public:
 		void inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
-          int posicion0,int destino0, double velocidad0, double t,bool verbose0, arma::mat Mapa_0,arma::mat PosicionNodos_0,std::string Mapa_file_0);
+          int posicion0,int destino0, double velocidad0, double t,bool verbose0, arma::sp_mat  Mapa_0,arma::ivec  Usables_0,arma::mat PosicionNodos_0);
+		
 		void asignar_rol(double prob_rol, double prob_actv_academica);
 		void Actividad(double prob_tipo_actividad,double t);
 		std::tuple<double, double, double> prob_actividad_est(double spawn_time, double t);
 		std::tuple<double, double, double> prob_actividad_admin(double t);
-		void draw(sf::RenderWindow & window,arma::mat Mapa,arma::mat PosNodos);
-		void Avanzar(arma::mat Madyacencia, double dt, bool verbose);
+		void draw(sf::RenderWindow & window,arma::mat PosNodos);
+		void Avanzar(arma::sp_mat Madyacencia, double dt, bool verbose);
 		int Nodo(void);
 		double Arista(arma::mat Madyacencia);
 		int Nodo_in_route(void);
@@ -70,13 +71,13 @@ class Agente_Universitario
 		void asignar_pos_arista(double pos_arista){Pos_arista=pos_arista;};
 		void asignar_ruta(int simulationTime,int nodo_i,int nodo_f);
 		void hacer_actividad(double t,double dt);
-		arma::mat getMapa(void){return Mapa;};  
+		arma::sp_mat getMapa(void){return Mapa;};  
 		arma::mat getPosicionNodos(void){return PosicionNodos;};
 		void hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad);
 	};
 
 void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
-          int posicion0,int destino0, double velocidad0, double t,bool verbose0, arma::mat Mapa_0,arma::mat PosicionNodos_0,std::string Mapa_file_0){
+          int posicion0,int destino0, double velocidad0, double t,bool verbose0, arma::sp_mat  Mapa_0,arma::ivec  Usables_0,arma::mat PosicionNodos_0){
 
             asignar_rol(rand_rol_un,prob_actv_academica);
             Actividad(prob_tipo_actividad,t);
@@ -87,13 +88,13 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
             en_ruta=true; //se asume que siempre que se inicializa se entra a la U y se toma un camino
             Vel = velocidad0;
             Pos_arista = 0;
-			Mapa_file=Mapa_file_0;
-            Mapa= Mapa_0;
+			Mapa=Mapa_0;
+			Usables=Usables_0;
             verbose= verbose0;
 			// std::cout<<"load_arma\n";
             PosicionNodos = PosicionNodos_0;//load_csv_arma("./nodos-finales.csv");
 			// std::cout<<posicion0<<"\t"<<destino0<<"-----------""\n";
-            Ruta = Ruta_imagen(posicion0,destino0,"Environment/Usables.csv",Mapa_file,false);
+            Ruta = Ruta_imagen(posicion0,destino0,Usables,Mapa);
             Pos_nodo = Ruta(0);
             tactividad=0;
             //asignar_ruta(spawn_time,Ruta);
@@ -358,7 +359,7 @@ std::tuple<double, double, double> Agente_Universitario::prob_actividad_admin(do
                 return std::make_tuple(P_a, P_o, P_i);  
             }
         } 
-void Agente_Universitario::Avanzar(arma::mat Madyacencia, double dt, bool verbose)
+void Agente_Universitario::Avanzar(arma::sp_mat Madyacencia, double dt, bool verbose)
 	{	
 		
 		// std::cout<<Pos_arista<<"->"<<Pos_arista	+dt*Vel<<"\t";
@@ -430,7 +431,7 @@ arma::vec Agente_Universitario::getPosition(arma::mat PosNodos, int nodo)
 		
 }
 
-void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::mat PosNodos)
+void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat PosNodos)
 	{	
 		double pos_x;
 		double pos_y;
@@ -499,7 +500,7 @@ void Agente_Universitario::asignar_ruta(int simulationTime, int nodo_i,int nodo_
 			if (isLeisureActivity) 
 				{	std::cout<<"Actividad ocio "<<actividad <<std::endl; 
 					// Calculate the route using ruta_imagen function
-					Ruta = Ruta_imagen(nodo_i,nodo_f,"Environment/Usables.csv",Mapa_file,false);
+					Ruta = Ruta_imagen(nodo_i,nodo_f,Usables,Mapa);
 					en_ruta=true;
 					en_actividad=false;
 				}
@@ -511,7 +512,7 @@ void Agente_Universitario::asignar_ruta(int simulationTime, int nodo_i,int nodo_
 		}
 	else 
 		{ //los estudiantes siempre cambian de locacion
-			Ruta = Ruta_imagen(nodo_i,nodo_f,"Environment/Usables.csv",Mapa_file,false);
+			Ruta = Ruta_imagen(nodo_i,nodo_f,Usables,Mapa);
 			en_ruta=true;
 			en_actividad=false;
 		}

@@ -16,7 +16,8 @@
 #include "Agente.h"
 #include "Tools.h"
 
-ofstream rol;
+
+std::ofstream rol;
 // SFML
 
 // https://www.sfml-dev.org/tutorials/2.5/system-thread.php
@@ -42,23 +43,41 @@ bool verbose=false;
 //-------
 int main(int argc, char **argv)
 	{
+		
 	rol.open("rol.csv");
-
+	
 	try{if(std::stoi(argv[1])==1){verbose=false;};}
 	catch (...){verbose=false;}
 
+	int resolucion=50;
+
 	const int N=1;
 	Agente_Universitario Persona[N];
-	int start=11;
-	int end=0;
+
 	std::random_device rd;
 	std::mt19937 gen(50);
 	std::uniform_real_distribution<double> real_dist(0.0,1.0);
 	std::uniform_int_distribution<int> int_dist(0,99); 
-	std::string Mapa_file  = "Environment/Matriz_adyacencia_mapa.csv";
-	arma::mat Mapa_0=load_csv_arma(Mapa_file);
+	
+	arma::mat imagen= load_imagen(resolucion);
+	int n=imagen.n_cols;
+	int nn=n*n;	
+	std::cout<<nn*nn<<"\n";
+	std::vector<float> Madyacencia(nn*nn);	
+	std::vector<int> Usables(nn);
+	matriz_adyacencia(Madyacencia,nn,n);
+	Acceso(imagen,Madyacencia,nn,Usables);
+	arma::mat Ma_arma;
+	arma::ivec Usables_vec;
+	Ma_arma = arma::conv_to<arma::mat>::from(Madyacencia);
+	Ma_arma.reshape(nn,nn);
+	arma::sp_mat Madyacencia_sp(Ma_arma);
+	Usables_vec = arma::conv_to<arma::ivec>::from(Usables);
+
+	std::cout<<nn*nn<<"\n";
+
 	arma::mat PosicionNodos_0=load_csv_arma("./nodos-finales.csv");
-	int nimagen = 10;
+	
 	int t_spawn=0; //por ahora todos se crean al tiempo
 	float cap_basura=0.2; //ahora mismo no hace nada
 	float t_actividad=7200;
@@ -72,24 +91,23 @@ int main(int argc, char **argv)
 			//arma::vec destino = coord_edificios.row(rand_destino);
 			//arma::vec inicio = {5,5};
 			int nodo_inicio = int_dist(gen);//xy_to_node(inicio, nimagen);
-			int nodo_destino = int_dist(gen);//xy_to_node(destino, nimagen				
+			int nodo_destino = int_dist(gen);//xy_to_node(destino, nimagen PosicionNodos_0				
 			double rand_rol = real_dist(gen);
 			double rand_type_actv = real_dist(gen);
 			double rand_actv_acad = real_dist(gen);
 		
 			Persona[jj].inicializar(rand_rol,rand_type_actv,rand_actv_acad,t_spawn,cap_basura,t_actividad,
-									nodo_inicio,nodo_destino,vel,t,verbose,Mapa_0,PosicionNodos_0,Mapa_file);
+									nodo_inicio,nodo_destino,vel,t,verbose,Madyacencia_sp,Usables_vec,PosicionNodos_0);
 			
 			rol<< jj<< " " << Persona[jj].getRol()<<" "<< rand_rol<<" "<<Persona[jj].getActividad() << std::endl;
 		}
-	
+	std::cout<<nn*nn<<"\n";
 	
 	// std::cout<< Persona[0].getMapa().n_cols<< "\t"<< Persona[0].getMapa().n_rows<<std::endl;
 	// std::cout<< Persona[0].getPosicionNodos().n_cols<< "\t"<< Persona[0].getPosicionNodos().n_rows<<std::endl;
 	if(verbose) std::cout<<Persona[0].getPosicionNodos()<<std::endl;
 	// ******* sfml
 	arma::mat PosicionNodos=Persona[0].getPosicionNodos();
-	arma::mat Mapa=Persona[0].getMapa();
 	// Zona de declaración de variables
 	// Herramientas generales
 	Tools tools;
@@ -103,7 +121,7 @@ int main(int argc, char **argv)
 	sf::Texture textFondoNodos;
 	// Se crea el fondo como Sprite
 	sf::Sprite sprFondo;
-	std::string figFondo="./Environment/10_10_high_res.png";
+	std::string figFondo="./Environment/Fondos/"+std::to_string(resolucion)+".png";
 	// std::string figFondoNodos="./figs/Contenedores-Residuos-nods.png";
 	char opcionesDeFondo=1;
 
@@ -351,7 +369,7 @@ int main(int argc, char **argv)
 				{	
 					if(Persona[jj].EnRuta()) 
 						{	
-							Persona[jj].Avanzar(Mapa,dt,false);
+							Persona[jj].Avanzar(Madyacencia_sp,dt,false);
 						}
 					if(Persona[jj].EnActividad()){
 						
@@ -386,7 +404,7 @@ int main(int argc, char **argv)
 					if(Persona[jj].getActividad()!=0) 
 						{	
 							
-							Persona[jj].draw(window,Mapa,PosicionNodos_0);
+							Persona[jj].draw(window,PosicionNodos_0);
 							std::cout<<"------------\n";
 							//rol<<Persona[jj].getRol()<<" "<<Persona[jj].getScale()<<std::endl;
 							// std::cout<<Persona[jj].getRol()<<" "<<Persona[jj].getScale()<<"\n";
