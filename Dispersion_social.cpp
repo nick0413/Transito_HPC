@@ -18,7 +18,7 @@
 #include "Agente.h"
 #include "Tools.h"
 
-ofstream rol;
+std::ofstream rol;
 //ofstream times;
 
 // *** Global variables to physics calculation ***
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 
   t_Global=0;
   int t_spawn=0; //por ahora todos se crean al tiempo
-  float cap_basura=0.2; //ahora mismo no hace nada
+  float cap_basura=1; //ahora mismo no hace nada
   float t_actividad=7200;
   double vel=0.05;
   
@@ -250,7 +250,12 @@ void physics(){
           Persons[jj].hacer_actividad(t_Global,dt_Global,nodo_inicio,nodo_destino,prob_actv); 
       
         }
-      
+
+	// Testear la capacidad de basura
+	
+	  fprintf(stderr,"Rol: %i, Cap act basura %f\n",Persons[jj].getRol(),
+		Persons[jj].getBasuraActual());
+	
       }
       
 
