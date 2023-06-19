@@ -34,9 +34,9 @@ windows_compile2 :
 
 
 
-.PHONY : ubuntu	
+.PHONY : linux	
 
-ubuntu:
+linux :
 	rm -f ./metrics/*.txt
 	g++ -c $(MAIN_CPP) -fopenmp
 	g++ $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo -fopenmp
