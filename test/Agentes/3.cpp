@@ -47,11 +47,45 @@ arma::mat rd_fill(arma::mat Matriz,float val)
 // 	}
 
 
+// int main() {
+//     double data[] = {1.0, 2.0, 3.0, 4.0, 5.0};  // 1D array
+
+//     arma::mat matrix(data, 1, 5);  // Construct a 1x5 matrix from the 1D array
+
+//     std::cout << "Matrix:\n" << matrix << std::endl;
+
+//     return 0;
+// }
+
+// int main()
+// {
+//     std::vector<float> vec = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
+//     int rows = 2;
+//     int cols = 3;
+
+//     // Convert std::vector<float> to arma::mat
+//     arma::mat armaMat = arma::mat(vec.data(), rows, cols, false);
+
+//     // Print the resulting Armadillo matrix
+//     armaMat.print();
+
+//     return 0;
+// }
+
+#include <iostream>
+#include <vector>
+#include <armadillo>
+
 int main() {
-    double data[] = {1.0, 2.0, 3.0, 4.0, 5.0};  // 1D array
+    std::vector<double> vec = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};  // Example vector
+    int rows = 2;  // Number of rows
+    int cols = 3;  // Number of columns
 
-    arma::mat matrix(data, 1, 5);  // Construct a 1x5 matrix from the 1D array
+    arma::mat matrix;
+    matrix = arma::conv_to<arma::mat>::from(vec);  // Convert vector to matrix
+    matrix.reshape(rows, cols);  // Reshape the matrix to the specified dimensions
 
+    // Print the resulting matrix
     std::cout << "Matrix:\n" << matrix << std::endl;
 
     return 0;
