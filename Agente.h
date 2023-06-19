@@ -12,7 +12,7 @@
 #include "imagen_pathfind.h"
 
 
-
+double delta = 0.05;//delta provisional basada en una produccion de 400gr de basura por 8 horas por persona
 class Agente_Universitario; 
 
 class Agente_Universitario
@@ -75,10 +75,16 @@ public:
   arma::mat getMapa(void){return Mapa;};  
   arma::mat getPosicionNodos(void){return PosicionNodos;};
   void hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad);
-
+  double pos_x(arma::vec r,arma::mat Mapa,arma::mat PosNodos);
+  double pos_y(arma::vec r,arma::mat Mapa,arma::mat PosNodos);
+  arma::vec vector_posicion(arma::mat Mapa,arma::mat PosNodos);
+  
   // Basura
-  bool setBasuraActual(float);
+  void Actualizar_Basura(float basura);
   float getBasuraActual(void);
+  void Depositar_Basura(arma::mat basura_heatmap,arma::mat PosNodos);
+  float getCapacidad_Basura(void){return capacidad_basura;}
+  //void generar_basura()
   
 };
 
@@ -86,25 +92,26 @@ float Agente_Universitario::getBasuraActual(){
   return this->basura_actual;
 }
 
-bool Agente_Universitario::setBasuraActual(float basura_actual){
+void Agente_Universitario::Actualizar_Basura(float basura){
 
   float auxBasuraActual=this->basura_actual+this->delta_produccion_basura;
+  basura_actual = auxBasuraActual;
 
-  if(basura_actual<=1){
+  /*if(basura<=1){
     // Se le puede colocar un valor directo a la basura actual
-    this->basura_actual = basura_actual;
+    this->basura_actual = basura;
   }
   else if(auxBasuraActual<=this->capacidad_basura){
-    // Cuando el argumenro basura actual es mayor a uno, se hace ac
+    // Cuando el argumento basura actual es mayor a uno, se hace 
     // actualización por incremento.
     // Solo se actualiza cuando no se supera la capacidad de basura
     this->basura_actual=auxBasuraActual;
   }
   else{
-    return false;
-  }
+    std::cout<<"No se cumplio ninguna condicion para actualizar la basura";
+  }*/
 
-  return true;
+  
 }
 
 void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
@@ -137,15 +144,15 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
   
   if(rol==0){
     // Estudiante
-    this->delta_produccion_basura=0.1; 
+    this->delta_produccion_basura = delta; //0.1; Todos tienen la misma delta provisionalmente
   }
   else if(rol==1){
     // Administrativo
-    this->delta_produccion_basura=0.05;
+    this->delta_produccion_basura = delta; //0.05;
   }
   else{
     // Docente
-    this->delta_produccion_basura=0.025;
+    this->delta_produccion_basura = delta; //0.025;
   }
   
 }
@@ -457,6 +464,7 @@ void Agente_Universitario::Print_pos(void)
   std::cout<<Pos_nodo<<" "<<Pos_arista<<"\n";
 }
 arma::vec Agente_Universitario::getPosition(arma::mat PosNodos, int nodo)
+
 {	
 
   double posx= PosNodos(nodo, 1);
@@ -467,7 +475,54 @@ arma::vec Agente_Universitario::getPosition(arma::mat PosNodos, int nodo)
 
 		
 }
+arma::vec Agente_Universitario::vector_posicion(arma::mat Mapa,arma::mat PosNodos)
+{
+    int nodo_pos=Nodo_in_route();
+    int next_pos=Next_in_route();
+    arma::vec nodo_siguiente;	
+    arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
+    if(next_pos==-100)
+	  {
+      std::cout<<"fin de la ruta"<<en_actividad<<std::endl;
+	    nodo_siguiente=nodo_actual;
+	  //return;
+	  }
 
+  else
+  {
+	    nodo_siguiente=getPosition(PosNodos,next_pos);
+  }
+  arma::vec r = nodo_siguiente-nodo_actual;
+
+  return r;
+}
+  
+
+  
+double Agente_Universitario::pos_x(arma::vec r,arma::mat Mapa,arma::mat PosNodos)
+{
+    double pos_x;
+    if(en_ruta)
+    {
+      int nodo_pos=Nodo_in_route();
+      int next_pos=Next_in_route();
+      arma::vec nodo_siguiente;	
+      arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
+
+      if(next_pos==-100)
+	{
+    std::cout<<"fin de la ruta"<<en_actividad<<std::endl;
+	  nodo_siguiente=nodo_actual;
+	  //return;
+	}
+    return pos_x; //Falta terminar
+  }
+  return 0;
+}
+double Agente_Universitario::pos_y(arma::vec r,arma::mat Mapa,arma::mat PosNodos)
+{
+  return 0; //Falta terminar
+}
 void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::mat PosNodos)
 {	
   double pos_x;
@@ -491,7 +546,7 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat Mapa,arma::m
       }
 
 
-      arma::vec r=nodo_siguiente-nodo_actual;
+      arma::vec r=nodo_siguiente-nodo_actual;;
 
       arma::vec r2=arma::normalise(r,1);
 
@@ -578,6 +633,55 @@ void Agente_Universitario::hacer_actividad(double t,double dt,int nodo_i,int nod
   }
 
   // Se actualiza la basura de manera incremental según delta_produccion_basura
-  setBasuraActual(2.0);
+  
 
+}
+
+void Agente_Universitario::Depositar_Basura(arma::mat basura_heatmap,arma::mat PosNodos)
+{ 
+
+  double pos_x;
+  double pos_y;
+		
+  if(en_ruta)
+    {
+      int nodo_pos=Nodo_in_route();
+      int next_pos=Next_in_route();
+      arma::vec nodo_siguiente;	
+      arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
+
+      if(next_pos==-100)
+	{
+	  std::cout<<"fin de la ruta"<<en_actividad<<std::endl;
+	  nodo_siguiente=nodo_actual;
+	  return;
+	}
+      else{
+	nodo_siguiente=getPosition(PosNodos,next_pos);
+      }
+
+
+      arma::vec r=nodo_siguiente-nodo_actual;;
+
+      arma::vec r2=arma::normalise(r,1);
+
+      						
+      pos_x=(100*r2(0)*Pos_arista)+nodo_actual(0);
+      pos_y=(100*r2(1)*Pos_arista)+nodo_actual(1);
+
+    }
+		
+  if(en_actividad)
+    {
+      int nodo_pos=Nodo_in_route();
+      arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
+      pos_x=nodo_actual(0);
+      pos_y=nodo_actual(1);
+      sprite.setScale(scale, scale);
+      //std::cout<<pos_x<<"\t"<<pos_y<<"\n";
+
+
+    }
+  basura_heatmap.at(int(pos_x),int(pos_y))+=1;
+  
 }

@@ -19,6 +19,8 @@
 #include "Tools.h"
 
 std::ofstream rol;
+std::ofstream basura;
+std::string filename = "heatmap_output.txt";
 //ofstream times;
 
 // *** Global variables to physics calculation ***
@@ -30,6 +32,7 @@ std::mt19937 Gen(68); // gen(Rd())
 std::uniform_real_distribution<double> Real_dist(0.0,1.0);
 std::uniform_int_distribution<int> Int_dist(0,99); 
 arma::mat Mapa;
+arma::mat basura_heatmap = arma::zeros<arma::mat>(1000, 1000);
 double dt_Global;
 double t_Global;
 sf::Clock ClockPhysics;
@@ -64,20 +67,23 @@ int main(int argc, char **argv)
   Tools tools;
 
   rol.open("rol.csv");
+  basura.open("basura.txt");
   // times.open("times.txt", ios:: app);
   
   try{if(std::stoi(argv[1])==1){verbose=false;};}
   catch (...){verbose=false;}
+  // Garbage heatmap
 
+  
   // Person number
-  int N=500;
+  int N=10;
   // Array Person
   Persons.resize(N);
 
 
   t_Global=0;
   int t_spawn=0; //por ahora todos se crean al tiempo
-  float cap_basura=1; //ahora mismo no hace nada
+  float cap_basura=0.4; //ahora mismo no hace nada, esta en unidades de kg
   float t_actividad=7200;
   double vel=0.05;
   
@@ -166,15 +172,22 @@ int main(int argc, char **argv)
 			
     // En esta parte se colocan los objetos
     window.draw(sprFondo);
-
+    basura<<"Capacidad basura"<<"\t" << "Basura actual" <<std::endl;
     // Update persons
     for(int jj = 0; jj < N; ++jj) {	
       if(Persons[jj].getActividad()!=0) {			
 	Persons[jj].draw(window,Mapa,PosicionNodos);
-      }			       					
+      }	
+      basura<< Persons[jj].getCapacidad_Basura()<< "\t" << Persons[jj].getBasuraActual() << std::endl;
     }
+    
 
+    if(int(t_Global)%50==0){
+       
 
+    // Save the matrix to a file
+      basura_heatmap.save(filename, arma::arma_ascii);
+    }
     // Se muestra todo
     window.display();
 
@@ -182,7 +195,8 @@ int main(int argc, char **argv)
 
   // Finish thread physics
   threadPhysics.terminate();
-
+  basura.close();
+  rol.close();
   return 0;
 }
 
@@ -193,6 +207,7 @@ int main(int argc, char **argv)
 
 // Persons's movement
 void physics(){
+  arma::mat PosicionNodos=Persons[0].getPosicionNodos();
   sf::Time elapsed; // Se tiene en cuenta el tiempo de procesamiento  
 			 int N = Persons.size();
 
@@ -237,6 +252,10 @@ void physics(){
     
       for (int jj = imin; jj < imax; ++jj){ 	
         //std::cout<<jj<<std::endl;
+        Persons[jj].Actualizar_Basura(2.0);
+        if(Persons[jj].getBasuraActual()>Persons[jj].getCapacidad_Basura()){
+          Persons[jj].Depositar_Basura(basura_heatmap,PosicionNodos);
+        }
         if(Persons[jj].EnRuta()){	
           Persons[jj].Avanzar(Mapa,dt_Global,false);
         }
