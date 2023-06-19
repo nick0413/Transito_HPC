@@ -1,3 +1,4 @@
+
 # Modelo de agentes para la generación de residuos en la UN
 
 - [Requerimientos](#requerimientos)
@@ -46,6 +47,7 @@ $$ \eta _p (n)= \frac{S(n)}{n} $$
 
 Descargar la última versión de la rama main del repositor.
 
+
 ## Windows
 
 ## Linux
@@ -73,3 +75,7 @@ Se crean salas para interactuar, distintos canales y los mensajes son persistent
 <img src="./figs/inf/discord.png" alt="Imagen de Discord" width=50>
 
 
+
+# Hardware
+- Para correr la simulación a escala entera (un mapa de 200x200 pixeles) se requiere 16Gb de Ram para que sea estable. Los requerimientos de resoluciones menores aún no se han medido. 
+- El proceso más intensivo es el preprocesamiento del mapa, que usa funciones de Madyacencia.h y es la razón del alto consumo de ram.

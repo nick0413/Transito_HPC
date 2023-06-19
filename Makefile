@@ -13,12 +13,11 @@ MAIN_exe=$(MAIN).exe
 windows : windows_compile windows_run
 
 windows_run :
-	set OMP_NUM_THREADS=$(NUM_THR)
-	.\Dispersion_social.exe  
+	$(MAIN).exe  
 
 windows_compile :
-	g++ -Isrc/include -c .\Dispersion_social.cpp 
-	g++ .\Dispersion_social.o -o Dispersion_social -Lsrc/lib -lsfml-graphics -lsfml-window -lsfml-system -lblas -fopenmp
+	g++ -Isrc/include -c .\$(MAIN).cpp 
+	g++ .\$(MAIN).o -o $(MAIN) -Lsrc/lib -lsfml-graphics -lsfml-window -lsfml-system -lblas -fopenmp
 
 .PHONY : windows2
 # First compile and then run for extra armadillo [Victor]

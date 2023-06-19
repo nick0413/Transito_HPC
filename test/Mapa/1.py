@@ -1,3 +1,6 @@
+filename = "xd/1_example.txt"
+
+
 import numpy as np
 import csv
 
@@ -13,10 +16,7 @@ def y_coord(n):
 	y=n%N
 	return y*scale
 
-def write_numpy_array_to_csv(array, filename):
-	with open(filename, 'w', newline='') as csvfile:
-		writer = csv.writer(csvfile)
-		writer.writerows(array)
+
 
 def fill_array():
 	array = np.empty((N*N, 3))
@@ -29,10 +29,14 @@ def fill_array():
 	
 	return array
 
-
-
-# Call the function to fill the array
+def write_numpy_array_to_csv(array, filename):
+	with open(filename, 'w', newline='') as csvfile:
+		writer = csv.writer(csvfile)
+		writer.writerows(array)
+# Open the file in write mode
 result = fill_array()
-
-# Print the resulting array
-write_numpy_array_to_csv(result, 'nodos-finales.csv')
+print(result)
+write_numpy_array_to_csv(result,filename=filename)
+# with open(filename, "w") as file:
+#     # Perform operations on the file
+#     file.write("This is a new file.")
