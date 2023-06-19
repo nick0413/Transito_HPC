@@ -84,7 +84,6 @@ arma::ivec dijkstra_arma(arma::mat Mapa, int source,int target)
 	    }
 
 	}
-
     }
   prev(source)=-1;
 		

@@ -25,6 +25,7 @@ class Agente_Universitario
 		int facultad;
 		int spawn_time;
 		float capacidad_basura;
+		float basura_actula;
 		float tiempo_actividad;
 		bool en_actividad;
 		bool en_ruta;
