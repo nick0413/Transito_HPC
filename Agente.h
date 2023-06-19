@@ -105,7 +105,8 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
             
         }
 
-void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academica){
+void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academica)
+{
             
             if(prob_rol<0.91){ //0.91
                 rol = 0; //Es estudiante
@@ -204,6 +205,7 @@ void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academi
                     
                 
             }
+}
 
 
 void Agente_Universitario::Actividad(double prob_tipo_actividad,double t){

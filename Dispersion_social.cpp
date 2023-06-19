@@ -51,17 +51,17 @@ int main(int argc, char **argv)
 	const int N=40;
 
 	std::string Mapa_file = "Environment/Matriz_adyacencia_mapa.csv";
-	arma::mat Mapa= load_csv_arma(Mapa_file);
 	//std::cout<< Mapa.n_cols<< "\t"<< Mapa.n_rows<<std::endl;
-	arma::mat PosicionNodos = load_csv_arma("./nodos-finales.csv");
-	std::cout<< PosicionNodos.n_cols<< "\t"<< PosicionNodos.n_rows<<std::endl;
-	if(verbose) std::cout<<PosicionNodos;
-	const int N=200;
+	//arma::mat PosicionNodos = load_csv_arma("./nodos-finales.csv");
+	//std::cout<< PosicionNodos.n_cols<< "\t"<< PosicionNodos.n_rows<<std::endl;
+	//if(verbose) std::cout<<PosicionNodos;
+	
 
 	Agente_Universitario Persona[N];
 	int start=11;
 	int end=0;
-	int seed = std::stoi(argv[2]);
+	int seed = 5;//std::stoi(argv[2]);
+	
 	std::random_device rd;
 
 	std::mt19937 gen(68);
@@ -93,9 +93,12 @@ int main(int argc, char **argv)
 
 			}
 	
-	std::cout<< Persona[0].getMapa().n_cols<< "\t"<< Persona[0].getMapa().n_rows<<std::endl;
-	std::cout<< Persona[0].getPosicionNodos().n_cols<< "\t"<< Persona[0].getPosicionNodos().n_rows<<std::endl;
-	if(verbose) std::cout<<Persona[0].getPosicionNodos()<<std::endl;
+	
+	if(verbose) {
+		std::cout<<Persona[0].getPosicionNodos()<<std::endl;
+		std::cout<< Persona[0].getMapa().n_cols<< "\t"<< Persona[0].getMapa().n_rows<<std::endl;
+		std::cout<< Persona[0].getPosicionNodos().n_cols<< "\t"<< Persona[0].getPosicionNodos().n_rows<<std::endl;
+		}
 	// ******* sfml
 
 	arma::mat PosicionNodos=Persona[0].getPosicionNodos();
