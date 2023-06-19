@@ -74,6 +74,18 @@ Se crean salas para interactuar, distintos canales y los mensajes son persistent
 
 <img src="./figs/inf/discord.png" alt="Imagen de Discord" width=50>
 
+Permitió compartir archivos.
+
+<img src="./figs/inf/drive.png" alt="Imagen de Drive" width=50>
+
+
+Se realizaron las primeras reuniones y se grababan las llamadas.
+
+<img src="./figs/inf/meet.png" alt="Imagen de Meet" width=50>
+
+Para editar documentos en formato .tex.
+
+<img src="./figs/inf/Overleaf.png" alt="Imagen de Overleaf" width=50>
 
 
 # Hardware

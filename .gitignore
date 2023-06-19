@@ -17,3 +17,4 @@ a.exe
 *.o
 test/Agentes/Environment/Matriz_adyacencia_mapa.csv
 test/Agentes/Environment/Usables.csv
+Dispersion_social.o

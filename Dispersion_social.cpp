@@ -18,8 +18,8 @@
 #include "Agente.h"
 #include "Tools.h"
 
-int N=100;
-int resolucion=200;
+int N=1000;
+int resolucion=50; // 10, 50 , 100, 200
 float scale=0.2;//200/resolucion;
 std::ofstream rol;
 //ofstream times;
@@ -144,10 +144,11 @@ int main(int argc, char **argv)
 				window.draw(sprFondo);
 
 				for(int jj = 0; jj < N; ++jj) 
-				{	
+				{
+				  //fprintf(stderr,"jj:%i, t: %f\n",jj,t_Global);
 					if(Personas[jj].getActividad()!=0) 
 						{	
-							// std::cout<<t_Global<<"\t";
+						
 							Personas[jj].draw(window,PosicionNodos_0,scale);
 							// std::cout<<t_Global<<"\n";
 							
@@ -287,7 +288,10 @@ void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, 
 				for (int jj = imin; jj < imax; ++jj)// xy_to_node(inicio, nimagen);
 					{ 	
 						// std::cout<<jj<<"\t"<<imax <<"\n";
-						displayProgressBar((float(jj)/float(imax)));
+					  if(thr_id==(num_thr-1)){
+					    displayProgressBar(((float)(jj-imin)/(imax-imin)));    
+					  }
+					
 						nodo_inicio = Int_dist(Gen);
 						nodo_destino = Int_dist(Gen); 
 						rand_rol = Real_dist(Gen);
