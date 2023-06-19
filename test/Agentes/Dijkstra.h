@@ -14,18 +14,19 @@ arma::vec mat_to_vec(arma::mat matrix)
 		arma::vec vector = arma::vectorise(matrix);
 		return vector;
 	}
-arma::mat load_csv_arma (const std::string & path) {
-  arma::mat X;
-  X.load(path, arma::csv_ascii);
-  return X;
-}
+arma::mat load_csv_arma (const std::string & path) 
+	{
+	arma::mat X;
+	X.load(path, arma::csv_ascii);
+	return X;
+	}
 
 arma::ivec append_vec(arma::ivec & vector, int value)
-{
-  vector.resize(vector.n_elem+1);
-  vector(vector.n_elem-1)=value;
-  return vector;
-}
+	{
+		vector.resize(vector.n_elem+1);
+		vector(vector.n_elem-1)=value;
+		return vector;
+	}
 
 arma::vec append_vec(arma::vec & vector, double value)
 	{
@@ -98,3 +99,38 @@ arma::ivec dijkstra_arma(arma::mat Mapa, int source,int target)
 		arma::ivec path = reverse(path_find(prev,source,target));
 		return path;
 	}
+
+arma::ivec dijkstra_arma_sp(arma::sp_fmat Mapa, int source, int target)
+		{	
+		int n=Mapa.n_rows;
+		arma:: ivec prev(n);
+		arma::vec dist(n);
+		bool visited[n] ={0};
+		fill_arma(dist,9999);
+
+		dist(source)=0;
+		prev(source)=-1;
+
+		for(int gg=0; gg<n-1;gg++)
+			{
+				int u= getMin_arma(dist,visited,n);
+				visited[u]=true;
+
+				for(int v = 0; v<n;v++)	
+					{	
+						if(Mapa(u,v)!=9999)
+						{
+							if(!visited[v] && (dist(u)+Mapa(u,v))< dist(v))
+								{
+									prev(v)=u;					
+									dist(v)=dist(u)+Mapa(u,v);
+								}
+						}
+					}
+			}
+		prev(source)=-1;
+				
+		arma::ivec path = reverse(path_find(prev,source,target));
+		return path;
+	}
+

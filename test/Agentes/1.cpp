@@ -1,5 +1,4 @@
 #include <iostream>
-
 #include <vector>
 #include <armadillo>
 #include <fstream>
@@ -131,8 +130,8 @@ void matriz_adyacencia(float * mat, int filas,int n,bool progress=false)
 									{
 										if(ii%n==0 && ii!=0)
 											{
-												mat[(ii-1)*nn+jj]=9999;
-												mat[(ii)*nn+jj-1]=9999;
+												mat[(ii-1)*nn+jj]=0;
+												mat[(ii)*nn+jj-1]=0;
 											}
 									}
 							}					
@@ -140,13 +139,13 @@ void matriz_adyacencia(float * mat, int filas,int n,bool progress=false)
 			}
 	}
 
-void Acceso(arma::mat imagen, float * Madyacencia, int n_filas,bool progress=false)
+void Acceso(arma::mat imagen, float * Madyacencia, int n_filas,int * Usables,bool progress=false)
 	{
+		// El vector usables debe ser de dimension n_filas
 		int numRows=imagen.n_rows;
 		int numCols=imagen.n_cols;		
 		int element=0;
-		int n_cols=n_filas;
-		int Usables[n_filas];
+		int n_cols=n_filas; 
 		fill_vec(Usables,n_filas,3);
 
 		if(numCols!=numRows)
@@ -165,19 +164,18 @@ void Acceso(arma::mat imagen, float * Madyacencia, int n_filas,bool progress=fal
 							{
 								
 								// fill_row(Madyacencia,element,n_filas,9999);
-								fill_row(Madyacencia,n_cols,element,9999);
-								fill_col(Madyacencia,n_filas,element,9999);
-								std::cout<<"*\t";
+								fill_row(Madyacencia,n_cols,element,0);
+								fill_col(Madyacencia,n_filas,element,0);
 								Usables[element]=0;
 
 							}
 						else if(imagen(ii,jj)!=0)
-							{Usables[element]=1;std::cout<<"-\t";}
+							{Usables[element]=1;}
 						else
-							{Usables[element]=2;std::cout<<"+\t";
+							{Usables[element]=2;
 							throw std::logic_error("Alerta: Error en asigancion de Madyacencia\n");}
 
-						std::cout<<imagen(ii,jj)<<"\t||"<<ii<<"\t"<<jj<<"\t"<<element<<"\t"<<Usables[element]<<"\n";
+						// std::cout<<imagen(ii,jj)<<"\t||"<<ii<<"\t"<<jj<<"\t"<<element<<"\t"<<Usables[element]<<"\n";
 					}
 			}
 
@@ -188,7 +186,7 @@ void Acceso(arma::mat imagen, float * Madyacencia, int n_filas,bool progress=fal
 				{	
 					indice=ll*n_filas+tt;
 					if(Madyacencia[indice]==0)
-						{Madyacencia[indice]=9999;}
+						{Madyacencia[indice]=0;}
 				}
 			}
 
@@ -216,6 +214,16 @@ void save_matrix(float * mat,int n_filas,bool progress = false)
 	}
 
 
+void float_to_double(float * M1,double * M2, int n_filas, int n_cols)
+	{
+		for(int ii=0; ii<n_filas*n_cols;ii++)
+			{
+				M2[ii]=M1[ii];
+			}
+
+	}
+
+
 
 int main()
 	{	
@@ -226,11 +234,17 @@ int main()
 		int n=imagen.n_cols;
 		int nn=n*n;
 		float Madyacencia[nn*nn];
+		double Ma[nn*nn];
+		int Usables[nn];
 
 		matriz_adyacencia(Madyacencia,nn,n);
-		Acceso(imagen,Madyacencia,nn);
+		Acceso(imagen,Madyacencia,nn,Usables);
 		save_matrix(Madyacencia,nn);
+		float_to_double(Madyacencia,Ma,nn,nn);
+		arma::mat Ma_arma(Ma,nn, nn);
 
+		arma::sp_mat Ma_sp(Ma_arma);
+		Ma_sp.print();
 		salida.close();
 		usab.close();
 
