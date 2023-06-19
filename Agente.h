@@ -94,7 +94,7 @@ bool Agente_Universitario::setBasuraActual(float basura_actual){
     // Se le puede colocar un valor directo a la basura actual
     this->basura_actual = basura_actual;
   }
-  else if(auxBasuraActual<=capacidad_basura){
+  else if(auxBasuraActual<=this->capacidad_basura){
     // Cuando el argumenro basura actual es mayor a uno, se hace ac
     // actualización por incremento.
     // Solo se actualiza cuando no se supera la capacidad de basura

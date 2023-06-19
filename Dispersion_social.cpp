@@ -252,10 +252,10 @@ void physics(){
         }
 
 	// Testear la capacidad de basura
-	/*
+	
 	  fprintf(stderr,"Rol: %i, Cap act basura %f\n",Persons[jj].getRol(),
 		Persons[jj].getBasuraActual());
-	*/
+	
       }
       
 
