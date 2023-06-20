@@ -13,7 +13,8 @@ MAIN_exe=$(MAIN).exe
 windows : windows_compile windows_run
 
 windows_run :
-	$(MAIN).exe  
+	$(MAIN).exe
+	  
 
 windows_compile :
 	g++ -Isrc/include -c .\$(MAIN).cpp -fopenmp 
