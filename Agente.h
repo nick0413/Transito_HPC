@@ -27,7 +27,7 @@ class Agente_Universitario
 			int facultad;
 			int spawn_time;
 
-			float basura_actula;
+			
 			float tiempo_actividad;
 			bool en_actividad;
 			bool en_ruta;
@@ -44,7 +44,7 @@ class Agente_Universitario
 			bool verbose;
 			arma::mat PosicionNodos;
 			double tactividad;
-			bool vivo=true;
+			bool Is_Alive=false;
 
 			// Basura
 			float capacidad_basura; // kg/kg Normalizado
@@ -59,6 +59,9 @@ class Agente_Universitario
 			void Actividad(double prob_tipo_actividad,double t);
 			std::tuple<double, double, double> prob_actividad_est(double spawn_time, double t);
 			std::tuple<double, double, double> prob_actividad_admin(double t);
+			double prob_ingreso_est(double t, int seed);
+			double prob_ingreso_admin_y_prof(double t, int seed);
+			void Ingreso(double t, int seed, double rand);
 			void draw(sf::RenderWindow & window,arma::mat PosNodos, float s,float ratio);
 
 			void Avanzar(arma::sp_mat Madyacencia, double dt, bool verbose);
@@ -84,6 +87,8 @@ class Agente_Universitario
 			arma::sp_mat getMapa(void){return Mapa;};  
 			arma::mat getPosicionNodos(void){return PosicionNodos;};
 			void hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad);
+			bool getIs_Alive(void){return Is_Alive;};
+			void Alive(void){if(actividad==0){Is_Alive=false;}};
 
 			// Basura
 			bool setBasuraActual(float);
@@ -168,7 +173,15 @@ void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academi
     scale = 0.3f;
   } 
                  
+	//PRUEBA
+	rol=1;
+	if (!texture.loadFromFile("./figs/Adim_sprite.png"))
+		{std::cout<<" error loading texture\n";}
 
+		sprite.setTexture(texture);
+		sf::FloatRect spriteBounds = sprite.getLocalBounds();
+		sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+		scale = 0.2f;
             
   //Se desarrolla una actividad academica 
       /*Actividades 
@@ -253,7 +266,8 @@ void Agente_Universitario::Actividad(double prob_tipo_actividad,double t)
 
 
 				else//irse de la universidad
-					{actividad=0; }
+					{actividad=0; 
+					std::cout<<"SE LLEGA A ACTIVIDAD 0"  << std::endl;}
 			}
 
 		if(rol==1)
@@ -271,7 +285,8 @@ void Agente_Universitario::Actividad(double prob_tipo_actividad,double t)
 					{actividad = 2;}
 
 				else//irse de la universidad
-					{actividad=0; }
+					{actividad=0; 
+					std::cout<<"SE LLEGA A ACTIVIDAD 0"  << std::endl;}
 			}
 
 		if(rol==2)
@@ -292,7 +307,8 @@ void Agente_Universitario::Actividad(double prob_tipo_actividad,double t)
 				}
 
 				else{
-				actividad=0; //irse de la universidad
+				actividad=0; //irse de la universidad 
+				std::cout<<"SE LLEGA A ACTIVIDAD 0"  << std::endl;
 				}
 			}
 
@@ -346,14 +362,14 @@ std::tuple<double, double, double> Agente_Universitario::prob_actividad_est(doub
 std::tuple<double, double, double> Agente_Universitario::prob_actividad_admin(double t)
 {
   double inicio_dia = 0;//7*3600
-  double inicio_descanso = 3600; //12*3600
-  double final_descanso = 4600; //14*3600
-  double final_dia = 5600; //17*3600
+  double inicio_descanso = 3600*5; //12*3600
+  double final_descanso = 4600*7; //14*3600
+  double final_dia = 5600*10; //17*3600
   double P_a;
   double P_o;
   double P_i;
   double x=t;
-  double d=4000; //13*3600
+  double d=3600*6; //13*3600
   double s = 0.5*3600; 
   if(inicio_dia<t && t<=inicio_descanso){
     P_a = 0.8;
@@ -512,8 +528,10 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat PosNodos, fl
 		arma::vec pos;
 		bool errr=false;
 		// std::cout<<true<<"\n";
-		
-		if(en_ruta)
+		if(Is_Alive==false){
+			return;
+		}
+		else if(en_ruta)
 			{
 				pos=getAgentPosition(PosNodos,ratio,false);
 				pos_x=pos(0);
@@ -529,6 +547,7 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat PosNodos, fl
 				pos_y=nodo_actual(1);
 				sprite.setScale(scale*s, scale*s);		
 			}
+		
 		else	
 			{ 
 				std::cout<<"Error en draw, no tiene actividad definida "<<en_ruta<<" "<<en_actividad<<"\n";
@@ -636,3 +655,46 @@ bool Agente_Universitario::setBasuraActual(float basura_actual)
 
 		return true;
 	}
+
+double Agente_Universitario::prob_ingreso_est(double t, int seed) {
+   
+
+    double mean = 3600 *3;
+    double standardDeviation = 3600;
+
+    double exponent = -pow((t - mean), 2) / (2 * pow(standardDeviation, 2));
+    double result = exp(exponent);
+
+    return result;
+}
+
+double Agente_Universitario::prob_ingreso_admin_y_prof(double t, int seed) {
+  
+
+    double mean = 3600;
+    double standardDeviation = 1800;
+
+    double exponent = -pow((t - mean), 2) / (2 * pow(standardDeviation, 2));
+    double result = exp(exponent);
+
+    return result;
+}
+
+void Agente_Universitario::Ingreso(double t, int seed, double rand){
+	
+	if(rol==0)//son estudiantes
+	{ double prob = prob_ingreso_est(t, seed);
+		if(rand<prob)
+		{
+			Is_Alive=true;
+		}
+	}
+
+	if(rol==1 || rol == 2)//son estudiantes
+	{ double prob = prob_ingreso_admin_y_prof(t, seed);
+		if(rand<prob)
+		{
+			Is_Alive=true;
+		}
+	}
+}

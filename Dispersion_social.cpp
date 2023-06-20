@@ -18,11 +18,11 @@
 #include "Agente.h"
 #include "Tools.h"
 
-int N=1000;
+int N=5;
 int resolucion=50; // 10, 50 , 100, 200
 float scale=0.2;//200/resolucion;
 bool verbose=false;
-int num_threads = 6; // Specify the desired number of threads
+int num_threads = 1; // Specify the desired number of threads
 int alive=0;
 float ratio=(float)1000/resolucion;
 
@@ -181,7 +181,9 @@ int main(int argc, char **argv)
 				for(int jj = 0; jj < N; ++jj) 
 				{	
 				  //fprintf(stderr,"jj:%i, t: %f\n",jj,t_Global);
-					if(Personas[jj].getActividad()!=0) 
+				  	
+					
+					if(Personas[jj].getIs_Alive()) 
 						{	alive+=1;
 						
 							Personas[jj].draw(window,PosicionNodos_0,scale,ratio);
@@ -261,6 +263,11 @@ void physics()
 						for (int jj = imin; jj < imax; ++jj)
 							{ 	
 								//std::cout<<jj<<std::endl;
+								Personas[jj].Alive();
+								if(Personas[jj].getIs_Alive()==false) {
+									double rand = Real_dist(Gen);
+									Personas[jj].Ingreso(t_Global,2,rand);
+								}
 								if(Personas[jj].EnRuta())
 									{Personas[jj].Avanzar(Madyacencia_sp,dt_Global,false);}
 
