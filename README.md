@@ -1,6 +1,8 @@
 
 # Modelo de agentes para la generación de residuos en la UN
 
+## Introducción
+
 - [Requerimientos](#requerimientos)
 
 Una simulación modelo de agentes que se propone simular la generación de basura en la Universidad Nacional de Colombia. 
@@ -22,7 +24,7 @@ Los agentes están contenidos en un array unidimensional el cual se tiene que ma
 
 <img src="./figs/inf/omp_threads.png" alt="Asignación de array en threads de OpenMP" width=250>
 
-*Figura 1. Asignación de array en threads de OpenMP*
+*Figura ee1. Asignación de array en threads de OpenMP*
 
 
 ### Métricas
@@ -32,11 +34,36 @@ La manera en la que se determina el speedup:
 
 $$ S(n)=\frac{T(1)}{T(n)} $$
 
+En la Figura ee2 se observa el speedup para la inicialización de los agentes.
+
+<img src="./metrics/init_speedup_final.png" alt="Speedup al inicializar los agentes" width=700>
+
+*Figura ee2. Speedup al inicializar los agentes.*
+
+En la Figura ee3 se tiene el speedup para la actualización de agentes.
+
+<img src="./metrics/physics_speedup_final.png" alt="Speedup en la actualización de los agentes" width=700>
+
+*Figura ee3. Speedup en la actualización de los agentes.*
+
 #### Eficiencia paralela
 
 La eficiencia paralela viene dada por la fórmula:
 
 $$ \eta _p (n)= \frac{S(n)}{n} $$
+
+De manera recíproca, se presentan las Figuras ee4 y ee5 para la eficiencia en paralelo.
+
+
+<img src="./metrics/init_efficiency_final.png" alt="Eficiencia de init" width=700>
+
+*Figura ee4. Eficiencia al inicializar los agentes.*
+
+<img src="./metrics/physics_speedup_final.png" alt="Eficiencia de physics" width=700>
+
+*Figura ee4. Eficiencia en la actualización de los agentes.*
+
+
 
 
 
@@ -45,12 +72,12 @@ $$ \eta _p (n)= \frac{S(n)}{n} $$
 - [SFML](https://www.sfml-dev.org/): Se usa para la interfaz gráfica y tiene su propia manera de lanzar threads.
 - [OpenMP](https://www.openmp.org/): Se utiliza para programar de manera paralela por medio de memoria distribuida.
 
-Descargar la última versión de la rama main del repositoro.
+Descargar la última versión de la rama main del repositor.
 
 
-## Windows
+### Windows
 
-## Linux
+### Linux
 Para compilar se utiliza el gmake de esta manera
 ```bash
 gmake linux
@@ -88,6 +115,6 @@ Para editar documentos en formato .tex.
 <img src="./figs/inf/Overleaf.png" alt="Imagen de Overleaf" width=50>
 
 
-# Hardware
+## Hardware
 - Para correr la simulación a escala entera (un mapa de 200x200 pixeles) se requiere 16Gb de Ram para que sea estable. Los requerimientos de resoluciones menores aún no se han medido. 
 - El proceso más intensivo es el preprocesamiento del mapa, que usa funciones de Madyacencia.h y es la razón del alto consumo de ram.
