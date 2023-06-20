@@ -18,8 +18,8 @@
 #include "Agente.h"
 #include "Tools.h"
 
-int N=50;
-int resolucion=50; // 10, 50 , 100, 200
+int N=1000;
+int resolucion=100; // 10, 50 , 100, 200
 float scale=0.2;//200/resolucion;
 bool verbose=false;
 int num_threads = 6; // Specify the desired number of threads
@@ -145,10 +145,12 @@ int main(int argc, char **argv)
 		arma::sp_mat M_PlaceHolder(Ma_arma);
 		Madyacencia_sp=M_PlaceHolder;
 		Usables_vec = arma::conv_to<arma::ivec>::from(Usables);
+		Usables_vec.save("Usables.csv",arma::csv_ascii);
 		PosicionNodos_0=load_csv_arma("./Environment/Nodos_finales/nodos"+std::to_string(resolucion) +".csv");
 
+		// print_connections(Madyacencia_sp,2868);
 		
-		std::cout<<"Carga del mapa completada, inicializando angetes\n";
+		std::cout<<"Carga del mapa completada, inicializando agentes\n";
 		
 		// Madyacencia_sp.print();
 		init_personas_activities(t_spawn, cap_basura, t_actividad, vel, verbose,Madyacencia_sp,Usables_vec,PosicionNodos_0); 
@@ -275,7 +277,7 @@ void physics()
 	{	
 
 
-	  //omp_set_num_threads(num_threads); // Set the number of threads
+	  	omp_set_num_threads(num_threads); // Set the number of threads
 		sf::Time elapsed; // Se tiene en cuenta el tiempo de procesamiento  
 		int N = Personas.size();
 
@@ -361,8 +363,8 @@ void physics()
 
 void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, double vel, bool verbose, arma::sp_mat & Mapa, arma::ivec & Usables,arma::mat PosicionNodos )
 	{	
-	  //omp_set_num_threads(num_threads);
-		std::cout<<"Entra a la funcion\n";
+	  	omp_set_num_threads(num_threads);
+		// std::cout<<"Entra a la funcion\n";
 		int N=Personas.size();
 		int nodo_inicio;
 		int nodo_destino;
@@ -405,10 +407,12 @@ void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, 
 						rand_actv_acad = Real_dist(Gen);
 						prob=Real_dist(Gen);
 						// std::cout<<"310\n";
+						// std::cout<<"\t"<<jj<<" "<<0<<" "<<nodo_destino <<"\t"<<thr_id<<"\n";
 						Personas[jj].inicializar(rand_rol,rand_type_actv,rand_actv_acad,t_spawn,cap_basura,t_actividad,
-									nodo_inicio,nodo_destino,vel,t_Global,false,Mapa,Usables_vec,PosicionNodos,prob);
-									
+									2965,nodo_destino,vel,t_Global,false,Mapa,Usables_vec,PosicionNodos,prob);
+						
 					}
+				// std::cout<<"Inicializacion terminada "<<thr_id<<"\n";
 			}
 		auto end = std::chrono::steady_clock::now();
 		std::chrono::duration<double> diff = end - start;
@@ -417,6 +421,7 @@ void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, 
 		fprintf(fp,"%i %.15e\n", threads, time);
 		fclose(fp);
 		return;
+		std::cout<<"Inicializacion terminada\n";
 	}
 
 // Events smfl manager

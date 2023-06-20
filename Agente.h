@@ -124,7 +124,10 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
 		Usables=Usables_0;
 		verbose= verbose0;
 		PosicionNodos = PosicionNodos_0;
+		// std::cout<<"\t-";
 		Ruta = Ruta_imagen(posicion0,destino0,Usables,Mapa);
+		// Ruta = Ruta_imagen(posicion0,destino0,Usables,Mapa);
+		// std::cout<<"-\n";
 		Pos_nodo = Ruta(0);
 		Nodo_base=Ruta(0);
 		tactividad=0;
