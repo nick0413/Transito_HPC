@@ -11,8 +11,22 @@ std::ofstream salida;
 std::ofstream usab;
 
 //void fill_row(std::vector<float>& mat, int cols, int fila, float val)
+float secondsToHours(float seconds) {
+    float hours = seconds / 3600.0;  // Divide seconds by the number of seconds in an hour (3600)
+    return hours;
+}
+
+float hoursToSeconds(float hours) {
+    float seconds = hours * 3600.0;  // Divide seconds by the number of seconds in an hour (3600)
+    return seconds;
+}
 
 
+double gaussian(double x, double mean, double stddev) {
+    double exponent = -0.5 * pow((x - mean) / stddev, 2);
+    double coefficient = 1.0 / (stddev * sqrt(2 * M_PI));
+    return coefficient * exp(exponent);
+}
 int next_node(arma::ivec Usables, int nodo)
 	{  
 		for( int ii=nodo; ii<Usables.size(); ii++)

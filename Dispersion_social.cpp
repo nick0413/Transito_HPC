@@ -18,11 +18,7 @@
 #include "Agente.h"
 #include "Tools.h"
 
-<<<<<<< HEAD
-int N=1000; // Número de agentes
-=======
 int N=50;
->>>>>>> 3f58f55c6a7bd7f08c06ad971730f333ae6a397c
 int resolucion=50; // 10, 50 , 100, 200
 float scale=0.2;//200/resolucion;
 bool verbose=false;
@@ -109,7 +105,7 @@ int main(int argc, char **argv)
 		  fprintf(stderr,"Agentes: %i resolución: %i\n", N, resolucion);
 		}
 		catch(...){
-		  N=1000;
+		  N=100;
 		  resolucion=50;
 		  fprintf(stderr,"Agentes: %i resolución: %i\n", N, resolucion);
 		}
@@ -365,6 +361,7 @@ void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, 
 		double rand_type_actv;
 		double rand_actv_acad;
 		double time;
+		double prob=0;
 		FILE *fp;
 		fp = fopen("./metrics/inits.txt","a");
 		int threads=0;
@@ -397,9 +394,10 @@ void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, 
 						rand_rol = Real_dist(Gen);
 						rand_type_actv = Real_dist(Gen);
 						rand_actv_acad = Real_dist(Gen);
+						prob=Real_dist(Gen);
 						// std::cout<<"310\n";
 						Personas[jj].inicializar(rand_rol,rand_type_actv,rand_actv_acad,t_spawn,cap_basura,t_actividad,
-									nodo_inicio,nodo_destino,vel,t_Global,false,Mapa,Usables_vec,PosicionNodos);
+									nodo_inicio,nodo_destino,vel,t_Global,false,Mapa,Usables_vec,PosicionNodos,prob);
 									
 					}
 			}

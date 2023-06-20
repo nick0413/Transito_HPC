@@ -31,6 +31,18 @@ windows_compile2 :
 	g++ -Isrc/include -c .\Dispersion_social.cpp -fopenmp
 	g++ .\Dispersion_social.o -o Dispersion_social -Lsrc/lib -lsfml-graphics -lsfml-window -lsfml-system -lblas -larmadillo -fopenmp
 
+.PHONY : windows3
+# First compile and then run for extra armadillo [Victor]
+windows3 : windows_compile3 windows_run3
+
+windows_run3 :
+	set OMP_NUM_THREADS=$(NUM_THR) 
+	.\Dispersion_social.exe  
+
+windows_compile3 :
+	g++ -Isrc/include -c .\Dispersion_social.cpp -fopenmp
+	g++ .\Dispersion_social.o -o Dispersion_social -Lsrc/lib -lsfml-graphics -lsfml-window -lsfml-system -lopenblas -larmadillo -fopenmp
+
 
 
 .PHONY : linux	
