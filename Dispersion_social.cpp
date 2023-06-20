@@ -18,9 +18,15 @@
 #include "Agente.h"
 #include "Tools.h"
 
-int N=1000;
-int resolucion=10; // 10, 50 , 100, 200
-float scale=1;//200/resolucion;
+int N=1;
+int resolucion=50; // 10, 50 , 100, 200
+float scale=0.2;//200/resolucion;
+bool verbose=false;
+int num_threads = 1; // Specify the desired number of threads
+int alive=0;
+float ratio=(float)1000/resolucion;
+
+
 std::ofstream rol;
 //ofstream times;
 
@@ -38,23 +44,32 @@ arma::mat PosicionNodos_0;
 double dt_Global;
 double t_Global;
 sf::Clock ClockPhysics;
-sf::Time TimeUpdatePhysics = sf::milliseconds(1); // milliseconds (Int32) or microseconds (Int64)
+sf::Time TimeUpdatePhysics = sf::milliseconds(20); // milliseconds (Int32) or microseconds (Int64)
+
+void draw_text(sf::RenderWindow & window,sf::Text text,std::string text_0, float posx, float posy)
+	{
+		text.setString(text_0);
+		text.setPosition(posx, posy);
+		window.draw(text);
+	}
+void draw_box(sf::RenderWindow & window,sf::RectangleShape box,float posx, float posy,sf::Color color)
+	{
+			box.setPosition(posx, posy);
+			box.setFillColor(color);
+			window.draw(box);
+
+	}
+
 
 void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, double vel, bool verbose, arma::sp_mat & Mapa, arma::ivec & Usables,arma::mat PosicionNodos );
 
 
-void events_sfml_manager(sf::RenderWindow &window, sf::Event &event,
-			 sf::View &viewPrincipal, sf::Texture &textFondo,
-			 Tools &tools, char &opcionesDeFondo,
-			 sf::Vector2f &viewPricipalCenter,
-			 sf::Sprite &sprFondo,sf::Texture &textFondoNodos ,
-			 float dxViewPrincipal, float dyViewPrincipal, float zoomViewPrincipal);
+void events_sfml_manager(sf::RenderWindow &window, sf::Event &event,sf::View &viewPrincipal, sf::Texture &textFondo,Tools &tools, char &opcionesDeFondo, 
+			 sf::Vector2f &viewPricipalCenter,sf::Sprite &sprFondo,sf::Texture &textFondoNodos ,float dxViewPrincipal, float dyViewPrincipal, float zoomViewPrincipal);
 
 
 void physics();
 
-bool verbose=false;
-int num_threads = 1; // Specify the desired number of threads
 
 int main(int argc, char **argv)
 	{
@@ -63,7 +78,7 @@ int main(int argc, char **argv)
 
 		
 
-    	omp_set_num_threads(num_threads); // Set the number of threads
+    omp_set_num_threads(num_threads); // Set the number of threads
 
 
 
@@ -73,7 +88,6 @@ int main(int argc, char **argv)
 		dt_Global = 1;
 		
 		Personas.resize(N);
-
 
 		t_Global=0;
 		int t_spawn=0; //por ahora todos se crean al tiempo
@@ -100,8 +114,11 @@ int main(int argc, char **argv)
 		
 		// Madyacencia_sp.print();
 		init_personas_activities(t_spawn, cap_basura, t_actividad, vel, verbose,Madyacencia_sp,Usables_vec,PosicionNodos_0); 
-		
+		std::cout<<"\n";
 			
+		sf::Font font;
+		if (!font.loadFromFile("fonts/ethnocentric rg.otf"))
+			{throw std::logic_error("La fuente no fue encontrada\n");}
 
 		sf::RenderWindow window;
 		sf::Texture textFondo;
@@ -113,6 +130,17 @@ int main(int argc, char **argv)
 		sf::Vector2f viewPricipalCenter(500, 500);
 		sf::Vector2f viewPricipalSize(1000, 1000);
 		sf::View viewPrincipal(viewPricipalCenter, viewPricipalSize);
+
+		sf::Text text1;
+		text1.setFont(font);
+    text1.setCharacterSize(20);
+    text1.setFillColor(sf::Color::Black);
+		
+		float UI_size_x=500;float UI_size_y=40;
+		sf::RectangleShape UI(sf::Vector2f(UI_size_x, UI_size_y));
+		UI.setOutlineThickness(2.f);
+ 		UI.setOutlineColor(sf::Color::Black);
+		sf::Color color1(100, 100,100);
 				
 		// Parámetros de vista
 		float dxViewPrincipal=100.f;
@@ -128,14 +156,14 @@ int main(int argc, char **argv)
 		window.create(sf::VideoMode(textureSize.x, textureSize.y),"TransitoHPC");
 		sprFondo.setTexture(textFondo);
 		sf::Thread threadPhysics(&physics);
+		std::cout<<"Iniciando fisicas\n";
 		threadPhysics.launch();  
 
-		std::cout<<"--------------------------\n";
+		// std::cout<<"--------------------------\n";
 
 
 		while(window.isOpen())
-			{ 
-				t_Global+=dt_Global;
+			{ 		
 				sf::Event event;
 
 				// Event manager
@@ -149,19 +177,25 @@ int main(int argc, char **argv)
 
 
 				window.draw(sprFondo);
-
+				alive=0;
 				for(int jj = 0; jj < N; ++jj) 
-				{
+				{	
 				  //fprintf(stderr,"jj:%i, t: %f\n",jj,t_Global);
 					if(Personas[jj].getActividad()!=0) 
-						{	
+						{	alive+=1;
 						
-							Personas[jj].draw(window,PosicionNodos_0,scale);
+							Personas[jj].draw(window,PosicionNodos_0,scale,ratio);
 							// std::cout<<t_Global<<"\n";
 							
 						}	
 							       					
 				}
+
+				
+				draw_box(window,UI,10,10,color1);
+				draw_text(window,text1,"Agentes en la simulacion:"+std::to_string(alive),20,20);
+				if(alive==0){std::cout<<"Todos murieron\n";}
+				// std::cout<<"- ";
 
 				window.display();
 
@@ -182,7 +216,7 @@ void physics()
 	{	
 
 
-    	omp_set_num_threads(num_threads); // Set the number of threads
+    omp_set_num_threads(num_threads); // Set the number of threads
 		sf::Time elapsed; // Se tiene en cuenta el tiempo de procesamiento  
 		int N = Personas.size();
 
@@ -198,8 +232,8 @@ void physics()
 		
 		while(true)
 			{
-				// Calculate time to sleep exactly timeUpdatePhysics was defined 
-
+				t_Global+=dt_Global;
+				// std::cout<<t_Global<<"\n";
 				elapsed = ClockPhysics.restart();
 				total++;
 				if (TimeUpdatePhysics>elapsed)
@@ -228,7 +262,7 @@ void physics()
 							{ 	
 								//std::cout<<jj<<std::endl;
 								if(Personas[jj].EnRuta())
-									{Personas[jj].Avanzar(Madyacencia_sp,dt_Global,false);}
+									{Personas[jj].Avanzar(Madyacencia_sp,dt_Global,true);}
 
 								if(Personas[jj].EnActividad())
 									{
@@ -295,12 +329,12 @@ void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, 
 				if(num_thr>1 && thr_id==(num_thr-1) && (N%Nlocal)!=0)
 					{Nlocal+=N%num_thr;}
 
-				std::cout<<"298\n";
+				// std::cout<<"298\n";
 
 				for (int jj = imin; jj < imax; ++jj)// xy_to_node(inicio, nimagen);
 					{ 	
-						// if(thr_id==(num_thr-1))
-						// 	{displayProgressBar(((float)(jj-imin)/(imax-imin)));}
+						if(thr_id==(num_thr-1))
+							{displayProgressBar(((float)(jj-imin)/(imax-imin)));}
 					
 						nodo_inicio = Int_dist(Gen);
 						nodo_destino = Int_dist(Gen); 

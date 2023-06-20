@@ -35,6 +35,7 @@ class Agente_Universitario
 			sf::Sprite sprite;
 			sf::Texture texture;
 			double Pos_nodo;
+			double Nodo_base;
 			double Pos_arista;
 			double Vel;
 			float scale;
@@ -58,7 +59,7 @@ class Agente_Universitario
 			void Actividad(double prob_tipo_actividad,double t);
 			std::tuple<double, double, double> prob_actividad_est(double spawn_time, double t);
 			std::tuple<double, double, double> prob_actividad_admin(double t);
-			void draw(sf::RenderWindow & window,arma::mat PosNodos, float s);
+			void draw(sf::RenderWindow & window,arma::mat PosNodos, float s,float ratio);
 
 			void Avanzar(arma::sp_mat Madyacencia, double dt, bool verbose);
 			int Nodo(void);
@@ -66,7 +67,9 @@ class Agente_Universitario
 			int Nodo_in_route(void);
 			int Next_in_route(void);
 			void Print_pos(void);
-			arma::vec getPosition(arma::mat PosNodos, int nodo);
+			arma::vec getNodePosition(arma::mat PosNodos, int nodo);
+			arma::vec getAgentPosition(arma::mat PosNodos, float ratio,bool verbose);
+			arma::vec getDirection(arma::mat PosNodos);
 			arma::ivec getRuta(void){return Ruta;};
 			int getRol(void){return rol;};
 			float getScale(void){return scale;};
@@ -78,8 +81,8 @@ class Agente_Universitario
 			void asignar_pos_arista(double pos_arista){Pos_arista=pos_arista;};
 			void asignar_ruta(int simulationTime,int nodo_i,int nodo_f);
 			void hacer_actividad(double t,double dt);
-					arma::sp_mat getMapa(void){return Mapa;};  
-					arma::mat getPosicionNodos(void){return PosicionNodos;};
+			arma::sp_mat getMapa(void){return Mapa;};  
+			arma::mat getPosicionNodos(void){return PosicionNodos;};
 			void hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad);
 
 			// Basura
@@ -88,29 +91,6 @@ class Agente_Universitario
 	
 	};
 
-
-float Agente_Universitario::getBasuraActual()
-	{return this->basura_actual;}
-
-bool Agente_Universitario::setBasuraActual(float basura_actual)
-	{
-
-		float auxBasuraActual=this->basura_actual+this->delta_produccion_basura;
-
-		if(basura_actual<=1)// Se le puede colocar un valor directo a la basura actual
-			{this->basura_actual = basura_actual;}
-		else if(auxBasuraActual<=this->capacidad_basura)
-			{
-				// Cuando el argumenro basura actual es mayor a uno, se hace ac
-				// actualización por incremento.
-				// Solo se actualiza cuando no se supera la capacidad de basura
-				this->basura_actual=auxBasuraActual;
-			}
-		else
-			{return false;}
-
-		return true;
-	}
 
 void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
     int posicion0,int destino0, double velocidad0, double t,bool verbose0, arma::sp_mat  Mapa_0,arma::ivec  Usables_0,arma::mat PosicionNodos_0)
@@ -128,34 +108,24 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
 		Usables=Usables_0;
 		verbose= verbose0;
 		PosicionNodos = PosicionNodos_0;
-		std::cout<<"No "<<posicion0<<" "<<destino0<<" "<<Usables.size()<<"\t";
 		Ruta = Ruta_imagen(posicion0,destino0,Usables,Mapa);
-		std::cout<<"hay pedo\n";
 		Pos_nodo = Ruta(0);
-		
+		Nodo_base=Ruta(0);
 		tactividad=0;
 
-
-
 			
-  sf::FloatRect spriteBounds = sprite.getLocalBounds();
-  sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
+		sf::FloatRect spriteBounds = sprite.getLocalBounds();
+		sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
 
-  // inicialización de la basura
-  this->basura_actual=0.0;
-  
-  if(rol==0){
-    // Estudiante
-    this->delta_produccion_basura=0.1; 
-  }
-  else if(rol==1){
-    // Administrativo
-    this->delta_produccion_basura=0.05;
-  }
-  else{
-    // Docente
-    this->delta_produccion_basura=0.025;
-  }
+		// inicialización de la basura
+		this->basura_actual=0.0;
+		
+		if(rol==0)
+			{this->delta_produccion_basura=0.1;}
+		else if(rol==1)
+			{this->delta_produccion_basura=0.05;}
+		else
+			{this->delta_produccion_basura=0.025;}
   
 }
 
@@ -418,7 +388,9 @@ std::tuple<double, double, double> Agente_Universitario::prob_actividad_admin(do
     return std::make_tuple(P_a, P_o, P_i);  
   }
 } 
+
 void Agente_Universitario::Avanzar(arma::sp_mat Madyacencia, double dt, bool verbose=false)
+
 	{	
 		// std::cout<<Pos_arista<<"->"<<Pos_arista	+dt*Vel<<"\t";
 		Pos_arista+=dt*Vel;
@@ -443,107 +415,133 @@ void Agente_Universitario::Avanzar(arma::sp_mat Madyacencia, double dt, bool ver
 				Pos_arista=0;
 			}
 		if(verbose) {
-			std::cout<<Pos_arista<<"->"<<Pos_arista	+dt*Vel<<"\t";
-			std::cout<<"arista actual: "<<Pos_arista<<"\tEntre nodos:" <<Pos_nodo<<"->"<<Ruta(idx(0)+1); 
+			// std::cout<<Pos_arista<<"->"<<Pos_arista	+dt*Vel<<"\t";
+			std::cout<<"arista actual: "<<Pos_arista<<"\tEntre nodos:" <<Pos_nodo<<"->"<<Ruta(idx(0)+1)<<"\n"; 
 			}
 
 
 }
 
 int Agente_Universitario::Nodo(void)
-{
-  return Pos_nodo;
-}
+	{return Pos_nodo;}
 double Agente_Universitario::Arista(arma::mat Madyacencia)
-{	
-  arma::uvec idx=arma::find(Ruta == Pos_nodo);
-  double cuadra=Madyacencia(Pos_nodo,Ruta(idx(0)+1));
-  return Pos_arista/cuadra;
-}
+	{	
+		arma::uvec idx=arma::find(Ruta == Pos_nodo);
+		double cuadra=Madyacencia(Pos_nodo,Ruta(idx(0)+1));
+		return Pos_arista/cuadra;
+	}
 
 int Agente_Universitario::Nodo_in_route(void)
-{
-  arma::uvec idx=arma::find(Ruta == Pos_nodo);
-  return Ruta(idx(0));
-}
+	{
+		arma::uvec idx=arma::find(Ruta == Pos_nodo);
+		return Ruta(idx(0));
+	}
 int Agente_Universitario::Next_in_route(void)
-{	
-		
-  arma::uvec idx=arma::find(Ruta == Pos_nodo);
-  if (idx(0)+1>=Ruta.size()){en_ruta=false;en_actividad=true;return-100;}
-  return Ruta(idx(0)+1);
-}
+	{	
+			
+		arma::uvec idx=arma::find(Ruta == Pos_nodo);
+		if (idx(0)+1>=Ruta.size())
+			{
+				en_ruta=false;
+				en_actividad=true;
+				return-100;
+			}
+		return Ruta(idx(0)+1);
+	}
 
 void Agente_Universitario::Print_pos(void)
-{
-  std::cout<<Pos_nodo<<" "<<Pos_arista<<"\n";
-}
-arma::vec Agente_Universitario::getPosition(arma::mat PosNodos, int nodo)
-{	
+	{std::cout<<Pos_nodo<<" "<<Pos_arista<<"\n";}
 
-  double posx= PosNodos(nodo, 1);
-  double posy= PosNodos(nodo, 2);
-  arma::vec position = {posx, posy};
+
+arma::vec Agente_Universitario::getNodePosition(arma::mat PosNodos, int nodo)
+	{	
+
+		double posx= PosNodos(nodo, 1);
+		double posy= PosNodos(nodo, 2);
+		arma::vec position = {posx, posy};
+				
+		return position;
+			
+	}
+
+arma::vec Agente_Universitario::getAgentPosition(arma::mat PosNodos,float ratio, bool verbose)
+	{
+		double pos_x;
+		double pos_y;
+		int nodo_pos=Nodo_in_route();
+		int next_pos=Next_in_route();
+		arma::vec nodo_siguiente;	
+		arma::vec nodo_actual=getNodePosition(PosNodos,nodo_pos);
 		
-  return position;
+		if(next_pos==-100)
+			{nodo_siguiente=nodo_actual;}
+		else
+			{nodo_siguiente=getNodePosition(PosNodos,next_pos);}
 
-		
-}
 
-void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat PosNodos, float s)
+		arma::vec r=nodo_siguiente-nodo_actual;
+		arma::vec r2=arma::normalise(r,1);
+		pos_x=(ratio*r2(0)*Pos_arista)+nodo_actual(0);
+		pos_y=(ratio*r2(1)*Pos_arista)+nodo_actual(1);
+		arma::vec pos = {pos_x, pos_y};
+		return pos;
+
+	}
+arma::vec Agente_Universitario::getDirection(arma::mat PosNodos)
+	{	
+		int nodo_pos=Nodo_in_route();
+		int next_pos=Next_in_route();
+		arma::vec nodo_siguiente;	
+		arma::vec nodo_actual=getNodePosition(PosNodos,nodo_pos);
+
+		if(next_pos==-100)
+			{nodo_siguiente=nodo_actual;}
+		else
+			{nodo_siguiente=getNodePosition(PosNodos,next_pos);}
+
+
+		arma::vec r=nodo_siguiente-nodo_actual;
+		arma::vec r2=arma::normalise(r,1);
+		return r2;
+	}
+
+
+void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat PosNodos, float s,float ratio)
 	{	
 		double pos_x;
 		double pos_y;
-		// std::cout<<"draw\n";
+		arma::vec pos;
+		bool errr=false;
+		// std::cout<<true<<"\n";
+		
 		if(en_ruta)
 			{
-				int nodo_pos=Nodo_in_route();
-				int next_pos=Next_in_route();
-				arma::vec nodo_siguiente;	
-				arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
-
-				if(next_pos==-100)
-					{
-						// std::cout<<"fin de la ruta"<<en_actividad<<std::endl;
-						nodo_siguiente=nodo_actual;
-					}
-				else
-					{nodo_siguiente=getPosition(PosNodos,next_pos);}
-
-
-				arma::vec r=nodo_siguiente-nodo_actual;
-
-				arma::vec r2=arma::normalise(r,1);
-
-				if(r(0)<0)
-				{sprite.setScale(-scale*s, scale*s);}
-				else
-				{sprite.setScale(scale*s, scale*s);}
-
-										
-				pos_x=(100*r2(0)*Pos_arista)+nodo_actual(0);
-				pos_y=(100*r2(1)*Pos_arista)+nodo_actual(1);
-
+				pos=getAgentPosition(PosNodos,ratio,false);
+				pos_x=pos(0);
+				pos_y=pos(1);
+				sprite.setScale(scale*s, scale*s);
 			}
 		
 		else if(en_actividad)
 			{
 				int nodo_pos=Nodo_in_route();
-				arma::vec nodo_actual=getPosition(PosNodos,nodo_pos);
+				arma::vec nodo_actual=getNodePosition(PosNodos,nodo_pos);
 				pos_x=nodo_actual(0);
 				pos_y=nodo_actual(1);
-				sprite.setScale(scale*s, scale*s);
+				sprite.setScale(scale*s, scale*s);		
 			}
-		else
-			{std::cout<<"Error en draw, no tiene actividad definida----\n";}
+		else	
+			{ 
+				std::cout<<"Error en draw, no tiene actividad definida "<<en_ruta<<" "<<en_actividad<<"\n";
+				if(en_actividad){std::cout<<"En actividad";};			
+			}
+
 
 
 						
 		sprite.setPosition(sf::Vector2f(pos_y+50*s,pos_x+50*s));
 		window.draw(sprite);
 	}
-
-
 
 
 
@@ -585,30 +583,57 @@ void Agente_Universitario::asignar_ruta(int simulationTime, int nodo_i,int nodo_
 	}
 
 
+void Agente_Universitario::hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad)
+	{
+		tactividad+=dt;
+		double tmax_actividad = 50;
+		double trestante =  tmax_actividad-tactividad;
+		nodo_i=Nodo_in_route();
 
- void Agente_Universitario::hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad){
-    tactividad+=dt;
-    double tmax_actividad = 50;
-    double trestante =  tmax_actividad-tactividad;
-	nodo_i=Nodo_in_route();
-    //std::cout<<trestante<<" "<<actividad<<std::endl;
-    if(trestante<=0)
-		{
-			en_actividad=false;
-			tactividad=0;
-			Actividad(prob_tipo_actividad,t);
-			// std::cout<<"Nueva actividad: "<<actividad<<"tiempo "<< t <<std::endl;
-			if(actividad !=0)
-				{
-					en_ruta=true;
-					asignar_ruta(t,nodo_i, nodo_f);
-					// std::cout<<"Ruta asignada"<<std::endl;
-				}
-			//generar nuevos nodos, crear ruta, asignar ruta
-		} 
+		if(trestante<=0)
+			{
+				en_actividad=false;
+				tactividad=0;
+				Actividad(prob_tipo_actividad,t);
+
+				if(actividad !=0)
+					{
+						en_ruta=true;
+						en_actividad=false;
+						asignar_ruta(t,nodo_i, nodo_f);
+
+					}
+				if(actividad==0)
+					{
+
+					}
+				
+
+			} 
+		setBasuraActual(2.0);
+
+	}
 
 
-  	// Se actualiza la basura de manera incremental según delta_produccion_basura
-  	setBasuraActual(2.0);
+float Agente_Universitario::getBasuraActual()
+	{return this->basura_actual;}
 
-}
+bool Agente_Universitario::setBasuraActual(float basura_actual)
+	{
+
+		float auxBasuraActual=this->basura_actual+this->delta_produccion_basura;
+
+		if(basura_actual<=1)// Se le puede colocar un valor directo a la basura actual
+			{this->basura_actual = basura_actual;}
+		else if(auxBasuraActual<=this->capacidad_basura)
+			{
+				// Cuando el argumenro basura actual es mayor a uno, se hace ac
+				// actualización por incremento.
+				// Solo se actualiza cuando no se supera la capacidad de basura
+				this->basura_actual=auxBasuraActual;
+			}
+		else
+			{return false;}
+
+		return true;
+	}
