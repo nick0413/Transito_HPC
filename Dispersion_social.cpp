@@ -18,7 +18,7 @@
 #include "Agente.h"
 #include "Tools.h"
 
-int N=1;
+int N=1000; // Número de agentes
 int resolucion=50; // 10, 50 , 100, 200
 float scale=0.2;//200/resolucion;
 bool verbose=false;
@@ -73,12 +73,25 @@ void physics();
 
 int main(int argc, char **argv)
 	{
-		try{if(std::stoi(argv[1])==1){verbose=false;};}
-		catch (...){verbose=false;}
+		// try{if(std::stoi(argv[1])==1){verbose=false;};}
+		// catch (...){verbose=false;}
 
+		try{
+		  N=std::stoi(argv[1]);
+		  resolucion = std::stoi(argv[2]);
+		  if(resolucion!=10 && resolucion!=50 && resolucion!=100 && resolucion!=200){
+		    resolucion=50;
+		  }
+		  fprintf(stderr,"Agentes: %i resolución: %i\n", N, resolucion);
+		}
+		catch(...){
+		  N=1000;
+		  resolucion=50;
+		  fprintf(stderr,"Agentes: %i resolución: %i\n", N, resolucion);
+		}
 		
 
-    omp_set_num_threads(num_threads); // Set the number of threads
+		//omp_set_num_threads(num_threads); // Set the number of threads
 
 
 
@@ -110,12 +123,15 @@ int main(int argc, char **argv)
 		Madyacencia_sp=M_PlaceHolder;
 		Usables_vec = arma::conv_to<arma::ivec>::from(Usables);
 		PosicionNodos_0=load_csv_arma("./Environment/Nodos_finales/nodos"+std::to_string(resolucion) +".csv");
+
+		
 		std::cout<<"Carga del mapa completada, inicializando angetes\n";
 		
 		// Madyacencia_sp.print();
 		init_personas_activities(t_spawn, cap_basura, t_actividad, vel, verbose,Madyacencia_sp,Usables_vec,PosicionNodos_0); 
 		std::cout<<"\n";
-			
+
+		
 		sf::Font font;
 		if (!font.loadFromFile("fonts/ethnocentric rg.otf"))
 			{throw std::logic_error("La fuente no fue encontrada\n");}
@@ -216,7 +232,7 @@ void physics()
 	{	
 
 
-    omp_set_num_threads(num_threads); // Set the number of threads
+	  //omp_set_num_threads(num_threads); // Set the number of threads
 		sf::Time elapsed; // Se tiene en cuenta el tiempo de procesamiento  
 		int N = Personas.size();
 
@@ -286,7 +302,7 @@ void physics()
 					{
 						std::chrono::duration<double> diff = end - start;
 						time = diff.count();
-						fprintf(fp,"%i %f ",threads, time);	
+						fprintf(fp,"%i %.15e ",threads, time);	
 					}
 				else if(total <41 )
 					{
@@ -300,7 +316,7 @@ void physics()
 
 void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, double vel, bool verbose, arma::sp_mat & Mapa, arma::ivec & Usables,arma::mat PosicionNodos )
 	{	
-		omp_set_num_threads(num_threads);
+	  //omp_set_num_threads(num_threads);
 		std::cout<<"Entra a la funcion\n";
 		int N=Personas.size();
 		int nodo_inicio;
@@ -351,7 +367,7 @@ void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, 
 		std::chrono::duration<double> diff = end - start;
 		time = diff.count();
 		//times<<time<<" ";
-		fprintf(fp,"%i %f\n", threads, time);
+		fprintf(fp,"%i %.15e\n", threads, time);
 		fclose(fp);
 		return;
 	}

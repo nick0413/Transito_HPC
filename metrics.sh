@@ -1,14 +1,38 @@
 #!/bin/bash
 
+N=500
+RESOLUCIONES=(50 100)
+THREADS=(1 2 3 4 5 6 7)
+TIMEOUT=35 #segundos
+REPETICIONES=(1 2 3)
+
+# files
+PHYSICS=physics
+INIT=inits
+
 rm ./metrics/*.txt
 
-for j in {1..2}
+for res in ${RESOLUCIONES[@]}
 do
-    if (( $j > 1 )); then
-    rm ./metrics/physics.txt
+    
+    if (( $res >= 100 )); then
+	    TIMEOUT=420
     fi
-    echo "j $j"
-    for i in {5..6}
-    do  export OMP_NUM_THREADS=$i ;timeout 20  ./Dispersion_social.out >/dev/null
+    
+    for rep in ${REPETICIONES[@]}
+    do
+	if (( $rep > 1 )); then
+	    rm ./metrics/$PHYSICS.txt
+	fi
+	
+	for thr in ${THREADS[@]}
+	do
+	    echo "res: $res, rep: $rep, thr: $thr"
+	    export OMP_NUM_THREADS=$thr ;timeout $TIMEOUT ./Dispersion_social.out $N $res >/dev/null
+         
+	done
+	
     done
+    mv "./metrics/$PHYSICS.txt" "./metrics/$PHYSICS-$res.txt"
+    mv "./metrics/$INIT.txt" "./metrics/$INIT-$res.txt"
 done

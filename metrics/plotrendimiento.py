@@ -1,28 +1,28 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-Act=[]#cargar los datos de tiempos en esta lista
-Actsu=[]#aca se guardan los speedups
-Actef=[]#aca se guardan las eficiencias
-N =np.loadtxt("./physics.txt", usecols=[0], unpack=True)
-a=np.loadtxt("./physics.txt")
-maxcol=len(a[1])
-maxrows=len(a)
-total=0
-#print(N[-1])
+Act = [] #cargar los datos de tiempos en esta lista
+Actsu = [] #aca se guardan los speedups
+Actef = [] #aca se guardan las eficiencias
+N = np.loadtxt("./physics.txt", usecols=[0], unpack=True)
+a = np.loadtxt("./physics.txt")
+maxcol = len(a[1])
+maxrows = len(a)
+total = 0
+# print(N[-1])
 for i in range(int(maxcol/2)):
-    Act1=np.loadtxt("./physics.txt", usecols=[2*i+1], unpack=True)
+    Act1 = np.loadtxt("./physics.txt", usecols=[2*i+1], unpack=True)
     Act.append(Act1)
-    total=total+Act1
-    #print(total)
-    #print(Act[i])
-    Acts=Act[i][0]/Act[i]
+    total = total+Act1
+    # print(total)
+    # print(Act[i])
+    Acts = Act[i][0]/Act[i]
     Actsu.append(Acts)
-    #print(Actsu[i])
-#calcular promedio por num threads
+    # print(Actsu[i])
+# calcular promedio por num threads
 
-total=total/maxrows
-totalsu=total[0]/total
+total = total/maxrows
+totalsu = total[0]/total
 
 
 
@@ -39,11 +39,11 @@ for i in range(int(maxcol/2)):
 #plt.savefig('speedup.pdf')
 #plt.show()
 """
-limiteef=np.ones(len(N))*0.6
+limiteef = np.ones(len(N))*0.6
 plt.figure()
-plt.plot(N,totalsu,'xr-',N,N)
+plt.plot(N, totalsu, 'xr-', N, N)
 plt.title('Physics speedup')
-plt.legend(['Mean','theoric'])
+plt.legend(['Mean', 'theoric'])
 plt.grid(linestyle='--', linewidth=0.3)
 plt.savefig('physics_speedup2.pdf')
 #plt.show()
@@ -59,9 +59,9 @@ plt.grid(linestyle='--', linewidth=0.3)
 plt.savefig('physics_efficiency2.pdf')
 #plt.show()
 
-b=np.loadtxt("./inits.txt")
-maxcol2=len(b[1])
-maxrows2=len(b)
+b = np.loadtxt("./inits.txt")
+maxcol2 = len(b[1])
+maxrows2 = len(b)
 
 N2, inits =np.loadtxt("./inits.txt", usecols=[0, 1], unpack=True)
 inittotal=np.zeros(len(N))

@@ -37,7 +37,7 @@ windows_compile2 :
 
 linux :
 	rm -f ./metrics/*.txt
-	g++ -c $(MAIN_CPP) -fopenmp -O3
+	g++ -c $(MAIN_CPP) -fopenmp -Ofast
 	g++ $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo -fopenmp
 	echo "OMP_NUM_THREADS=$(NUM_THR) ./$(MAIN_OUT)"
 
