@@ -66,6 +66,7 @@ arma::ivec Ruta_imagen(int start, int end, arma::ivec & Usables, arma::sp_mat & 
 		// std::cout<<"termino los llamados---\n";
 		// std::cout<<Usables.size()<<"\n";
 		// std::cout<<Mapa.size()<<"\n";
+		// std::cout<<"\n";
 		if (start>Usables.size() || end>Usables.size())
 			{
 				std::cout<<start<<"->" <<end<<" Este es un mapa mas pequeño, cambiar start-end\n";
@@ -79,7 +80,7 @@ arma::ivec Ruta_imagen(int start, int end, arma::ivec & Usables, arma::sp_mat & 
 			{
 				if(verbose)std::cout<<end<<" No es un nodo accesible"; 
 				end=next_node(Usables,end);
-				if(verbose)std::cout<<", Se usara "<<end; 
+				if(verbose)std::cout<<", Se usara "<<end<<"\n"; 
 			}
 		if(Usables(start)==1)
 			{if(verbose)std::cout<<"Si start\n";}
@@ -90,7 +91,7 @@ arma::ivec Ruta_imagen(int start, int end, arma::ivec & Usables, arma::sp_mat & 
 				if(verbose)std::cout<<", Se usara "<< start<<"\n"; 
 			}
 		
-		
+		// std::cout<<"dijkstra usa "<<start<<" "<<end<<"\n";
 		arma:: ivec Ruta1=dijkstra_arma_sp(Mapa,start,end);
 
 		//Ruta1.print();
@@ -185,6 +186,7 @@ void matriz_adyacencia(std::vector<float>& mat, int filas,int n,bool progress=fa
 		// ; filas es la cantidad de filas/columnas que tiene la matriz de adyacencia, es decir n^2.
 		fill_zero(mat,filas*filas);
 		int indice=0;
+		int indice_inverso=0;
 		int nn=n*n;
 
 		for(int ii=0; ii<filas;ii++)
@@ -192,6 +194,7 @@ void matriz_adyacencia(std::vector<float>& mat, int filas,int n,bool progress=fa
 				for(int jj=0;jj<filas;jj++)
 					{
 						indice=ii*nn+jj;
+						// indice_inverso=jj*nn+ii;
 						
 						if((ii-n==jj-1 && (jj%n)!=0))
 							{mat[indice]=1.41;};
@@ -249,9 +252,9 @@ void Acceso(arma::mat imagen, std::vector<float>& Madyacencia, int n_filas,std::
 					{
 						element=ii*numRows+jj;
 						if(imagen(ii,jj)==0)
-							{
-								
-								// fill_row(Madyacencia,element,n_filas,9999);
+							{	
+								// std::cout<<imagen(ii,jj)<<"\n";
+								// if(element==2869)std::cout<<imagen(ii,jj)<<"????\n";
 								fill_row(Madyacencia,n_cols,element,0);
 								fill_col(Madyacencia,n_filas,element,0);
 								Usables[element]=0;
@@ -266,6 +269,9 @@ void Acceso(arma::mat imagen, std::vector<float>& Madyacencia, int n_filas,std::
 						// std::cout<<imagen(ii,jj)<<"\t||"<<ii<<"\t"<<jj<<"\t"<<element<<"\t"<<Usables[element]<<"\n";
 					}
 			}
+
+		// std::cout<<"Acceso\n";
+		// print_connections(Ma_sp2,2868);
 
 
 		int indice=0;

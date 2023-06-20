@@ -1,5 +1,12 @@
 #include <armadillo>
-
+void print_connections(arma::sp_mat Mapa, int node)
+	{
+		for(int ii=0; ii<Mapa.n_cols;ii++)
+			{
+				if(Mapa(node,ii)!=0)
+					{std::cout<<node<<"\t"<<ii<<"\t"<<Mapa(node,ii)<<"\n";}
+			}
+	}
 
 void fill_arma(arma::vec & vec, double value)
 	{
@@ -64,6 +71,9 @@ arma::ivec dijkstra_arma(arma::mat Mapa, int source,int target)
 		arma:: ivec prev(n);
 		arma::vec dist(n);
 		bool visited[n];
+		bool verbose=false;
+		if(source==2965 ||target==2829)
+			{verbose=true;std::cout<<"\n";}
 		for(int rr=0;rr<n;rr++)
 			{visited[rr]=false;}
 		fill_arma(dist,9999);
@@ -72,7 +82,8 @@ arma::ivec dijkstra_arma(arma::mat Mapa, int source,int target)
 		prev(source)=-1;
 
 		for(int gg=0; gg<n-1;gg++)
-			{
+			{	
+				if(verbose)std::cout<<gg<<"\t"<<n-1<<"\n";
 				int u= getMin_arma(dist,visited,n);
 				visited[u]=true;
 
@@ -96,39 +107,56 @@ arma::ivec dijkstra_arma(arma::mat Mapa, int source,int target)
 	}
 
 
+
+
 arma::ivec dijkstra_arma_sp(arma::sp_mat Mapa, int source,int target)
 	{	
 		int n=Mapa.n_rows;
 		arma:: ivec prev(n);
 		arma::vec dist(n);
 		bool visited[n];
+		bool verbose=true;
+		int next=0;
 		for(int rr=0;rr<n;rr++)
 			{visited[rr]=false;}
 		fill_arma(dist,9999);
 
 		dist(source)=0;
-		prev(source)=-1;
 
-		for(int gg=0; gg<n-1;gg++)
+		// print_connections(Mapa,2868);
+		prev(source)=-1;
+		int gg=0;
+		for(; gg<n-1;gg++)
 			{
-				int u= getMin_arma(dist,visited,n);
+				// if(verbose)std::cout<<gg<<"\t"<<n-1<<"\n";
+				int u= getMin_arma(dist,visited,n); // Get the closest unvisited node
 				visited[u]=true;
 
 				for(int v = 0; v<n;v++)	
 					{	
 						if(Mapa(u,v)!=0)
-							{
+							{	
+								// std::cout<<"\t"<<visited[v]<<" "<<dist(u)<<"\t"<<Mapa(u,v)<<"\t"<<dist(v)<<"\t------------\n";
+								//  std::cout<<u<<"\t"<<v<<"\t"<<Mapa(u,v)<<"\n";
+								// if(dist(u)!=9999)std::cout<<visited[v]<<" "<<dist(u)<<"\t"<<Mapa(u,v)<<"\t"<<dist(v)<<"\t------------\n";
+								// if(u==next || v==next)std::cout<<dist(next)<<" "<< Mapa(u,v)<<" "<<(dist(u)+Mapa(u,v))<<" "<<dist(v)<<"\n";
 								if(!visited[v] && (dist(u)+Mapa(u,v))< dist(v))
 									{
 										prev(v)=u;						
 										dist(v)=dist(u)+Mapa(u,v);
+										// std::cout<<dist(v)<<" En nodo "<<v<<"\n";
+										next=v;
 									}
 							}
 
 					}
 			}
+		// std::cout<<gg<<" "<<n-1 <<"final Dijkstra\n";
+		// if(gg==n-1){std::cout<<"finalized search\n";}
 		prev(source)=-1;
 				
 		arma::ivec path = reverse(path_find(prev,source,target));
 		return path;
 	}
+
+
