@@ -46,7 +46,9 @@ double dt_Global;
 double t_Global;
 sf::Clock ClockPhysics;
 sf::Time TimeUpdatePhysics = sf::milliseconds(1); // milliseconds (Int32) or microseconds (Int64)
-
+arma::mat Entradas_Uni=load_csv_arma("./Environment/Edificios/50.csv");
+std::uniform_int_distribution<int> Seleccion_Entrada(0,Entradas_Uni.n_rows-1);
+std::mt19937 gen_entradas(Rd()); 
 void draw_text(sf::RenderWindow & window,sf::Text text,std::string text_0, float posx, float posy)
 	{
 		text.setString(text_0);
@@ -92,10 +94,10 @@ void physics();
 
 
 int main(int argc, char **argv)
-	{
+	{	
 		// try{if(std::stoi(argv[1])==1){verbose=false;};}
 		// catch (...){verbose=false;}
-
+		
 		try{
 		  N=std::stoi(argv[1]);
 		  resolucion = std::stoi(argv[2]);
@@ -388,8 +390,8 @@ void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, 
 					{ 	
 						if(thr_id==(num_thr-1))
 							{displayProgressBar(((float)(jj-imin)/(imax-imin)));}
-					
-						nodo_inicio = Int_dist(Gen);
+						
+						nodo_inicio = Entradas_Uni(Seleccion_Entrada(gen_entradas),2);
 						nodo_destino = Int_dist(Gen); 
 						rand_rol = Real_dist(Gen);
 						rand_type_actv = Real_dist(Gen);

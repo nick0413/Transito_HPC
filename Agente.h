@@ -81,7 +81,6 @@ class Agente_Universitario
 			void asignar_pos_nodo(double pos_nodo){Pos_nodo=pos_nodo;};
 			void asignar_pos_arista(double pos_arista){Pos_arista=pos_arista;};
 			void asignar_ruta(int simulationTime,int nodo_i,int nodo_f);
-			void hacer_actividad(double t,double dt);
 			arma::sp_mat getMapa(void){return Mapa;};  
 			arma::mat getPosicionNodos(void){return PosicionNodos;};
 			void hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad);
@@ -99,7 +98,7 @@ bool Agente_Universitario::Alive(float prob_alive,int t)
 	{	
 		bool alive=false;
 
-		double prob_salir=gaussian(secondsToHours(t),5,2);
+		double prob_salir=gaussian(secondsToHours(t),9,2);
 		if(prob_alive<prob_salir)
 			{alive=true;}
 
@@ -588,7 +587,7 @@ void Agente_Universitario::asignar_ruta(int simulationTime, int nodo_i,int nodo_
 void Agente_Universitario::hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad)
 	{
 		tactividad+=dt;
-		double tmax_actividad = 200;
+		double tmax_actividad = 2*3600;
 		double trestante =  tmax_actividad-tactividad;
 		nodo_i=Nodo_in_route();
 
