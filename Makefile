@@ -13,8 +13,7 @@ MAIN_exe=$(MAIN).exe
 windows : windows_compile windows_run
 
 windows_run :
-	$(MAIN).exe
-	  
+	$(MAIN).exe	  
 
 windows_compile :
 	g++ -Isrc/include -c .\$(MAIN).cpp -fopenmp 
@@ -41,6 +40,11 @@ linux :
 	g++ -c $(MAIN_CPP) -fopenmp -Ofast
 	g++ $(MAIN).o -o $(MAIN_OUT) -lsfml-graphics -lsfml-window -lsfml-system -larmadillo -fopenmp
 	echo "OMP_NUM_THREADS=$(NUM_THR) ./$(MAIN_OUT)"
+
+.PHONY : metrics
+
+metrics :
+	sh ./metrics/metrics_figures.sh	
 
 .PHONY : clean
 clean : 
