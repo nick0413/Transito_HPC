@@ -18,11 +18,11 @@
 #include "Agente.h"
 #include "Tools.h"
 
-int N=1;
+int N=1000;
 int resolucion=50; // 10, 50 , 100, 200
 float scale=0.2;//200/resolucion;
 bool verbose=false;
-int num_threads = 1; // Specify the desired number of threads
+int num_threads = 6; // Specify the desired number of threads
 int alive=0;
 float ratio=(float)1000/resolucion;
 
@@ -98,7 +98,7 @@ int main(int argc, char **argv)
 		arma::mat imagen= load_imagen(resolucion);
 		int n=imagen.n_cols;
 		int nn=n*n;
-		std::cout<<"Resolucion: "<<resolucion<<"pixeles \t"<<nn*nn<<" nodos\n";
+		std::cout<<"Resolucion: "<<resolucion<<"pixeles \t"<<nn*nn<<" nodos y poblacion maxima"<<N<<"\n";
 		std::vector<float> Madyacencia(nn*nn);	
 		std::vector<int> Usables(nn);
 		matriz_adyacencia(Madyacencia,nn,n);
@@ -262,7 +262,7 @@ void physics()
 							{ 	
 								//std::cout<<jj<<std::endl;
 								if(Personas[jj].EnRuta())
-									{Personas[jj].Avanzar(Madyacencia_sp,dt_Global,true);}
+									{Personas[jj].Avanzar(Madyacencia_sp,dt_Global,false);}
 
 								if(Personas[jj].EnActividad())
 									{

@@ -419,7 +419,6 @@ void Agente_Universitario::Avanzar(arma::sp_mat Madyacencia, double dt, bool ver
 			std::cout<<"arista actual: "<<Pos_arista<<"\tEntre nodos:" <<Pos_nodo<<"->"<<Ruta(idx(0)+1)<<"\n"; 
 			}
 
-
 }
 
 int Agente_Universitario::Nodo(void)
