@@ -38,6 +38,7 @@ std::random_device Rd;
 std::mt19937 Gen(68); // gen(Rd()) 
 std::uniform_real_distribution<double> Real_dist(0.0,1.0);
 std::uniform_int_distribution<int> Int_dist(0,resolucion*resolucion-1); 
+std::uniform_int_distribution<int> ratio_dist(-ratio*0.5,ratio*0.5); 
 arma::sp_mat Madyacencia_sp;
 arma::ivec Usables_vec;
 arma::mat PosicionNodos_0;
@@ -102,7 +103,9 @@ int main(int argc, char **argv)
 		//   if(resolucion!=10 && resolucion!=50 && resolucion!=100 && resolucion!=200){
 		//     resolucion=50;
 		//   }
-		//   fprintf(stderr,"Agentes: %i resolución: %i\n", N, resolucion);
+
+		//   fprintf(stderr,"Agentes: %i resolucion: %i\n", N, resolucion);
+
 		// }
 		// catch(...){
 		//   N=100;
@@ -112,8 +115,9 @@ int main(int argc, char **argv)
 		
 
 		//omp_set_num_threads(num_threads); // Set the number of threads
+		sf::Clock clock;
 
-
+		ratio=(float)1000/resolucion;
 
 		Tools tools;
 
@@ -172,14 +176,15 @@ int main(int argc, char **argv)
 
 		sf::Text text1;
 		text1.setFont(font);
-    text1.setCharacterSize(20);
-    text1.setFillColor(sf::Color::Black);
+    	text1.setCharacterSize(20);
+    	text1.setFillColor(sf::Color::Black);
 		sf::Text text2;
 		text2.setFont(font);
-    text2.setCharacterSize(20);
-    text2.setFillColor(sf::Color::Black);	
+    	text2.setCharacterSize(18);
+    	text2.setFillColor(sf::Color::Black);	
 
-		float UI_size_x=500;float UI_size_y=90;
+
+		float UI_size_x=550;float UI_size_y=90;
 		sf::RectangleShape UI(sf::Vector2f(UI_size_x, UI_size_y));
 		UI.setOutlineThickness(2.f);
  		UI.setOutlineColor(sf::Color::Black);
@@ -238,10 +243,16 @@ int main(int argc, char **argv)
 							       					
 				}
 
+				auto elapsed = clock.getElapsedTime().asSeconds();
+				// std::cout<<elapsed<<"\n";
+				// Convert elapsed time to minutes and seconds
+				int minutes = static_cast<int>(elapsed) / 60;
+				float seconds = elapsed-(float)60*minutes;
 				
 				draw_box(window,UI,10,10,color1);
 				draw_text(window,text1,"Agentes en la simulacion:"+std::to_string(alive),20,20);
-				draw_text(window,text1,"Tiempo: "+std::to_string(int(t_Global)),20,50);
+				draw_text(window,text2,"Tiempo: "+std::to_string(int(t_Global)),20,50);
+				draw_text(window,text2,"Tiempo real: "+std::to_string(minutes)+"m"+to_string_with_one_decimal(seconds)+"s",230,50);
 				if(alive==0){std::cout<<"Todos murieron\n";}
 				// std::cout<<"- ";
 
@@ -325,7 +336,7 @@ void physics()
 										// std::cout<<jj<<"\n";
 									}
 								
-								Personas[jj].basura(basura_heatmap,PosicionNodos_0,Real_dist(Gen),dt_Global,ratio);
+								Personas[jj].basura(basura_heatmap,PosicionNodos_0,Real_dist(Gen),dt_Global,ratio,ratio_dist(Gen),ratio_dist(Gen));
 								// fprintf(stderr,"Rol: %i, Cap act basura %f\n",Personas[jj].getRol(),Personas[jj].getBasuraActual());
 						
 							}
