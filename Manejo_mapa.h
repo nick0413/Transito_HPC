@@ -11,6 +11,26 @@ std::ofstream salida;
 std::ofstream usab;
 
 //void fill_row(std::vector<float>& mat, int cols, int fila, float val)
+std::string to_string_with_one_decimal(float value)
+{
+    // Convert the float to a string using std::to_string
+    std::string str = std::to_string(value);
+
+    // Find the position of the decimal point
+    size_t decimalPos = str.find('.');
+
+    if (decimalPos != std::string::npos)
+    {
+        // Check if there is more than one decimal digit
+        if (str.size() - decimalPos > 2)
+        {
+            // Erase all digits after the first decimal digit
+            str.erase(decimalPos + 2);
+        }
+    }
+
+    return str;
+}
 float secondsToHours(float seconds) {
     float hours = seconds / 3600.0;  // Divide seconds by the number of seconds in an hour (3600)
     return hours;
