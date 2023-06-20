@@ -33,8 +33,8 @@ class Agente_Universitario
 			arma::ivec Ruta;
 			sf::Sprite sprite;
 			sf::Texture texture;
+			int Nodo_base;
 			double Pos_nodo;
-			double Nodo_base;
 			double Pos_arista;
 			double Vel;
 			float scale;
@@ -54,7 +54,8 @@ class Agente_Universitario
 		
 		public:
 			void inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
-					int posicion0,int destino0, double velocidad0, double t,bool verbose, arma::sp_mat  Mapa_0,arma::ivec  Usables_0,arma::mat PosicionNodos_0);
+    						int posicion0,int destino0, double velocidad0, double t,bool verbose0, arma::sp_mat  Mapa_0,
+							arma::ivec  Usables_0,arma::mat PosicionNodos_0, float prob_alive);
 			void asignar_rol(double prob_rol, double prob_actv_academica);
 			void Actividad(double prob_tipo_actividad,double t);
 			std::tuple<double, double, double> prob_actividad_est(double spawn_time, double t);
@@ -85,6 +86,8 @@ class Agente_Universitario
 			arma::mat getPosicionNodos(void){return PosicionNodos;};
 			void hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad);
 			void basura(arma::mat & Basura,arma::mat PosNodos, float drop, float dt,float ratio);
+			bool Alive(float prob_alive,int t);
+			bool Is_Alive(void){return vivo;};
 
 			// Basura
 			void setBasuraActual(float basura_fixed);
@@ -92,12 +95,24 @@ class Agente_Universitario
 	
 	};
 
+bool Agente_Universitario::Alive(float prob_alive,int t)
+	{	
+		bool alive=false;
 
+		double prob_salir=gaussian(secondsToHours(t),5,2);
+		if(prob_alive<prob_salir)
+			{alive=true;}
+
+		return true;
+	}
 void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_actividad, double prob_actv_academica, int t_spawn,  float cap_basura, float t_actividad,
-    int posicion0,int destino0, double velocidad0, double t,bool verbose0, arma::sp_mat  Mapa_0,arma::ivec  Usables_0,arma::mat PosicionNodos_0)
+    int posicion0,int destino0, double velocidad0, double t,bool verbose0, arma::sp_mat  Mapa_0,arma::ivec  Usables_0,arma::mat PosicionNodos_0, float prob_alive)
 	{
+		vivo=Alive(prob_alive,t);
+		std::cout<<vivo<<"\n";
 		asignar_rol(rand_rol_un,prob_actv_academica);
 		Actividad(prob_tipo_actividad,t);
+		
 		spawn_time = t_spawn;
 		capacidad_basura = cap_basura;
 		tiempo_actividad = t_actividad;
@@ -184,8 +199,7 @@ void Agente_Universitario::asignar_rol(double prob_rol, double prob_actv_academi
 	9 clase veterinaria
 	10 clase agrarias 
 	11 clase enfermeria
-	12 clase odontologia
-                    
+	12 clase odontologia             
       */
       if(0<prob_actv_academica && prob_actv_academica<=0.24)
 	  {
@@ -285,17 +299,14 @@ void Agente_Universitario::Actividad(double prob_tipo_actividad,double t)
 							
 								
 						
-				if(0<prob_tipo_actividad && prob_tipo_actividad<=P_a){
-				actividad = 1; //actividad academica
-				}
+				if(0<prob_tipo_actividad && prob_tipo_actividad<=P_a)//actividad academica
+					{actividad = 1; }
 							
-				else if(P_a<prob_tipo_actividad && prob_tipo_actividad<=(P_a+P_o)){
-				actividad = 2; //ocio o comer
-				}
+				else if(P_a<prob_tipo_actividad && prob_tipo_actividad<=(P_a+P_o))//ocio o comer
+					{actividad = 2;}
 
-				else{
-				actividad=0; //irse de la universidad
-				}
+				else//irse de la universidad
+					{actividad=0;}
 			}
 
 
@@ -533,7 +544,7 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat PosNodos, fl
 			}
 		else	
 			{ 
-				std::cout<<"Error en draw, no tiene actividad definida "<<en_ruta<<" "<<en_actividad<<"\n";
+				// std::cout<<"Error en draw, no tiene actividad definida "<<en_ruta<<" "<<en_actividad<<"\n";
 				if(en_actividad){std::cout<<"En actividad";};			
 			}
 
@@ -548,29 +559,19 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat PosNodos, fl
 
 void Agente_Universitario::asignar_ruta(int simulationTime, int nodo_i,int nodo_f) 
 	{
-		
-		// Check if it's the first assignment
-		bool isFirstAssignment = (simulationTime == spawn_time);
-		// Actividad = 0 -> Irse /// Actividad = 1 -> actv academica /// Actividad = 2 -> ocio o comer
-		// Check if the activity is leisure
-		bool isLeisureActivity = (actividad == 2);
 
-
-			// Assign a route based on different conditions
 			if (rol == 1 || rol == 2)//si es profesor o admin solo recibe ruta si es la inicializacion o si es actividad de ocio
 				{ 
-					if (isLeisureActivity) 
+					if (actividad == 2) 
 						{	
-							// std::cout<<"Actividad ocio "<<actividad <<std::endl; 
-							// Calculate the route using ruta_imagen function
 							Ruta = Ruta_imagen(nodo_i,nodo_f,Usables,Mapa);
 							en_ruta=true;
 							en_actividad=false;
 						}
 					else
 						{   
-							// std::cout<<"entra en el else"<<std::endl;
-							en_ruta=false; //Profesores y administrativos solo cambian de locacion para comer/ocio
+
+							en_ruta=false;
 							en_actividad=true;
 						}
 				}
@@ -587,7 +588,7 @@ void Agente_Universitario::asignar_ruta(int simulationTime, int nodo_i,int nodo_
 void Agente_Universitario::hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad)
 	{
 		tactividad+=dt;
-		double tmax_actividad = 50;
+		double tmax_actividad = 200;
 		double trestante =  tmax_actividad-tactividad;
 		nodo_i=Nodo_in_route();
 
@@ -606,12 +607,13 @@ void Agente_Universitario::hacer_actividad(double t,double dt,int nodo_i,int nod
 					}
 				if(actividad==0)
 					{
-
+						en_ruta=true;
+						en_actividad=false;
+						asignar_ruta(t,nodo_i, Nodo_base);
 					}
 				
 
 			} 
-		setBasuraActual(2.0);
 
 	}
 

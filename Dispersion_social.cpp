@@ -345,6 +345,7 @@ void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, 
 		double rand_type_actv;
 		double rand_actv_acad;
 		double time;
+		double prob=0;
 		FILE *fp;
 		fp = fopen("./metrics/inits.txt","a");
 		int threads=0;
@@ -377,9 +378,10 @@ void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, 
 						rand_rol = Real_dist(Gen);
 						rand_type_actv = Real_dist(Gen);
 						rand_actv_acad = Real_dist(Gen);
+						prob=Real_dist(Gen);
 						// std::cout<<"310\n";
 						Personas[jj].inicializar(rand_rol,rand_type_actv,rand_actv_acad,t_spawn,cap_basura,t_actividad,
-									nodo_inicio,nodo_destino,vel,t_Global,false,Mapa,Usables_vec,PosicionNodos);
+									nodo_inicio,nodo_destino,vel,t_Global,false,Mapa,Usables_vec,PosicionNodos,prob);
 									
 					}
 			}
