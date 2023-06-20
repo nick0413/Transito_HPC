@@ -85,7 +85,7 @@ class Agente_Universitario
 			arma::sp_mat getMapa(void){return Mapa;};  
 			arma::mat getPosicionNodos(void){return PosicionNodos;};
 			void hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad);
-			void basura(arma::mat & Basura,arma::mat PosNodos, float drop, float dt,float ratio);
+			void basura(arma::mat & Basura,arma::mat PosNodos, float drop, float dt,float ratio,int rx,int ry);
 			bool Alive(float prob_alive,int t);
 			bool Is_Alive(void){return vivo;};
 
@@ -138,11 +138,11 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
 		drop_prob=0.05;
 		
 		if(rol==0)
-			{delta_produccion_basura=0.1;}
+			{delta_produccion_basura=0.01;}
 		else if(rol==1)
-			{delta_produccion_basura=0.05;}
+			{delta_produccion_basura=0.005;}
 		else
-			{delta_produccion_basura=0.025;}
+			{delta_produccion_basura=0.0025;}
   
 }
 
@@ -551,7 +551,7 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat PosNodos, fl
 
 
 						
-		sprite.setPosition(sf::Vector2f(pos_y+50*s,pos_x+50*s));
+		sprite.setPosition(sf::Vector2f(pos_y+ratio,pos_x+ratio));
 		window.draw(sprite);
 	}
 
@@ -617,15 +617,20 @@ void Agente_Universitario::hacer_actividad(double t,double dt,int nodo_i,int nod
 
 	}
 
-void Agente_Universitario::basura(arma::mat & Basura,arma::mat PosNodos, float drop, float dt,float ratio)
+void Agente_Universitario::basura(arma::mat & Basura,arma::mat PosNodos, float drop, float dt,float ratio,int rx,int ry)
 	{	
 		basura_actual+=delta_produccion_basura*dt;
-
+		int basura_size=Basura.n_cols;
 		if(basura_actual>=capacidad_basura || drop<drop_prob)
 			{
 				arma::vec pos=getAgentPosition(PosNodos,ratio,false);
-				int pos_x=int(pos(0));
-				int pos_y=int(pos(1));
+				int pos_x=int(pos(0)+ratio+rx);
+				int pos_y=int(pos(1)+ratio+ry);
+				if(pos_x>=basura_size)
+					{pos_x=basura_size-1;}
+				if(pos_y>=basura_size)
+					{pos_y=basura_size-1;}
+
 				Basura(pos_x,pos_y)+=basura_actual;
 				basura_actual=0;
 			}

@@ -16,7 +16,7 @@ windows_run :
 	$(MAIN).exe	  
 
 windows_compile :
-	g++ -Isrc/include -c .\$(MAIN).cpp -fopenmp 
+	g++ -Isrc/include -c .\$(MAIN).cpp -fopenmp -O
 	g++ .\$(MAIN).o -o $(MAIN) -Lsrc/lib -lsfml-graphics -lsfml-window -lsfml-system -lblas -fopenmp
 
 .PHONY : windows2

@@ -63,7 +63,9 @@ arma::ivec dijkstra_arma(arma::mat Mapa, int source,int target)
 		int n=Mapa.n_rows;
 		arma:: ivec prev(n);
 		arma::vec dist(n);
-		bool visited[n] ={0};
+		bool visited[n];
+		for(int rr=0;rr<n;rr++)
+			{visited[rr]=false;}
 		fill_arma(dist,9999);
 
 		dist(source)=0;
@@ -99,7 +101,9 @@ arma::ivec dijkstra_arma_sp(arma::sp_mat Mapa, int source,int target)
 		int n=Mapa.n_rows;
 		arma:: ivec prev(n);
 		arma::vec dist(n);
-		bool visited[n] ={0};
+		bool visited[n];
+		for(int rr=0;rr<n;rr++)
+			{visited[rr]=false;}
 		fill_arma(dist,9999);
 
 		dist(source)=0;
