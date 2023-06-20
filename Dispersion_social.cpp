@@ -18,7 +18,7 @@
 #include "Agente.h"
 #include "Tools.h"
 
-int N=1000;
+int N=100;
 int resolucion=100; // 10, 50 , 100, 200
 float scale=0.2;//200/resolucion;
 bool verbose=false;
@@ -281,7 +281,7 @@ void physics()
 	{	
 
 
-	  	omp_set_num_threads(num_threads); // Set the number of threads
+	  //omp_set_num_threads(num_threads); // Set the number of threads
 		sf::Time elapsed; // Se tiene en cuenta el tiempo de procesamiento  
 		int N = Personas.size();
 
@@ -367,7 +367,7 @@ void physics()
 
 void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, double vel, bool verbose, arma::sp_mat & Mapa, arma::ivec & Usables,arma::mat PosicionNodos )
 	{	
-	  	omp_set_num_threads(num_threads);
+	  //omp_set_num_threads(num_threads);
 		// std::cout<<"Entra a la funcion\n";
 		int N=Personas.size();
 		int nodo_inicio;
