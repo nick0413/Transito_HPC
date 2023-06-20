@@ -109,7 +109,7 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
     int posicion0,int destino0, double velocidad0, double t,bool verbose0, arma::sp_mat  Mapa_0,arma::ivec  Usables_0,arma::mat PosicionNodos_0, float prob_alive)
 	{
 		vivo=Alive(prob_alive,t);
-		std::cout<<vivo<<"\n";
+		// std::cout<<vivo<<"\n";
 		asignar_rol(rand_rol_un,prob_actv_academica);
 		Actividad(prob_tipo_actividad,t);
 		

@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 		  fprintf(stderr,"Agentes: %i resolución: %i\n", N, resolucion);
 		}
 		catch(...){
-		  N=1000;
+		  N=100;
 		  resolucion=50;
 		  fprintf(stderr,"Agentes: %i resolución: %i\n", N, resolucion);
 		}
