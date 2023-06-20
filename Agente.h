@@ -27,7 +27,6 @@ class Agente_Universitario
 			int facultad;
 			int spawn_time;
 
-			float basura_actula;
 			float tiempo_actividad;
 			bool en_actividad;
 			bool en_ruta;
@@ -50,6 +49,7 @@ class Agente_Universitario
 			float capacidad_basura; // kg/kg Normalizado
 			float delta_produccion_basura; // kg/kg*s Normalizado
 			float basura_actual; // kg/kg Normalizado
+			float drop_prob;
 
 		
 		public:
@@ -84,9 +84,10 @@ class Agente_Universitario
 			arma::sp_mat getMapa(void){return Mapa;};  
 			arma::mat getPosicionNodos(void){return PosicionNodos;};
 			void hacer_actividad(double t,double dt,int nodo_i,int nodo_f,double prob_tipo_actividad);
+			void basura(arma::mat & Basura,arma::mat PosNodos, float drop, float dt,float ratio);
 
 			// Basura
-			bool setBasuraActual(float);
+			void setBasuraActual(float basura_fixed);
 			float getBasuraActual(void);
 	
 	};
@@ -118,14 +119,15 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
 		sprite.setOrigin(spriteBounds.width / 2.f, spriteBounds.height / 2.f);
 
 		// inicialización de la basura
-		this->basura_actual=0.0;
+		basura_actual=0.0;
+		drop_prob=0.05;
 		
 		if(rol==0)
-			{this->delta_produccion_basura=0.1;}
+			{delta_produccion_basura=0.1;}
 		else if(rol==1)
-			{this->delta_produccion_basura=0.05;}
+			{delta_produccion_basura=0.05;}
 		else
-			{this->delta_produccion_basura=0.025;}
+			{delta_produccion_basura=0.025;}
   
 }
 
@@ -613,26 +615,23 @@ void Agente_Universitario::hacer_actividad(double t,double dt,int nodo_i,int nod
 
 	}
 
+void Agente_Universitario::basura(arma::mat & Basura,arma::mat PosNodos, float drop, float dt,float ratio)
+	{	
+		basura_actual+=delta_produccion_basura*dt;
+
+		if(basura_actual>=capacidad_basura || drop<drop_prob)
+			{
+				arma::vec pos=getAgentPosition(PosNodos,ratio,false);
+				int pos_x=int(pos(0));
+				int pos_y=int(pos(1));
+				Basura(pos_x,pos_y)+=basura_actual;
+				basura_actual=0;
+			}
+
+	}
 
 float Agente_Universitario::getBasuraActual()
-	{return this->basura_actual;}
+	{return basura_actual;}
 
-bool Agente_Universitario::setBasuraActual(float basura_actual)
-	{
-
-		float auxBasuraActual=this->basura_actual+this->delta_produccion_basura;
-
-		if(basura_actual<=1)// Se le puede colocar un valor directo a la basura actual
-			{this->basura_actual = basura_actual;}
-		else if(auxBasuraActual<=this->capacidad_basura)
-			{
-				// Cuando el argumenro basura actual es mayor a uno, se hace ac
-				// actualización por incremento.
-				// Solo se actualiza cuando no se supera la capacidad de basura
-				this->basura_actual=auxBasuraActual;
-			}
-		else
-			{return false;}
-
-		return true;
-	}
+void Agente_Universitario::setBasuraActual(float basura_fixed)
+	{basura_actual=basura_fixed;}

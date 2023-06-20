@@ -18,7 +18,7 @@
 #include "Agente.h"
 #include "Tools.h"
 
-int N=1000;
+int N=50;
 int resolucion=50; // 10, 50 , 100, 200
 float scale=0.2;//200/resolucion;
 bool verbose=false;
@@ -41,10 +41,11 @@ std::uniform_int_distribution<int> Int_dist(0,resolucion*resolucion-1);
 arma::sp_mat Madyacencia_sp;
 arma::ivec Usables_vec;
 arma::mat PosicionNodos_0;
+arma::mat basura_heatmap = arma::zeros<arma::mat>(1000, 1000);
 double dt_Global;
 double t_Global;
 sf::Clock ClockPhysics;
-sf::Time TimeUpdatePhysics = sf::milliseconds(20); // milliseconds (Int32) or microseconds (Int64)
+sf::Time TimeUpdatePhysics = sf::milliseconds(1); // milliseconds (Int32) or microseconds (Int64)
 
 void draw_text(sf::RenderWindow & window,sf::Text text,std::string text_0, float posx, float posy)
 	{
@@ -67,7 +68,26 @@ void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, 
 void events_sfml_manager(sf::RenderWindow &window, sf::Event &event,sf::View &viewPrincipal, sf::Texture &textFondo,Tools &tools, char &opcionesDeFondo, 
 			 sf::Vector2f &viewPricipalCenter,sf::Sprite &sprFondo,sf::Texture &textFondoNodos ,float dxViewPrincipal, float dyViewPrincipal, float zoomViewPrincipal);
 
+sf::Image convertToSFMLImage( arma::mat& matrix) 
+	{
+			const size_t rows = matrix.n_rows;
+			const size_t cols = matrix.n_cols;
 
+			sf::Image image;
+			image.create(cols, rows);
+
+			for (size_t y = 0; y < rows; ++y) 
+				{
+					for (size_t x = 0; x < cols; ++x) 
+						{
+								float pixelValue = matrix(y, x);
+								sf::Color color(pixelValue*100, 0, 0,pixelValue*100);
+								image.setPixel(x, y, color);
+						}
+				}
+
+		return image;
+	}
 void physics();
 
 
@@ -93,8 +113,9 @@ int main(int argc, char **argv)
 		int t_spawn=0; //por ahora todos se crean al tiempo
 		float cap_basura=1; //ahora mismo no hace nada
 		float t_actividad=7200;
-		double vel=0.05;
+		double vel=0.005;
 
+		
 		arma::mat imagen= load_imagen(resolucion);
 		int n=imagen.n_cols;
 		int nn=n*n;
@@ -130,13 +151,19 @@ int main(int argc, char **argv)
 		sf::Vector2f viewPricipalCenter(500, 500);
 		sf::Vector2f viewPricipalSize(1000, 1000);
 		sf::View viewPrincipal(viewPricipalCenter, viewPricipalSize);
+		sf::Image heat_map_image;
+		sf::Texture heat_map;
 
 		sf::Text text1;
 		text1.setFont(font);
     text1.setCharacterSize(20);
     text1.setFillColor(sf::Color::Black);
-		
-		float UI_size_x=500;float UI_size_y=40;
+		sf::Text text2;
+		text2.setFont(font);
+    text2.setCharacterSize(20);
+    text2.setFillColor(sf::Color::Black);	
+
+		float UI_size_x=500;float UI_size_y=90;
 		sf::RectangleShape UI(sf::Vector2f(UI_size_x, UI_size_y));
 		UI.setOutlineThickness(2.f);
  		UI.setOutlineColor(sf::Color::Black);
@@ -177,6 +204,10 @@ int main(int argc, char **argv)
 
 
 				window.draw(sprFondo);
+				heat_map_image = convertToSFMLImage(basura_heatmap);
+				heat_map.loadFromImage(heat_map_image);
+				sf::Sprite heat_map_tx(heat_map);
+				window.draw(heat_map_tx);
 				alive=0;
 				for(int jj = 0; jj < N; ++jj) 
 				{	
@@ -194,6 +225,7 @@ int main(int argc, char **argv)
 				
 				draw_box(window,UI,10,10,color1);
 				draw_text(window,text1,"Agentes en la simulacion:"+std::to_string(alive),20,20);
+				draw_text(window,text1,"Tiempo: "+std::to_string(int(t_Global)),20,50);
 				if(alive==0){std::cout<<"Todos murieron\n";}
 				// std::cout<<"- ";
 
@@ -201,6 +233,8 @@ int main(int argc, char **argv)
 
 			}
 
+		basura_heatmap.save("./Environment/mats/m.csv",arma::csv_ascii);
+		heat_map_image.saveToFile("./Environment/mats/t"+std::to_string(int(t_Global))+".png");
 		threadPhysics.terminate();
 
 		return 0;
@@ -274,10 +308,12 @@ void physics()
 										Personas[jj].hacer_actividad(t_Global,dt_Global,nodo_inicio,nodo_destino,prob_actv); 
 										// std::cout<<jj<<"\n";
 									}
-
+								
+								Personas[jj].basura(basura_heatmap,PosicionNodos_0,Real_dist(Gen),dt_Global,ratio);
 								// fprintf(stderr,"Rol: %i, Cap act basura %f\n",Personas[jj].getRol(),Personas[jj].getBasuraActual());
 						
 							}
+						// basura_heatmap.save("Environment/mats/"+std::to_string(int(t_Global))+".csv", arma::csv_ascii);
 					}
 
 
