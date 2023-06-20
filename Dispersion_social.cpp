@@ -19,8 +19,8 @@
 #include "Tools.h"
 
 int N=1000;
-int resolucion=50; // 10, 50 , 100, 200
-float scale=0.2;//200/resolucion;
+int resolucion=10; // 10, 50 , 100, 200
+float scale=1;//200/resolucion;
 std::ofstream rol;
 //ofstream times;
 
@@ -31,7 +31,7 @@ std::vector<Agente_Universitario>  Personas;
 std::random_device Rd;
 std::mt19937 Gen(68); // gen(Rd()) 
 std::uniform_real_distribution<double> Real_dist(0.0,1.0);
-std::uniform_int_distribution<int> Int_dist(0,resolucion*resolucion); 
+std::uniform_int_distribution<int> Int_dist(0,resolucion*resolucion-1); 
 arma::sp_mat Madyacencia_sp;
 arma::ivec Usables_vec;
 arma::mat PosicionNodos_0;
@@ -54,11 +54,18 @@ void events_sfml_manager(sf::RenderWindow &window, sf::Event &event,
 void physics();
 
 bool verbose=false;
+int num_threads = 1; // Specify the desired number of threads
 
 int main(int argc, char **argv)
 	{
 		try{if(std::stoi(argv[1])==1){verbose=false;};}
 		catch (...){verbose=false;}
+
+		
+
+    	omp_set_num_threads(num_threads); // Set the number of threads
+
+
 
 		Tools tools;
 
@@ -172,7 +179,10 @@ int main(int argc, char **argv)
 
 // Persons's movement
 void physics()
-	{
+	{	
+
+
+    	omp_set_num_threads(num_threads); // Set the number of threads
 		sf::Time elapsed; // Se tiene en cuenta el tiempo de procesamiento  
 		int N = Personas.size();
 
@@ -228,7 +238,7 @@ void physics()
 										prob_actv = Real_dist(Gen);
 										//da una nueva ruta si acaba la actividad
 										Personas[jj].hacer_actividad(t_Global,dt_Global,nodo_inicio,nodo_destino,prob_actv); 
-										std::cout<<jj<<"\n";
+										// std::cout<<jj<<"\n";
 									}
 
 								// fprintf(stderr,"Rol: %i, Cap act basura %f\n",Personas[jj].getRol(),Personas[jj].getBasuraActual());
@@ -255,7 +265,9 @@ void physics()
 	}
 
 void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, double vel, bool verbose, arma::sp_mat & Mapa, arma::ivec & Usables,arma::mat PosicionNodos )
-	{
+	{	
+		omp_set_num_threads(num_threads);
+		std::cout<<"Entra a la funcion\n";
 		int N=Personas.size();
 		int nodo_inicio;
 		int nodo_destino;
@@ -283,25 +295,23 @@ void init_personas_activities(int t_spawn, float cap_basura, float t_actividad, 
 				if(num_thr>1 && thr_id==(num_thr-1) && (N%Nlocal)!=0)
 					{Nlocal+=N%num_thr;}
 
-				
+				std::cout<<"298\n";
 
 				for (int jj = imin; jj < imax; ++jj)// xy_to_node(inicio, nimagen);
 					{ 	
-						// std::cout<<jj<<"\t"<<imax <<"\n";
-					  if(thr_id==(num_thr-1)){
-					    displayProgressBar(((float)(jj-imin)/(imax-imin)));    
-					  }
+						// if(thr_id==(num_thr-1))
+						// 	{displayProgressBar(((float)(jj-imin)/(imax-imin)));}
 					
 						nodo_inicio = Int_dist(Gen);
 						nodo_destino = Int_dist(Gen); 
 						rand_rol = Real_dist(Gen);
 						rand_type_actv = Real_dist(Gen);
 						rand_actv_acad = Real_dist(Gen);
+						// std::cout<<"310\n";
 						Personas[jj].inicializar(rand_rol,rand_type_actv,rand_actv_acad,t_spawn,cap_basura,t_actividad,
 									nodo_inicio,nodo_destino,vel,t_Global,false,Mapa,Usables_vec,PosicionNodos);
 									
 					}
-				std::cout<<std::endl;
 			}
 		auto end = std::chrono::steady_clock::now();
 		std::chrono::duration<double> diff = end - start;
@@ -332,7 +342,7 @@ void events_sfml_manager(sf::RenderWindow &window, sf::Event &event,
 
 						if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 							{
-								std::cout<<"Move left"<<std::endl;
+								// std::cout<<"Move left"<<std::endl;
 								sf::Vector2f posActual=viewPrincipal.getCenter();
 								viewPrincipal.move(-dxViewPrincipal,0);
 																		
@@ -345,7 +355,7 @@ void events_sfml_manager(sf::RenderWindow &window, sf::Event &event,
 							}
 						else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 							{
-								std::cout<<"Move Right"<<std::endl;
+								// std::cout<<"Move Right"<<std::endl;
 																		
 								sf::Vector2f posActual=viewPrincipal.getCenter();
 								viewPrincipal.move(dxViewPrincipal,0);
@@ -359,7 +369,7 @@ void events_sfml_manager(sf::RenderWindow &window, sf::Event &event,
 							}
 						else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 							{
-								std::cout<<"Move Up"<<std::endl;
+								// std::cout<<"Move Up"<<std::endl;
 																		
 								sf::Vector2f posActual=viewPrincipal.getCenter();
 								viewPrincipal.move(0,-dyViewPrincipal);
@@ -373,7 +383,7 @@ void events_sfml_manager(sf::RenderWindow &window, sf::Event &event,
 							}
 						else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 							{
-								std::cout<<"Move Down"<<std::endl;
+								// std::cout<<"Move Down"<<std::endl;
 																		
 								sf::Vector2f posActual=viewPrincipal.getCenter();
 								viewPrincipal.move(0,dyViewPrincipal);
@@ -393,7 +403,7 @@ void events_sfml_manager(sf::RenderWindow &window, sf::Event &event,
 						if(sf::Keyboard::isKeyPressed(sf::Keyboard::Tab))
 							{
 								// Se encarga de cambiar el fondo
-								std::cout<<"Tab is pressed"<<std::endl;
+								// std::cout<<"Tab is pressed"<<std::endl;
 								if(opcionesDeFondo==3)
 								{opcionesDeFondo=0;}
 								switch(++opcionesDeFondo)
