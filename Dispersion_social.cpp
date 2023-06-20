@@ -96,19 +96,19 @@ int main(int argc, char **argv)
 		// try{if(std::stoi(argv[1])==1){verbose=false;};}
 		// catch (...){verbose=false;}
 
-		try{
-		  N=std::stoi(argv[1]);
-		  resolucion = std::stoi(argv[2]);
-		  if(resolucion!=10 && resolucion!=50 && resolucion!=100 && resolucion!=200){
-		    resolucion=50;
-		  }
-		  fprintf(stderr,"Agentes: %i resolución: %i\n", N, resolucion);
-		}
-		catch(...){
-		  N=100;
-		  resolucion=50;
-		  fprintf(stderr,"Agentes: %i resolución: %i\n", N, resolucion);
-		}
+		// try{
+		//   N=std::stoi(argv[1]);
+		//   resolucion = std::stoi(argv[2]);
+		//   if(resolucion!=10 && resolucion!=50 && resolucion!=100 && resolucion!=200){
+		//     resolucion=50;
+		//   }
+		//   fprintf(stderr,"Agentes: %i resolución: %i\n", N, resolucion);
+		// }
+		// catch(...){
+		//   N=100;
+		//   resolucion=50;
+		//   fprintf(stderr,"Agentes: %i resolución: %i\n", N, resolucion);
+		// }
 		
 
 		//omp_set_num_threads(num_threads); // Set the number of threads

@@ -1,23 +1,26 @@
 #!/bin/bash
 
 N=500
-RESOLUCIONES=(50 100)
+RESOLUCIONES=(10)
 THREADS=(1 2 3 4 5 6 7)
-TIMEOUT=35 #segundos
+TIMEOUT=7 #segundos
 REPETICIONES=(1 2 3)
 
 # files
 PHYSICS=physics
 INIT=inits
 
-rm ./metrics/*.txt
+# rm ./metrics/*.txt
 
 for res in ${RESOLUCIONES[@]}
 do
     
-    if (( $res >= 100 )); then
-	    TIMEOUT=420
+    if (( $res >= 50 )); then
+	TIMEOUT=35
+    elif (( $res >= 100 )); then
+	TIMEOUT=420
     fi
+    
     
     for rep in ${REPETICIONES[@]}
     do

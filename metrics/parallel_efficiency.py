@@ -19,7 +19,7 @@ def formatter(data):
     return auxData
 
 
-labels = ['50x50 px', '100x100 px']
+labels = ['10x10 px', '50x50 px', '100x100 px']
 lines_style = [':', '--', '-.']
 data_files = []
 data_np = []
