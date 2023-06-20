@@ -128,8 +128,11 @@ void Agente_Universitario::inicializar(double rand_rol_un,  double prob_tipo_act
 		Usables=Usables_0;
 		verbose= verbose0;
 		PosicionNodos = PosicionNodos_0;
+		std::cout<<"No "<<posicion0<<" "<<destino0<<" "<<Usables.size()<<"\t";
 		Ruta = Ruta_imagen(posicion0,destino0,Usables,Mapa);
+		std::cout<<"hay pedo\n";
 		Pos_nodo = Ruta(0);
+		
 		tactividad=0;
 
 
@@ -501,7 +504,7 @@ void Agente_Universitario::draw(sf::RenderWindow & window,arma::mat PosNodos, fl
 
 				if(next_pos==-100)
 					{
-						std::cout<<"fin de la ruta"<<en_actividad<<std::endl;
+						// std::cout<<"fin de la ruta"<<en_actividad<<std::endl;
 						nodo_siguiente=nodo_actual;
 					}
 				else
@@ -599,7 +602,7 @@ void Agente_Universitario::asignar_ruta(int simulationTime, int nodo_i,int nodo_
 				{
 					en_ruta=true;
 					asignar_ruta(t,nodo_i, nodo_f);
-					std::cout<<"Ruta asignada"<<std::endl;
+					// std::cout<<"Ruta asignada"<<std::endl;
 				}
 			//generar nuevos nodos, crear ruta, asignar ruta
 		} 

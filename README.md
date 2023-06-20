@@ -22,7 +22,7 @@ Los agentes están contenidos en un array unidimensional el cual se tiene que ma
 
 <img src="./figs/inf/omp_threads.png" alt="Asignación de array en threads de OpenMP" width=250>
 
-*Figura ee1. Asignación de array en threads de OpenMP*
+*Figura 1. Asignación de array en threads de OpenMP*
 
 
 ### Métricas
@@ -45,7 +45,7 @@ $$ \eta _p (n)= \frac{S(n)}{n} $$
 - [SFML](https://www.sfml-dev.org/): Se usa para la interfaz gráfica y tiene su propia manera de lanzar threads.
 - [OpenMP](https://www.openmp.org/): Se utiliza para programar de manera paralela por medio de memoria distribuida.
 
-Descargar la última versión de la rama main del repositor.
+Descargar la última versión de la rama main del repositoro.
 
 
 ## Windows
