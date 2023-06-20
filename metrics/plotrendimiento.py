@@ -27,7 +27,7 @@ totalsu=total[0]/total
 
 
 
-
+"""
 
 plt.figure()
 for i in range(int(maxcol/2)):
@@ -38,12 +38,13 @@ for i in range(int(maxcol/2)):
     #plt.show()
 #plt.savefig('speedup.pdf')
 #plt.show()
-
+"""
 plt.figure()
 plt.plot(N,totalsu,'xr-',N,N)
 plt.title('Physics speedup')
 plt.legend(['Mean','theoric'])
-plt.savefig('physics_speedup.pdf')
+plt.grid(linestyle='--', linewidth=0.3)
+#plt.savefig('physics_speedup.pdf')
 #plt.show()
 
 
@@ -53,25 +54,37 @@ plt.figure()
 plt.plot(N,totalef,'xg-',N,o)
 plt.title('Physics efficiency')
 plt.legend(['efficiency','theoric'])
-plt.savefig('physics_efficiency.pdf')
+plt.grid(linestyle='--', linewidth=0.3)
+#plt.savefig('physics_efficiency.pdf')
 #plt.show()
 
+b=np.loadtxt("./inits.txt")
+maxcol2=len(b[1])
+maxrows2=len(b)
 
 N2, inits =np.loadtxt("./inits.txt", usecols=[0, 1], unpack=True)
-initssu=inits[0]/inits
+inittotal=np.zeros(len(N))
+for i in range(int(maxrows2/len(N))):
+    inittotal+=inits[i*len(N):(i+1)*len(N)]
+    #print(inittotal)
+inittotal=inittotal/(maxrows2/len(N))
+initssu=inittotal[0]/inittotal
 plt.figure()
-plt.plot(N2,initssu,'xb-',N2,N2)
+plt.plot(N,initssu,'xb-',N,N)
 plt.title('Init speedup ')
 plt.legend(['init','theoric'])
-plt.savefig('init_speedup.pdf')
-#plt.show()
+plt.grid(linestyle='--', linewidth=0.3)
+#plt.savefig('init_speedup.pdf')
+plt.show()
 
 
-initsef=initssu/N2
-o2=np.ones(len(N2))
+
+initsef=initssu/N
+o2=np.ones(len(N))
 plt.figure()
-plt.plot(N2,initsef,'xb-',N2,o2)
+plt.plot(N,initsef,'xb-',N,o2)
 plt.title('Init efficiency')
 plt.legend(['init','theoric'])
-plt.savefig('init_efficiency.pdf')
-#plt.show()
+plt.grid(linestyle='--', linewidth=0.3)
+#plt.savefig('init_efficiency.pdf')
+plt.show()
