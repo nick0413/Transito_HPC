@@ -76,7 +76,16 @@ Descargar la última versión de la rama main del repositor.
 
 
 ### Windows
-
+Utilizar un programa que lea a
+```
+mingw32-make windowsA
+```
+donde A puede tomar valores '','2','3' dependiendo de la instalacion de armadillo y blas.
+```
+mingw32-make windows    #armadillo incluido en path
+mingw32-make windows2   #armadillo no incluido -lblas
+mingw32-make windows3   #armadillo no incluido -lopenblas
+```
 ### Linux
 Para compilar se utiliza el gmake de esta manera
 ```bash
