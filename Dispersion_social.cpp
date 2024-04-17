@@ -207,7 +207,9 @@ int main(int argc, char **argv)
 		textureSize = textFondo.getSize();
 		window.create(sf::VideoMode(textureSize.x, textureSize.y),"TransitoHPC");
 		sprFondo.setTexture(textFondo);
+
 		sf::Thread threadPhysics(&physics);
+		
 		std::cout<<"Iniciando fisicas\n";
 		threadPhysics.launch();  
 
@@ -281,7 +283,7 @@ void physics()
 	{	
 
 
-	  //omp_set_num_threads(num_threads); // Set the number of threads
+		//omp_set_num_threads(num_threads); // Set the number of threads
 		sf::Time elapsed; // Se tiene en cuenta el tiempo de procesamiento  
 		int N = Personas.size();
 
@@ -293,7 +295,6 @@ void physics()
 		int threads=0;
 		FILE *fp;
 		fp = fopen("./metrics/physics.txt","a");
-			
 		
 		while(true)
 			{
